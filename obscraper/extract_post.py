@@ -2,7 +2,10 @@
 
 import re
 
-from . import extract_page, utils
+from . import utils
+
+# timezone of server generating post timestamps
+OB_SERVER_TZ = 'US/Eastern'
 
 def extract_url(post_html):
     """Extract the URL of the post.
@@ -30,7 +33,8 @@ def extract_author(post_html):
 
 def extract_publish_date(post_html):
     """Extract the date the post was published."""
-    return extract_page.extract_publish_dates(post_html)[0]
+    messy_date = post_html.find(attrs = {'class': 'entry-date'}).text
+    return utils.tidy_date(messy_date, OB_SERVER_TZ)
 
 def extract_number(post_html):
     return int(extract_meta_header(post_html)['post'][0])
@@ -51,9 +55,6 @@ def extract_format(post_html):
     return extract_meta_header(post_html).get('format', [''])[0]
 
 def extract_word_count(post_html):
-    if extract_page.is_post_truncated(post_html):
-        raise ValueError('cannot extract word count from a truncated post')
-
     words_to_ignore = ['GD', 'Star', 'Ratingloading...']
     return utils.count_words(post_html.find(attrs = {'class': 'entry-content'}).text, words_to_ignore)
 
@@ -64,14 +65,11 @@ def extract_internal_links(post_html):
         A dict consisting of hyperlinks to OB webpages, and how many times
         they were repeated (usually 1).
     """
-    if extract_page.is_post_truncated(post_html):
-        raise ValueError('cannot extract hyperlinks from a truncated post')
-
     all_links = [ tag['href'] for tag in post_html.find(
         attrs = {'class': 'entry-content'}
         ).find_all('a') ]
     
-    int_links = [ link for link in all_links if extract_page.is_ob_post_url(link) ]
+    int_links = [ link for link in all_links if is_ob_post_url(link) ]
 
     int_link_dict = {}
     for link in int_links:
@@ -86,14 +84,11 @@ def extract_external_links(post_html):
         A dict consisting of hyperlinks to non-OB webpages, and how many times
         they were repeated (usually 1).
     """
-    if extract_page.is_post_truncated(post_html):
-        raise ValueError('cannot extract hyperlinks from a truncated post')
-
     all_links = [ tag['href'] for tag in post_html.find(
         attrs = {'class': 'entry-content'}
         ).find_all('a') ]
     
-    ext_links = [ link for link in all_links if not extract_page.is_ob_post_url(link) ]
+    ext_links = [ link for link in all_links if not is_ob_post_url(link) ]
     ext_link_dict = {}
     for link in ext_links:
         ext_link_dict[link] = ext_link_dict.get(link, 0) + 1
@@ -102,10 +97,7 @@ def extract_external_links(post_html):
 
 def extract_meta_header(post_html):
     """Extract metadata header from a post."""
-    if extract_page.has_post_in_id(post_html):
-        raw_headers = post_html['class']
-    else:
-        raw_headers = post_html.find(extract_page.has_post_in_id)['class']
+    raw_headers = post_html.find(has_post_in_id)['class']
     headers = [header.split(sep='-', maxsplit=1) for header in raw_headers]
     keys = [header[0] for header in headers]
     values = [header[1] if len(header) == 2 else None for header in headers]
@@ -119,3 +111,10 @@ def extract_vote_auth_code(page_html):
     match = re.search(r'(gdsr_cnst_nonce\s*=\s*")(\w+)("\s*;)', str(page_html), re.MULTILINE)
     return match.group(2) if match is not None else None
 
+def has_post_in_id(tag):
+    """Check whether the id attribute of an html tag contains the word "post"."""
+    return tag.has_attr('id') and bool(re.compile('^post-\d+$').search(tag['id']))
+
+def is_ob_post_url(url):
+    """Check whether a URL corresponds to an overcomingbias post."""
+    return re.search(r'^https{0,1}://www.overcomingbias.com/(\d{4}/\d{2}/\S+\.html|\?p=\d+)$', url) is not None
