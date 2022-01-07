@@ -39,12 +39,18 @@ def get_posts_by_url(urls):
 def get_votes(post_numbers):
     """Get vote counts for some posts.
     
+    If one of the numbers is in an incorrect format, an exception is
+    raised. Unlike other functions, get_votes returns 0 (rather than
+    None) when a post is not found. This is because it is not possible
+    to determine whether a post exists or not from the vote count API;
+    it will just return 0 in this case. 
+
     Args:
         post_numbers: List (int). A list of post numbers.
     
     Returns: 
         A dictionary whose keys are the post numbers and values
-        are vote counts.
+        are vote counts (0 if the post is not found).
     """
     [raise_exception_if_number_has_incorrect_format(number) for number in post_numbers]
     return {number: grab.grab_votes(number) for number in post_numbers}
@@ -52,12 +58,16 @@ def get_votes(post_numbers):
 def get_comments(post_numbers):
     """Get comment counts for some posts.
     
+    If one of the numbers is in an incorrect format, an exception is
+    raised. If a post is not found, None is returned for that particular
+    post.
+
     Args:
         post_numbers: List (int). A list of post numbers.
     
     Returns:
         A dictionary whose keys are the post numbers and values
-        are comment counts.
+        are comment counts (or None if the post is not found).
     """
     [raise_exception_if_number_has_incorrect_format(number) for number in post_numbers]
     return {number: grab.grab_comments(number) for number in post_numbers}
