@@ -95,9 +95,9 @@ def extract_external_links(post_html):
     
     return ext_link_dict
 
-def extract_vote_auth_code(page_html):
+def extract_vote_auth_code(post_html):
     """Extract the vote authorisation code, or return None."""
-    match = re.search(r'(gdsr_cnst_nonce\s*=\s*")(\w+)("\s*;)', str(page_html), re.MULTILINE)
+    match = re.search(r'(gdsr_cnst_nonce\s*=\s*")(\w+)("\s*;)', str(post_html), re.MULTILINE)
     return match.group(2) if match is not None else None
 
 def extract_meta_header(post_html):
