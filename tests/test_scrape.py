@@ -2,12 +2,10 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-import datetime
-
-from obscraper import exceptions, post, scrape, grab
+from obscraper import post, scrape, grab
 
 class TestGetPostsByURL(unittest.TestCase):
-    def test_works_for_3_urls(self):
+    def test_returns_valid_posts_for_valid_urls(self):
         urls = [
             'https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html',
             'https://www.overcomingbias.com/2014/07/limits-on-generality.html',
@@ -17,14 +15,7 @@ class TestGetPostsByURL(unittest.TestCase):
         self.assertIsInstance(posts, list)
         self.assertTrue(len(posts), len(urls))
         for p in posts:
-            self.assertIsInstance(p, post.Post)
-            self.assertTrue(hasattr(p, 'words'))
-            self.assertFalse(hasattr(p, 'votes'))
-            self.assertFalse(hasattr(p, 'comments'))
-
-    def test_raises_exception_for_lesswrong_url(self):
-        url = ['https://www.overcomingbias.com/2007/10/a-rational-argu.html']
-        self.assertRaises(exceptions.InvalidResponseError, scrape.get_posts_by_url, url)
+            self.assert_is_valid_post(p)
 
     def test_raises_exception_if_url_is_wrong_type(self):
         for urls in [
@@ -44,13 +35,30 @@ class TestGetPostsByURL(unittest.TestCase):
         ]:
             self.assertRaises(ValueError, scrape.get_posts_by_url, urls)
 
+    def test_returns_none_for_invalid_urls(self):
+        urls = [
+            'https://www.overcomingbias.com/2007/10/a-rational-argu.html', # LessWrong URL
+            'https://www.overcomingbias.com/2012/08/not-a-real-post.html', # Fake URL
+            r'https://www.overcomingbias.com/2007/01/the-procrastinator%e2%80%99s-clock.html', # valid URL
+            ]
+        posts = scrape.get_posts_by_url(urls)
+        self.assertIsNone(posts[0])
+        self.assertIsNone(posts[1])
+        self.assert_is_valid_post(posts[2])
+
+    def assert_is_valid_post(self, p):
+        self.assertIsInstance(p, post.Post)
+        self.assertTrue(hasattr(p, 'words'))
+        self.assertFalse(hasattr(p, 'votes'))
+        self.assertFalse(hasattr(p, 'comments'))
+
 class TestGetStartPage(unittest.TestCase):
     # TODO
     # Partially tested in TestGetPostsByDate
     pass
 
 class TestAttachEditDates(unittest.TestCase):
-    def test_works_as_expected_for_fake_posts_and_dates(self):
+    def test_returns_post_with_date_attached_for_fake_posts_and_dates(self):
         # Expect more edit dates than posts
         edit_dates = {f'url {i+1}': f'edit date {i+1}' for i in range(10)}
         posts = [MagicMock(url=f'url {i+1}') for i in range(5)]
@@ -59,6 +67,14 @@ class TestAttachEditDates(unittest.TestCase):
         mock_edit_dates.assert_called_once()
         for i, p in enumerate(posts):
             p.set_edit_date.assert_called_once_with(f'edit date {i+1}')
+
+    def test_returns_none_for_invalid_post(self):
+        # Posts which could not be found are returned as None
+        edit_dates = {'fake url': 'fake edit date'}
+        with patch('obscraper.grab.grab_edit_dates', return_value=edit_dates) as mock_edit_dates:
+            invalid_post = scrape.attach_edit_dates([None])
+        mock_edit_dates.assert_called_once()
+        self.assertIsNone(invalid_post[0])
 
 class TestRaiseExceptionIfNumberHasIncorrectFormat(unittest.TestCase):
     def test_no_exception_raised_if_number_has_correct_format(self):

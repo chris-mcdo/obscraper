@@ -2,6 +2,8 @@
 
 import math
 import datetime
+
+from obscraper.exceptions import InvalidResponseError
 from . import grab, extract_post, utils
 
 # Maximum number of pages to look through on a single run. 
@@ -11,6 +13,10 @@ MIN_DATE = datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc)
 def get_posts_by_url(urls):
     """Get list of posts identified by their URLs.
     
+    If one of the URLs is in an incorrect format, an exception is
+    raised. If a post is not found (i.e. an InvalidResponseError 
+    occurs), None is returned for that particular post.
+
     Args:
         urls: List (String). A list of post URLs to scrape data for.
 
@@ -22,7 +28,12 @@ def get_posts_by_url(urls):
             raise TypeError(f'expected URL to be string, got {url}')
         if not extract_post.is_ob_post_url(url):
             raise ValueError(f'expected URL to be OB post URL, got {url}')
-    posts = [grab.grab_post_by_url(url) for url in urls]
+    posts = []
+    for url in urls:
+        try:
+            posts.append(grab.grab_post_by_url(url))
+        except InvalidResponseError:
+            posts.append(None)
     return attach_edit_dates(posts)
 
 def get_votes(post_numbers):
@@ -54,8 +65,7 @@ def get_comments(post_numbers):
 def attach_edit_dates(post_list):
     """Attach "last modified" dates to a list of posts."""
     date_list = grab.grab_edit_dates()
-    for post in post_list:
-            post.set_edit_date(date_list[post.url])
+    [post.set_edit_date(date_list[post.url]) for post in post_list if post is not None]
     return post_list
 
 def raise_exception_if_number_has_incorrect_format(number):
