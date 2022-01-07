@@ -59,6 +59,29 @@ class TestGetComments(unittest.TestCase):
         self.assertGreater(comments[numbers[0]], 100)
         self.assertGreater(comments[numbers[1]], 5)
         self.assertGreater(comments[numbers[2]], 30)
+    
+    def test_raises_type_error_if_numbers_are_wrong_type(self):
+        for numbers in [
+            [32451, [12345], 40591],
+            ['Stringy', 23019, 49281],
+        ]:
+            self.assertRaises(TypeError, scrape.get_comments, numbers)
+
+    def test_raises_value_error_if_numbers_out_of_range(self):
+        for numbers in [
+            [30219, 9999, 30194],
+            [12345, 98752, 100000],
+            [-31058, 20491]
+        ]:
+            self.assertRaises(ValueError, scrape.get_comments, numbers)
+
+    def test_returns_none_for_invalid_numbers(self):
+        numbers = [17209, 27056, 12345,]
+        comments = scrape.get_comments(numbers)
+        for c in [comments[numbers[0]], comments[numbers[2]]]:
+            self.assertIsNone(c)
+        self.assertIsInstance(comments[numbers[1]], int)
+        self.assertGreater(comments[numbers[1]], 1)
 
 class TestAttachEditDates(unittest.TestCase):
     def test_returns_post_with_date_attached_for_fake_posts_and_dates(self):

@@ -70,7 +70,13 @@ def get_comments(post_numbers):
         are comment counts (or None if the post is not found).
     """
     [raise_exception_if_number_has_incorrect_format(number) for number in post_numbers]
-    return {number: grab.grab_comments(number) for number in post_numbers}
+    comments = {}
+    for number in post_numbers:
+        try:
+            comments[number] = grab.grab_comments(number)
+        except InvalidResponseError:
+            comments[number] = None
+    return comments
 
 def attach_edit_dates(post_list):
     """Attach "last modified" dates to a list of posts."""
