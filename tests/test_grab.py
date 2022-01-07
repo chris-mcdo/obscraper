@@ -39,14 +39,18 @@ class TestGrabComments(unittest.TestCase):
         # Act
         self.assertRaises(exceptions.InvalidResponseError, grab.grab_comments, TEST_POST_NUMBER)
         mock_post_request.assert_called_once_with(grab.DISQUS_URL, params=params)
-    
-    def test_grab_comments_returns_more_than_min_comments_for_some_post(self):
-        result = grab.grab_comments(TEST_POST_NUMBER)
-        self.assertIsInstance(result, int)
-        self.assertGreater(result, TEST_POST_MIN_COMMENTS)
+
+    def test_returns_valid_count_for_example_post_numbers(self):
+        # This covers two cases - before and after the disqus API call argument format changed
+        # from "... http:// ..." to "... https:// ..."
+        numbers = [27739, 32811, 32814, 33023]
+        for number in numbers:
+            result = grab.grab_comments(number)
+            self.assertIsInstance(result, int)
+            self.assertGreater(result, 2)
 
     def test_grab_comments_raises_exception_with_invalid_number(self):
-        self.assertRaises(exceptions.InvalidResponseError, grab.grab_comments, 123)
+        self.assertRaises(exceptions.InvalidResponseError, grab.grab_comments, 12345)
 
 class TestGrabEditDates(unittest.TestCase):
     def test_grab_edit_dates_returns_expected_result(self):

@@ -114,4 +114,12 @@ def vote_identifier(number):
 
 def disqus_identifier(number):
     """String used to identify a post to the Disqus API."""
-    return f'{number} http://www.overcomingbias.com/?p={number}'
+    # Posts before post number 32814 use a different base URL in 
+    # their disqus API call argument
+    if number <= 18423:
+        base_url = 'http://prod.ob.trike.com.au/'
+    elif number <= 32811:
+        base_url = 'http://www.overcomingbias.com/'
+    else: 
+        base_url = 'https://www.overcomingbias.com/'
+    return f'{number} {base_url}?p={number}'

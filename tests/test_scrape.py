@@ -52,10 +52,13 @@ class TestGetPostsByURL(unittest.TestCase):
         self.assertFalse(hasattr(p, 'votes'))
         self.assertFalse(hasattr(p, 'comments'))
 
-class TestGetStartPage(unittest.TestCase):
-    # TODO
-    # Partially tested in TestGetPostsByDate
-    pass
+class TestGetComments(unittest.TestCase):
+    def test_returns_valid_comment_counts_for_valid_numbers(self):
+        numbers = [27739, 33023, 26449]
+        comments = scrape.get_comments(numbers)
+        self.assertGreater(comments[numbers[0]], 100)
+        self.assertGreater(comments[numbers[1]], 5)
+        self.assertGreater(comments[numbers[2]], 30)
 
 class TestAttachEditDates(unittest.TestCase):
     def test_returns_post_with_date_attached_for_fake_posts_and_dates(self):
