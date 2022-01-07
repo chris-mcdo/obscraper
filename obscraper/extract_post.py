@@ -125,7 +125,23 @@ def has_post_in_id(tag):
 
 def is_ob_post_url(url):
     """Check whether a URL corresponds to an overcomingbias post."""
-    return re.search(r'^https{0,1}://www.overcomingbias.com/(\d{4}/\d{2}/\S+\.html|\?p=\d+)$', url) is not None
+    return is_ob_post_long_url(url) or is_ob_post_short_url(url)
+
+def is_ob_post_long_url(url):
+    """Check whether a URL is a overcomingbias post long URL.
+    
+    A long URL is one which contains the "name" of the post, e.g.
+    https://www.overcomingbias.com/2011/05/jobs-kill-big-time.html.
+    """
+    return re.search(r'^https{0,1}://www.overcomingbias.com/\d{4}/\d{2}/\S+\.html$', url) is not None    
+
+def is_ob_post_short_url(url):
+    """Check whether a URL is a overcomingbias post short URL.
+    
+    A short URL is one which contains the "number" of the post, e.g.
+    https://www.overcomingbias.com/?p=26449.
+    """
+    return re.search(r'^https{0,1}://www.overcomingbias.com/\?p=\d+$', url) is not None
 
 def is_ob_site_html(html):
     """Check if some HTML is from the overcomingbias site.
