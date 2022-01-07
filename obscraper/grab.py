@@ -5,7 +5,6 @@ import re
 import bs4
 from . import extract_post, extract_dates, download, post, exceptions
 
-OB_PAGE_URL = 'https://www.overcomingbias.com/page/'
 POST_LIST_URL = 'https://www.overcomingbias.com/post.xml'
 GDSR_URL = 'https://www.overcomingbias.com/wp-content/plugins/gd-star-rating/ajax.php'
 DISQUS_URL = 'https://overcoming-bias.disqus.com/count-data.js'
