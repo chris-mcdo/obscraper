@@ -3,7 +3,7 @@ from functools import wraps, cache
 import json
 import re
 import bs4
-from . import extract_page, extract_post, extract_dates, download, post, exceptions
+from . import extract_post, extract_dates, download, post, exceptions
 
 OB_PAGE_URL = 'https://www.overcomingbias.com/page/'
 POST_LIST_URL = 'https://www.overcomingbias.com/post.xml'
@@ -15,64 +15,20 @@ VOTE_AUTH_UPDATE_URL = 'https://www.overcomingbias.com/2011/12/life-is-good.html
 def grab_post_by_url(url):
     """Download and create a post object from its URL.
     
+    Expects (and therefore doesn't check for) a valid OB
+    post URL. But will return an InvalidResponseError if
+    the resulting HTML is not an OB post.
+
     Args:
         url: String. The URL of the post to grab.
     
     Returns:
         A Post object containing the post data. 
     """
-    if not extract_page.is_ob_post_url(url):
-        raise ValueError(f'The URL {url} is in wrong format to be overcomingbias post')
     post_html = download.grab_html_soup(url)
-    if not extract_page.is_ob_site_html(post_html):
-        raise ValueError(f'The URL {url} corresponds to a LessWrong post')
-    if not extract_page.is_single_ob_post_html(post_html):
+    if not extract_post.is_ob_post_html(post_html):
         raise exceptions.InvalidResponseError(f'The document found at {url} was not an overcomingbias post')
     return post.create_post(post_html)
-
-def grab_page(page):
-    """Download a page given its page number.
-    
-    Raises an InvalidResponseError if the page is not found.
-
-    Args:
-        page: int. The page number of the archive page.
-
-    Returns:
-        BeautifulSoup object representing the page HTML.
-    """
-    if page == 0:
-        raise ValueError('Use of page 0 is forbidden to avoid bugs')
-    page_html = download.grab_html_soup(f'{OB_PAGE_URL}{page}')
-    if not extract_page.is_ob_page_html(page_html):
-        raise exceptions.InvalidResponseError(f'Page {page} was not found')
-    return page_html
-
-def grab_all_posts_on_page(number):
-    """Get all posts on a given archive page.
-
-    If the post is truncated on the archive page, the 
-    full post is downloaded from the post HTML, except
-    if the full post is no longer accessible on the
-    overcomingbias site. I.e. if it has been moved to 
-    LessWrong.
-
-    Args:
-        number: int. The page number of the archive page.
-
-    Returns:
-        List of post.Post objects.
-    """
-    page_html = grab_page(number)
-    post_html_list = extract_page.extract_post_html_list(page_html)
-    # Download full post HTML if post is truncated on archive page
-    for i, post_html in enumerate(post_html_list):
-        if extract_page.is_post_truncated(post_html) and not extract_page.has_post_moved(post_html):
-            final_url = extract_post.extract_url(post_html)
-            # Replace truncated post HTML with HTML from source.
-            final_html = download.grab_html_soup(final_url)
-            post_html_list[i] = extract_page.extract_post_html(final_html)
-    return [post.create_post(post_html) for post_html in post_html_list]
 
 def grab_comments(number):
     """Download the number of comments on an OB post from its number."""
@@ -95,18 +51,6 @@ def grab_edit_dates():
     urls = extract_dates.extract_urls(xml)
     dates = extract_dates.extract_edit_dates(xml)
     return {url: date for url, date in zip(urls, dates)}
-
-def grab_publish_dates(page):
-    """Grab the publish dates of posts on a given page.
-    
-    Raises an InvalidResponseError if the page is not found.
-
-    Returns:
-        A list of publish dates as datetime.datetime objects.
-    """
-    html = grab_page(page)
-    dates = extract_page.extract_publish_dates(html)
-    return dates
 
 def cache_auth(func):
     """Use a cached authentication code if possible."""

@@ -95,8 +95,21 @@ def extract_external_links(post_html):
     
     return ext_link_dict
 
+def extract_vote_auth_code(page_html):
+    """Extract the vote authorisation code, or return None."""
+    match = re.search(r'(gdsr_cnst_nonce\s*=\s*")(\w+)("\s*;)', str(page_html), re.MULTILINE)
+    return match.group(2) if match is not None else None
+
 def extract_meta_header(post_html):
-    """Extract metadata header from a post."""
+    """Extract metadata header from a post.
+    
+    Returns:
+        Dictionary whose keys are attribute names and
+        values are and lists of attribute values. 
+        Some attributes (e.g. tags) have multiple values,
+        others (e.g. post type and status) have only one.
+        Some attributes (e.g. "hentry") have no values.
+    """
     raw_headers = post_html.find(has_post_in_id)['class']
     headers = [header.split(sep='-', maxsplit=1) for header in raw_headers]
     keys = [header[0] for header in headers]
@@ -106,11 +119,6 @@ def extract_meta_header(post_html):
         if value is not None: header_dict[key].append(value)
     return header_dict
 
-def extract_vote_auth_code(page_html):
-    """Extract the vote authorisation code, or return None."""
-    match = re.search(r'(gdsr_cnst_nonce\s*=\s*")(\w+)("\s*;)', str(page_html), re.MULTILINE)
-    return match.group(2) if match is not None else None
-
 def has_post_in_id(tag):
     """Check whether the id attribute of an html tag contains the word "post"."""
     return tag.has_attr('id') and bool(re.compile('^post-\d+$').search(tag['id']))
@@ -118,3 +126,27 @@ def has_post_in_id(tag):
 def is_ob_post_url(url):
     """Check whether a URL corresponds to an overcomingbias post."""
     return re.search(r'^https{0,1}://www.overcomingbias.com/(\d{4}/\d{2}/\S+\.html|\?p=\d+)$', url) is not None
+
+def is_ob_site_html(html):
+    """Check if some HTML is from the overcomingbias site.
+    
+    Args:
+        html: BeautifulSoup object. An HTML page, possibly from
+        the overcomingbias site.
+    """
+    site_title = html.find(id='site-title')
+    if site_title is not None:
+        return 'www.overcomingbias.com' in site_title.a['href']
+    else:
+        return False
+
+def is_ob_post_html(html):
+    """Check if some HTML corresponds to an overcomingbias blog post.
+    
+    Args:
+        html: BeautifulSoup object. An HTML page, possibly from
+        the overcomingbias site.
+    """
+    if not is_ob_site_html(html):
+        return False
+    return "single-post" in html.body['class']

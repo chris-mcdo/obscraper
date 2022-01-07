@@ -2,7 +2,7 @@
 import datetime
 import unittest
 from unittest.mock import MagicMock, patch
-from obscraper import extract_page, grab, exceptions, post
+from obscraper import extract_post, grab, exceptions, post
 
 TEST_POST_NUMBER = 27739
 TEST_POST_MIN_VOTES = 150
@@ -11,103 +11,23 @@ TEST_POST_MIN_COMMENTS = 100
 class TestGrabPostByURL(unittest.TestCase):
 
     def test_grab_post_fails_with_lesswrong_post_url(self):
-        self.assertRaises(ValueError, grab.grab_post_by_url, 'https://www.overcomingbias.com/2007/10/a-rational-argu.html')
+        self.assertRaises(exceptions.InvalidResponseError, grab.grab_post_by_url, 'https://www.overcomingbias.com/2007/10/a-rational-argu.html')
 
     def test_grab_post_fails_with_fake_post_url(self):
         self.assertRaises(exceptions.InvalidResponseError, grab.grab_post_by_url, 'http://www.overcomingbias.com/2020/01/not-a-real-post.html')
 
-    def test_grab_post_fails_with_bad_url(self):
-        grab_post = grab.grab_post_by_url
-        self.assertRaises(ValueError, grab_post, 'https://example.com/')
-        self.assertRaises(ValueError, grab_post, 'https://overcomingbias.com/')
-        self.assertRaises(ValueError, grab_post, 'https://overcomingbias.com/page/1')
-        self.assertRaises(ValueError, grab_post, 'https://overcomingbias.com/not-a-real-page.html')
-        self.assertRaises(ValueError, grab_post, 'https://overcomingbias.com/2021/05/page/2')
+    def test_grab_post_works_with_number_url(self):
+        p = grab.grab_post_by_url(f'http://www.overcomingbias.com/?p={TEST_POST_NUMBER}')
+        self.assertIsInstance(p, post.Post)
+        self.assertEqual(p.number, TEST_POST_NUMBER)
+        self.assertGreater(p.words, 10)
 
-    def test_grab_post_works_with_real_urls(self):
-        self.grab_fake_post('http://www.overcomingbias.com/?p=33023')
-        self.grab_fake_post('https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html')
-
-    @patch('obscraper.extract_page.is_ob_site_html')
-    @patch('obscraper.extract_page.is_single_ob_post_html')
-    @patch('obscraper.post.create_post')
-    @patch('obscraper.download.grab_html_soup')
-    def grab_fake_post(self, url, mock_grab_html, mock_create_post, mock_is_ob_post, mock_is_from_ob_site):
-        # Arrange
-        mock_is_from_ob_site.return_value = True
-        mock_is_ob_post.return_value = True
-        mock_grab_html.return_value = 'Mock html'
-        mock_create_post.return_value = 'Mock post'
-        # Act
-        grab.grab_post_by_url(url)
-        # Assert
-        mock_grab_html.assert_called_once_with(url)
-        mock_is_ob_post.assert_called_once_with('Mock html')
-        mock_is_from_ob_site.assert_called_once_with('Mock html')
-        mock_create_post.assert_called_once_with('Mock html')
-
-class TestGrabPage(unittest.TestCase):
-    def test_page_0_raises_value_error(self):
-        self.assertRaises(ValueError, grab.grab_page, page=0)
-
-    def test_page_10000_raises_invalid_response_error(self):
-        self.assertRaises(exceptions.InvalidResponseError, grab.grab_page, page=10000)
-
-    def test_page_1_returns_valid_ob_page(self):
-        page_1 = grab.grab_page(1)
-        self.assertTrue(extract_page.is_ob_page_html(page_1))
-
-    def test_page_300_return_valid_ob_page(self):
-        page_300 = grab.grab_page(300)
-        self.assertTrue(extract_page.is_ob_page_html(page_300))
-
-class TestGrabAllPostsOnPageAndGrabPublishDates(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.addClassCleanup(patch.stopall)
-        cls.test_page = 1
-        patcher = patch('obscraper.grab.grab_page', return_value = grab.grab_page(cls.test_page))
-        cls.mock_grab_page = patcher.start()
-    
-    def test_normal_page_is_grabbed_correctly(self):
-        post_list = grab.grab_all_posts_on_page(self.test_page)
-        # Is it a list of posts?
-        self.assertIsInstance(post_list, list)
-        self.assertEqual(len(post_list), 10)
-        for p in post_list:
-            self.assertIsInstance(p, post.Post)
-            self.assertTrue(hasattr(p, 'words'))
-
-    @patch('obscraper.extract_page.has_post_moved')
-    def test_page_with_moved_but_not_truncated_post_is_grabbed_correctly(self, mock_has_post_moved):
-        mock_has_post_moved.side_effect = [False] * 9 + [True]
-        post_list = grab.grab_all_posts_on_page(self.test_page)
-        self.assertIsInstance(post_list, list)
-        self.assertEqual(len(post_list), 10)
-        for p in post_list:
-            self.assertIsInstance(p, post.Post)
-            self.assertTrue(hasattr(p, 'words'))
-
-    def test_page_with_moved_and_truncated_post_is_grabbed_correctly(self):
-        # TODO
-        # This gets difficult when patching is involved
-        pass
-
-    def test_grab_publish_date_works_as_expected(self):
-        # Arrange
-        utc = datetime.timezone.utc
-        # Act
-        dates = grab.grab_publish_dates(self.test_page)
-        # Assert
-        # Returns 10 items
-        self.assertEqual(len(dates), 10)
-        for d in dates:
-            # Type is datetime.datetime
-            self.assertIsInstance(d, datetime.datetime)
-            # Dates are between 2000 and now
-            self.assertGreater(d, datetime.datetime(2000, 1, 1, tzinfo=utc))
-            self.assertLess(d, datetime.datetime.now(utc))
-
+    def test_grab_post_works_with_string_url(self):
+        test_url = 'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html'
+        p = grab.grab_post_by_url(test_url)
+        self.assertIsInstance(p, post.Post)
+        self.assertEqual(p.url, test_url)
+        self.assertGreater(p.words, 10)
 
 class TestGrabComments(unittest.TestCase):
     @patch('obscraper.download.http_post_request')
@@ -144,8 +64,8 @@ class TestGrabEditDates(unittest.TestCase):
         self.assertGreater(dates[-1], datetime.datetime(2000, 1, 1, tzinfo=utc))
         self.assertLess(dates[0], datetime.datetime.now(utc))
         # Test first and last elements is valid post urls
-        self.assertTrue(extract_page.is_ob_post_url(urls[0]))
-        self.assertTrue(extract_page.is_ob_post_url(urls[-10]))
+        self.assertTrue(extract_post.is_ob_post_url(urls[0]))
+        self.assertTrue(extract_post.is_ob_post_url(urls[-10]))
 
 class TestGrabVotes(unittest.TestCase):
 
