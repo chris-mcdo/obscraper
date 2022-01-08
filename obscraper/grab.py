@@ -29,15 +29,15 @@ def grab_post_by_url(url):
         raise exceptions.InvalidResponseError(f'The document found at {url} was not an overcomingbias post')
     return post.create_post(post_html)
 
-def grab_comments(number):
-    """Download the number of comments on an OB post from its number."""
-    params = {'1': disqus_identifier(number)}
+def grab_comments(disqus_id):
+    """Download comment count of overcomingbias post."""
+    params = {'1': disqus_id}
     response = download.http_post_request(DISQUS_URL, params=params)
     raw_json = json.loads(re.search(r'(?<=displayCount\()(.*)(?=\))', response.text).group())
     if raw_json['counts'] != []:
         return raw_json['counts'][0]['comments']
     else:
-        raise exceptions.InvalidResponseError(f'No comment count was found for post {number}')
+        raise exceptions.InvalidResponseError(f'no comment count was found for Disqus ID {disqus_id}')
 
 def grab_edit_dates():
     """Grab list of post URLs and last edit dates.
@@ -111,15 +111,3 @@ def vote_auth_code():
 def vote_identifier(number):
     """String used to identify a post to the vote count API."""
     return f'atr.{number}'
-
-def disqus_identifier(number):
-    """String used to identify a post to the Disqus API."""
-    # Posts before post number 32814 use a different base URL in 
-    # their disqus API call argument
-    if number <= 18423:
-        base_url = 'http://prod.ob.trike.com.au/'
-    elif number <= 32811:
-        base_url = 'http://www.overcomingbias.com/'
-    else: 
-        base_url = 'https://www.overcomingbias.com/'
-    return f'{number} {base_url}?p={number}'

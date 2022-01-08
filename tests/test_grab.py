@@ -2,8 +2,15 @@
 import datetime
 import unittest
 from unittest.mock import MagicMock, patch
-from obscraper import extract_post, grab, exceptions, post
+from obscraper import extract_post, grab, exceptions, post, utils
 
+TEST_DISQUS_IDS = [
+'18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
+'18141 http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html',
+'18423 http://www.overcomingbias.com/?p=18423',
+'32811 http://www.overcomingbias.com/?p=32811',
+'33023 https://www.overcomingbias.com/?p=33023',
+]
 TEST_POST_NUMBER = 27739
 TEST_POST_MIN_VOTES = 150
 TEST_POST_MIN_COMMENTS = 100
@@ -30,27 +37,15 @@ class TestGrabPostByURL(unittest.TestCase):
         self.assertGreater(p.word_count, 10)
 
 class TestGrabComments(unittest.TestCase):
-    @patch('obscraper.download.http_post_request')
-    def test_grab_comments_gives_correct_arguments_to_http_post_request(self, mock_post_request):
-        # Arrange
-        # Return invalid response
-        mock_post_request.return_value.text = r'displayCount({"text":[],"counts":[]});'
-        params = {'1': grab.disqus_identifier(TEST_POST_NUMBER)}
-        # Act
-        self.assertRaises(exceptions.InvalidResponseError, grab.grab_comments, TEST_POST_NUMBER)
-        mock_post_request.assert_called_once_with(grab.DISQUS_URL, params=params)
-
     def test_returns_valid_count_for_example_post_numbers(self):
-        # This covers two cases - before and after the disqus API call argument format changed
-        # from "... http:// ..." to "... https:// ..."
-        numbers = [27739, 32811, 32814, 33023]
-        for number in numbers:
-            result = grab.grab_comments(number)
+        for disqus_id in TEST_DISQUS_IDS:
+            result = grab.grab_comments(disqus_id)
             self.assertIsInstance(result, int)
             self.assertGreater(result, 2)
 
     def test_grab_comments_raises_exception_with_invalid_number(self):
-        self.assertRaises(exceptions.InvalidResponseError, grab.grab_comments, 12345)
+        bad_id = '12345 https://www.overcomingbias.com/?p=12345'
+        self.assertRaises(exceptions.InvalidResponseError, grab.grab_comments, bad_id)
 
 class TestGrabEditDates(unittest.TestCase):
     def test_grab_edit_dates_returns_expected_result(self):

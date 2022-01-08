@@ -53,35 +53,76 @@ class TestGetPostsByURL(unittest.TestCase):
         self.assertFalse(hasattr(p, 'comments'))
 
 class TestGetComments(unittest.TestCase):
-    def test_returns_valid_comment_counts_for_valid_numbers(self):
-        numbers = [27739, 33023, 26449]
-        comments = scrape.get_comments(numbers)
-        self.assertGreater(comments[numbers[0]], 100)
-        self.assertGreater(comments[numbers[1]], 5)
-        self.assertGreater(comments[numbers[2]], 30)
+    def test_returns_valid_comment_counts_for_valid_disqus_ids(self):
+        disqus_ids = {
+            'https://www.overcomingbias.com/2006/11/introduction.html': 
+            '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
+            'https://www.overcomingbias.com/2007/03/the_very_worst_.html': 
+            '18141 http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html',
+            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 
+            '18423 http://www.overcomingbias.com/?p=18423',
+            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': 
+            '32811 http://www.overcomingbias.com/?p=32811',
+            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html': 
+            '33023 https://www.overcomingbias.com/?p=33023',
+        }
+        comments = scrape.get_comments(disqus_ids)
+        for url, comment in comments.items():
+            self.assertIn(url, disqus_ids.keys())
+            self.assertIsInstance(comment, int)
+            self.assertGreater(comment, 1)
     
-    def test_raises_type_error_if_numbers_are_wrong_type(self):
-        for numbers in [
-            [32451, [12345], 40591],
-            ['Stringy', 23019, 49281],
+    def test_raises_type_error_if_arguments_are_wrong_type(self):
+        for disqus_ids in [
+            {
+                'https://www.overcomingbias.com/2006/11/introduction.html': 
+                '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
+                'https://www.overcomingbias.com/2007/03/the_very_worst_.html': 
+                18481,
+            },
+            {
+                'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 
+                '18423 http://www.overcomingbias.com/?p=18423',
+                35618: 
+                '32811 http://www.overcomingbias.com/?p=32811',
+            }
         ]:
-            self.assertRaises(TypeError, scrape.get_comments, numbers)
+            self.assertRaises(TypeError, scrape.get_comments, disqus_ids)
 
-    def test_raises_value_error_if_numbers_out_of_range(self):
-        for numbers in [
-            [30219, 9999, 30194],
-            [12345, 98752, 100000],
-            [-31058, 20491]
+    def test_raises_value_error_if_arguments_have_wrong_value(self):
+        dt = utils.tidy_date('October 15, 2013 6:10 pm', 'US/Eastern')
+        for disqus_ids in [
+            {
+                'https://www.overcomingbias.com/2006/11/introduction.html': 
+                '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
+                'https://www.overcomingbias.com/2007/03/the_very_worst_.html': 
+                '18141 http://prod.ob.trike.com.au/?p=18141',
+            },
+            {'https://www.overcomingbias.com/2006/11/introduction.html': ''},
+            {'': '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html'}
         ]:
-            self.assertRaises(ValueError, scrape.get_comments, numbers)
+            self.assertRaises(ValueError, scrape.get_comments, disqus_ids)
 
     def test_returns_none_for_invalid_numbers(self):
-        numbers = [17209, 27056, 12345,]
-        comments = scrape.get_comments(numbers)
-        for c in [comments[numbers[0]], comments[numbers[2]]]:
-            self.assertIsNone(c)
-        self.assertIsInstance(comments[numbers[1]], int)
-        self.assertGreater(comments[numbers[1]], 1)
+        none_urls = [
+            'https://www.overcomingbias.com/2007/03/the_very_worst_.html',
+            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html',
+        ]
+        real_urls = ['https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html']
+        disqus_ids = {
+            'https://www.overcomingbias.com/2007/03/the_very_worst_.html': 
+            '12345 http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html',
+            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 
+            '18423 http://www.overcomingbias.com/?p=18423',
+            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': 
+            '65432 http://www.overcomingbias.com/?p=65432',
+        }
+        comments = scrape.get_comments(disqus_ids)
+        for url in none_urls:            
+            self.assertIsNone(comments[url])
+        for url in real_urls:
+            self.assertIsInstance(comments[url], int)
+            self.assertGreater(comments[url], 1)
 
 class TestAttachEditDates(unittest.TestCase):
     def test_returns_post_with_date_attached_for_fake_posts_and_dates(self):

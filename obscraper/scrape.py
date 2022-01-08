@@ -50,37 +50,51 @@ def get_votes(post_numbers):
     [raise_exception_if_number_has_incorrect_format(number) for number in post_numbers]
     return {number: grab.grab_votes(number) for number in post_numbers}
 
-def get_comments(post_numbers):
+def get_comments(disqus_ids):
     """Get comment counts for some posts.
-    
-    If one of the numbers is in an incorrect format, an exception is
-    raised. If a post is not found, None is returned for that particular
-    post.
+
+    Takes a dictionary of Disqus ID strings. If the Disqus 
+    ID is in an incorrect format, an exception is raised. 
+    If no post is found, None is returned for that particular post.
 
     Args:
-        post_numbers: List (int). A list of post numbers.
+        disqus_ids: Dictionary. Dictionary whose keys are post URLs
+        and values are Disqus ID strings.
     
     Returns:
-        A dictionary whose keys are the post numbers and values
+        A dictionary whose keys are the post URLs and values
         are comment counts (or None if the post is not found).
     """
-    [raise_exception_if_number_has_incorrect_format(number) for number in post_numbers]
+    [raise_exception_if_url_is_not_ob_post_long_url(url) for url in disqus_ids.keys()]
+    [raise_exception_if_disqus_id_has_incorrect_format(number) for number in disqus_ids.values()]
     comments = {}
-    for number in post_numbers:
+    for url, disqus_id in disqus_ids.items():
         try:
-            comments[number] = grab.grab_comments(number)
-        except InvalidResponseError:
-            comments[number] = None
+            comments[url] = grab.grab_comments(disqus_id)
+        except exceptions.InvalidResponseError:
+            comments[url] = None
     return comments
 
 def attach_edit_dates(post_list):
     """Attach "last modified" dates to a list of posts."""
     date_list = grab.grab_edit_dates()
-    [post.set_edit_date(date_list[post.url]) for post in post_list if post is not None]
-    return post_list
+    [p.set_edit_date(date_list[url]) for url, p in posts.items() if p is not None]
+    return posts
+
+def raise_exception_if_url_is_not_ob_post_long_url(url):
+    if not isinstance(url, str):
+        raise TypeError(f'expected URL to be string, got {url}')
+    if not extract_post.is_ob_post_long_url(url):
+        raise ValueError(f'expected URL to be ob post URL, got {url}')
 
 def raise_exception_if_number_has_incorrect_format(number):
     if not isinstance(number, int):
         raise TypeError(f'expected number to be integer, got {number}')
     if not (9999 < number < 100000):
-        raise ValueError(f'expected number to be 5 digits, got {number}')
+        raise ValueError(f'expected number to be 5-digit integer, got {number}')
+
+def raise_exception_if_disqus_id_has_incorrect_format(disqus_id):
+    if not isinstance(disqus_id, str):
+        raise TypeError(f'expected Disqus ID to be string, got {disqus_id}')
+    if not extract_post.is_valid_disqus_id(disqus_id):
+        raise ValueError(f'Disqus ID {disqus_id} is not valid')
