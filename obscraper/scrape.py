@@ -1,34 +1,36 @@
 """Get a list of posts by publish date or URL."""
 
-import math
-import datetime
+import re
 
 from . import grab, extract_post, exceptions
 
 def get_posts_by_url(urls):
     """Get list of posts identified by their URLs.
     
-    If one of the URLs is in an incorrect format, an exception is
-    raised. If a post is not found (i.e. an InvalidResponseError 
-    occurs), None is returned for that particular post.
+    The input should be a list of overcomingbias post "long"
+    URLs. A long URL is one which contains the "name" of the post, e.g.
+    https://www.overcomingbias.com/2011/05/jobs-kill-big-time.html.
+    
+    If one of the URLs is invalid, an exception is raised. 
+    If a post or post attribute is not found, "None" is 
+    returned for that particular post.
 
     Args:
-        urls: List (String). A list of post URLs to scrape data for.
+        urls: List (String). A list of overcomingbias post "long" 
+        URLs to scrape data for.
 
     Returns:
-        urls: List (String). A list of post URLs to scrape data for.
+        urls: Dictionary. A dictionary whose keys are the inputted
+        URLs and whose values are post.Post objects containing
+        data scraped from the input URLs.
     """
-    for url in urls:
-        if not isinstance(url, str):
-            raise TypeError(f'expected URL to be string, got {url}')
-        if not extract_post.is_ob_post_url(url):
-            raise ValueError(f'expected URL to be OB post URL, got {url}')
-    posts = []
+    [raise_exception_if_url_is_not_ob_post_long_url(url) for url in urls]
+    posts = {}
     for url in urls:
         try:
-            posts.append(grab.grab_post_by_url(url))
+            posts[url] = grab.grab_post_by_url(url)
         except (exceptions.AttributeNotFoundError, exceptions.InvalidResponseError):
-            posts.append(None)
+            posts[url] = None
     return attach_edit_dates(posts)
 
 def get_votes(post_numbers):
@@ -41,14 +43,16 @@ def get_votes(post_numbers):
     it will just return 0 in this case. 
 
     Args:
-        post_numbers: List (int). A list of post numbers.
+        disqus_ids: Dictionary. Dictionary whose keys are post URLs
+        and values are post numbers.
     
     Returns: 
-        A dictionary whose keys are the post numbers and values
+        A dictionary whose keys are the post URLs and values
         are vote counts (0 if the post is not found).
     """
-    [raise_exception_if_number_has_incorrect_format(number) for number in post_numbers]
-    return {number: grab.grab_votes(number) for number in post_numbers}
+    [raise_exception_if_url_is_not_ob_post_long_url(url) for url in post_numbers.keys()]
+    [raise_exception_if_number_has_incorrect_format(number) for number in post_numbers.values()]
+    return {url: grab.grab_votes(number) for url, number in post_numbers.items()}
 
 def get_comments(disqus_ids):
     """Get comment counts for some posts.
@@ -75,8 +79,16 @@ def get_comments(disqus_ids):
             comments[url] = None
     return comments
 
-def attach_edit_dates(post_list):
-    """Attach "last modified" dates to a list of posts."""
+def attach_edit_dates(posts):
+    """Attach "last modified" dates to a list of posts.
+    
+    Args:
+        posts: Dictionary. A dictionary whose keys are post
+        URLs and whose values are corresponding post.Post objects.
+
+    Returns:
+        An updated dictionary of posts.
+    """
     date_list = grab.grab_edit_dates()
     [p.set_edit_date(date_list[url]) for url, p in posts.items() if p is not None]
     return posts

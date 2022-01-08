@@ -43,3 +43,4 @@ class TestCountWords(unittest.TestCase):
         self.assertEqual(count(r'@@`]` ][[];[, ;..,``\/\/'), 0)
         self.assertEqual(count('2 numbers 2s'), 3)
         self.assertEqual(count('hyphenated-words are counted as-one'), 4)
+        self.assertEqual(count('email@adress.com is one word'), 4)

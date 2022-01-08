@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from obscraper import post, scrape, grab
+from obscraper import post, scrape, utils
 
 class TestGetPostsByURL(unittest.TestCase):
     def test_returns_valid_posts_for_valid_urls(self):
@@ -12,19 +12,20 @@ class TestGetPostsByURL(unittest.TestCase):
             'https://www.overcomingbias.com/2012/02/why-retire.html'
         ]
         posts = scrape.get_posts_by_url(urls)
-        self.assertIsInstance(posts, list)
+        self.assertIsInstance(posts, dict)
         self.assertTrue(len(posts), len(urls))
-        for p in posts:
+        for p in posts.values():
             self.assert_is_valid_post(p)
+            self.assertIn(p.url, urls)
 
-    def test_raises_exception_if_url_is_wrong_type(self):
+    def test_raises_type_error_if_urls_are_wrong_type(self):
         for urls in [
             ['https://www.overcomingbias.com/2007/10/a-rational-argu.html', None],
             [3514, 8293],
         ]:
             self.assertRaises(TypeError, scrape.get_posts_by_url, urls)
 
-    def test_raises_exception_if_url_in_wrong_format(self):
+    def test_raises_value_error_if_urls_in_wrong_format(self):
         for urls in [
             ['Not a URL'],
             ['https://example.com/'],
@@ -42,13 +43,13 @@ class TestGetPostsByURL(unittest.TestCase):
             r'https://www.overcomingbias.com/2007/01/the-procrastinator%e2%80%99s-clock.html', # valid URL
             ]
         posts = scrape.get_posts_by_url(urls)
-        self.assertIsNone(posts[0])
-        self.assertIsNone(posts[1])
-        self.assert_is_valid_post(posts[2])
+        self.assertIsNone(posts[urls[0]])
+        self.assertIsNone(posts[urls[1]])
+        self.assert_is_valid_post(posts[urls[2]])
 
     def assert_is_valid_post(self, p):
         self.assertIsInstance(p, post.Post)
-        self.assertTrue(hasattr(p, 'words'))
+        self.assertTrue(hasattr(p, 'word_count'))
         self.assertFalse(hasattr(p, 'votes'))
         self.assertFalse(hasattr(p, 'comments'))
 
