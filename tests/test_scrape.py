@@ -53,6 +53,47 @@ class TestGetPostsByURL(unittest.TestCase):
         self.assertFalse(hasattr(p, 'votes'))
         self.assertFalse(hasattr(p, 'comments'))
 
+class TestGetVotes(unittest.TestCase):
+    def test_returns_valid_vote_counts_for_valid_post_numbers(self):
+        post_numbers = {
+            'https://www.overcomingbias.com/2006/11/introduction.html': 18402,
+            'https://www.overcomingbias.com/2007/03/the_very_worst_.html': 18141,
+            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 18423,
+            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': 32811,
+            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html': 33023,
+        }
+        votes = scrape.get_votes(post_numbers)
+        for url, vote in votes.items():
+            self.assertIn(url, post_numbers.keys())
+            self.assertIsInstance(vote, int)
+            self.assertGreaterEqual(vote, 0)
+
+    def test_raises_type_error_if_arguments_are_wrong_type(self):
+        for post_numbers in [
+            {
+                'https://www.overcomingbias.com/2006/11/introduction.html': 18402,
+                12345: 45678
+            },
+            {
+                'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 18423,
+                'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': 'Rogue string',
+            },
+        ]:
+            self.assertRaises(TypeError, scrape.get_votes, post_numbers)
+
+    def test_raises_value_error_if_arguments_have_wrong_value(self):
+        for post_numbers in [
+            {
+                'https://www.overcomingbias.com/2006/11/introduction.html': 18402,
+                'https://www.overcomingbias.com/2006/introduction.html': 45678
+            },
+            {
+                'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 18423,
+                'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': 123456,
+            },
+        ]:
+            self.assertRaises(ValueError, scrape.get_votes, post_numbers)
+
 class TestGetComments(unittest.TestCase):
     def test_returns_valid_comment_counts_for_valid_disqus_ids(self):
         disqus_ids = {
