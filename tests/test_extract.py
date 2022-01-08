@@ -3,7 +3,7 @@ import unittest
 
 import bs4
 
-from obscraper import exceptions, extract_post, download, utils
+from obscraper import exceptions, extract_post, download, grab, utils
 
 TEST_POST_NUMBERS = [
     18402, # first post
@@ -194,10 +194,10 @@ class TestIsOBPostURL(unittest.TestCase):
     # The two accepted formats look like this
     # https://www.overcomingbias.com/?p=32980
     # https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html
-    def test_accepts_correctly_formatted_urls(self):
+    def test_accepts_all_ob_post_urls(self):
         is_url = extract_post.is_ob_post_url
-        self.assertTrue(is_url('https://www.overcomingbias.com/?p=32980'))
-        self.assertTrue(is_url('https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html'))
+        edit_dates = grab.grab_edit_dates()
+        [self.assertTrue(is_url(url)) for url in edit_dates.keys()]
 
     def test_rejects_incorrectly_formatted_urls(self):
         is_url = extract_post.is_ob_post_url
