@@ -4,6 +4,20 @@ from unittest.mock import MagicMock, patch
 
 from obscraper import post, scrape, utils
 
+class TestGetAllPosts(unittest.TestCase):
+    @patch('obscraper.grab.grab_edit_dates')
+    def test_returns_correct_result_for_fake_edit_list(self, mock_grab_edit_dates):
+        tidy = lambda d: utils.tidy_date(d, 'US/Eastern')
+        edit_dates = {
+            'https://www.overcomingbias.com/2006/11/introduction.html': tidy('November 22, 2006 6:17 am'),
+            'https://www.overcomingbias.com/2007/10/a-rational-argu.html': tidy('October 5, 2007 2:31 pm'),
+            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': tidy('July 2, 2021 9:15 am')
+        }
+        mock_grab_edit_dates.return_value = edit_dates
+        posts = scrape.get_all_posts()
+        self.assertEqual(len(posts), 2)
+        [self.assertEqual(p.edit_date, edit_dates[url]) for url, p in posts.items()]
+
 class TestGetPostsByURL(unittest.TestCase):
     def test_returns_valid_posts_for_valid_urls(self):
         urls = [

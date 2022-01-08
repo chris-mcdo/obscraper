@@ -4,6 +4,19 @@ import re
 
 from . import grab, extract_post, exceptions
 
+def get_all_posts():
+    """Get all posts hosted on the overcomingbias site.
+    
+    Returns:
+        A dictionary whose keys are the post URLs and whose 
+        values are post.Post objects containing data scraped from
+        the the URLs.
+    """
+    edit_dates = grab.grab_edit_dates()
+    all_posts = get_posts_by_url(list(edit_dates.keys()))
+    ob_posts = {url: p for url, p in all_posts.items() if p is not None}
+    return attach_edit_dates(ob_posts)
+
 def get_posts_by_url(urls):
     """Get list of posts identified by their URLs.
     
@@ -20,9 +33,9 @@ def get_posts_by_url(urls):
         URLs to scrape data for.
 
     Returns:
-        urls: Dictionary. A dictionary whose keys are the inputted
-        URLs and whose values are post.Post objects containing
-        data scraped from the input URLs.
+        A dictionary whose keys are the inputted URLs and whose 
+        values are post.Post objects containing data scraped from
+        the input URLs.
     """
     [raise_exception_if_url_is_not_ob_post_long_url(url) for url in urls]
     posts = {}
