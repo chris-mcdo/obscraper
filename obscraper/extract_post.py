@@ -2,7 +2,7 @@
 
 import re
 
-from . import utils
+from . import utils, exceptions
 
 # timezone of server generating post timestamps
 OB_SERVER_TZ = 'US/Eastern'
@@ -99,6 +99,12 @@ def extract_vote_auth_code(post_html):
     """Extract the vote authorisation code, or return None."""
     match = re.search(r'(gdsr_cnst_nonce\s*=\s*")(\w+)("\s*;)', str(post_html), re.MULTILINE)
     return match.group(2) if match is not None else None
+
+def extract_disqus_identifier(post_html):
+    """Extract the Disqus identifier."""
+    match = post_html.find(attrs={'class': 'dsq-postid'})
+    raise_attribute_not_found_error_if_none(match, 'Disqus identifier not found')
+    return post_html.find(attrs={'class': 'dsq-postid'})['data-dsqidentifier']
 
 def extract_meta_header(post_html):
     """Extract metadata header from a post.
