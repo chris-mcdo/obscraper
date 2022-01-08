@@ -30,7 +30,7 @@ def create_post(post_html, votes=False, comments=False):
     if votes:
         p.set_votes(grab.grab_votes(p.number))
     if comments:
-        p.set_comments(grab.grab_comments(p.number))
+        p.set_comments(grab.grab_comments(p.disqus_id))
     return p
 
 class Post:
