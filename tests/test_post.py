@@ -2,128 +2,119 @@
 
 import unittest
 from unittest.mock import MagicMock, patch
-from obscraper import extract_post, post, download, utils
-from obscraper.extract_post import OB_SERVER_TZ
 
-TEST_POST_NUMBER = 27739
-TEST_POST_MIN_VOTES = 150
-TEST_POST_MIN_COMMENTS = 100
+import datetime
+
+from obscraper import extract_post, post, download, utils
+
+TEST_POST_NUMBERS = [
+    18402, # first post
+    18141, # early post by another author
+    18423, # just before Disqus API changes 
+    32811, # just before Disqus API changes for 2nd time
+    33023, # recent RH post
+]
 
 class TestPost(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.post_html = download.grab_html_soup(f'https://overcomingbias.com/?p={TEST_POST_NUMBER}')
+        cls.post_htmls = {
+            number: 
+            download.grab_html_soup(f'https://www.overcomingbias.com/?p={number}') 
+            for number in TEST_POST_NUMBERS
+        }
 
-    def test_extracted_vote_auth_code_has_correct_format(self):
-        vote_auth_code = extract_post.extract_vote_auth_code(self.post_html)
-        self.assertRegex(vote_auth_code, r'^[a-z0-9]{10}$')
+    def test_create_post_returns_valid_posts_for_valid_htmls(self):
+        for html in self.post_htmls.values():
+            p = post.create_post(html, votes=False, comments=False)
+            self.assert_post_object_is_valid(p, votes=False, comments=False)
+    
+    def test_create_post_returns_valid_posts_for_valid_htmls_with_votes(self):
+        for html in self.post_htmls.values():
+            p = post.create_post(html, votes=True, comments=False)
+            self.assert_post_object_is_valid(p, votes=True, comments=False)
 
-    def test_create_post_gives_correct_result_for_test_post(self):
-        # Act
-        p = post.create_post(self.post_html, votes=True, comments=True)
-        # Assert
-        self.assert_standard_attributes_are_correct_for_post_27739(p)
-        self.assert_votes_and_comments_are_correct_for_post_27739(p)
-        self.assert_words_and_hyperlinks_are_correct_for_post_27739(p)
-        self.assertFalse(hasattr(p, 'edit_date'))
+    def test_create_post_returns_valid_posts_for_valid_htmls_with_comments(self):
+        for html in self.post_htmls.values():
+            p = post.create_post(html, votes=False, comments=True)
+            self.assert_post_object_is_valid(p, votes=False, comments=True)
 
-    def test_create_post_gives_correct_result_for_votes_and_comments(self):
-        p = post.create_post(self.post_html, votes=False, comments=False)
-        self.assert_standard_attributes_are_correct_for_post_27739(p)
-        self.assert_post_has_no_votes_or_comments_attributes(p)
-        self.assert_words_and_hyperlinks_are_correct_for_post_27739(p)
+    def assert_post_object_is_valid(self, test_post, votes, comments):
+        self.assert_post_has_standard_attributes(test_post)
+        self.assert_post_standard_attributes_have_correct_types(test_post)
+        self.assert_post_standard_attributes_have_valid_values(test_post)
+        if votes:
+            self.assertTrue(hasattr(test_post, 'votes'))
+            self.assertIsInstance(test_post.votes, int)
+            self.assertGreaterEqual(test_post.votes, 0)
+        else:
+            self.assertFalse(hasattr(test_post, 'votes'))
+        if comments:
+            self.assertTrue(hasattr(test_post, 'comments'))
+            self.assertIsInstance(test_post.comments, int)
+            self.assertGreaterEqual(test_post.comments, 0)
+        else:
+            self.assertFalse(hasattr(test_post, 'comments'))
 
-    def test_create_post_gives_correct_result_after_edit_date_attached(self):
-        p = post.create_post(self.post_html, votes=False, comments=False)
-        p.set_edit_date('Fake date')
-        self.assert_standard_attributes_are_correct_for_post_27739(p)
-        self.assert_post_has_no_votes_or_comments_attributes(p)
-        self.assert_words_and_hyperlinks_are_correct_for_post_27739(p)
-        self.assertEqual(p.edit_date, 'Fake date')
-
-    def assert_standard_attributes_are_correct_for_post_27739(self, test_post):
+    def assert_post_has_standard_attributes(self, test_post):
         self.assertIsInstance(test_post, post.Post)
-        self.assertEqual(test_post.name, 'forget-911')
-        self.assertEqual(test_post.number, TEST_POST_NUMBER)
+        for attr in [
+            'url', 'name', 'title', 'author', 'publish_date', 'number', 'tags', 'categories', 
+            'type', 'status', 'format', 'word_count', 'internal_links', 'external_links', 'disqus_id',
+        ]:
+            self.assertTrue(hasattr(test_post, attr))
+
+    def assert_post_standard_attributes_have_correct_types(self, test_post):
+        # str
+        for attr in ['url', 'name', 'title', 'author', 'type', 'status', 'format', 'disqus_id',]:
+            self.assertIsInstance(getattr(test_post, attr), str)
+        # datetime.datetime
+        self.assertIsInstance(test_post.publish_date, datetime.datetime)
+        # int
+        self.assertIsInstance(test_post.number, int)
+        self.assertIsInstance(test_post.word_count, int)
+        # list
+        self.assertIsInstance(test_post.tags, list)
+        self.assertIsInstance(test_post.categories, list)
+        # list elements
+        [self.assertIsInstance(tag, str) for tag in test_post.tags]
+        [self.assertIsInstance(cat, str) for cat in test_post.categories]
+        # dict
+        self.assertIsInstance(test_post.internal_links, dict)
+        self.assertIsInstance(test_post.external_links, dict)
+        # dict elements
+        [self.assertIsInstance(url, str) for url in test_post.internal_links.keys()]
+        [self.assertIsInstance(number, int) for number in test_post.internal_links.values()]
+        [self.assertIsInstance(url, str) for url in test_post.external_links.keys()]
+        [self.assertIsInstance(number, int) for number in test_post.external_links.values()]
+
+    def assert_post_standard_attributes_have_valid_values(self, test_post):
+        # URL and title
+        self.assertTrue(extract_post.is_ob_post_long_url(test_post.url))
+        self.assertRegex(test_post.name, r'^[a-z0-9-_%]+$')
+        # Metadata
+        self.assertTrue(9999 < test_post.number < 100000)
         self.assertEqual(test_post.type, 'post')
         self.assertEqual(test_post.status, 'publish')
         self.assertEqual(test_post.format, 'standard')
-        self.assertEqual(test_post.tags, ['death', 'signaling'])
-        self.assertEqual(test_post.categories, ['uncategorized'])
-        self.assertEqual(test_post.title, 'Forget 9/11')
-        self.assertEqual(test_post.author, 'Robin Hanson')
-        self.assertEqual(test_post.publish_date, utils.tidy_date('September 11, 2011 9:10 am', OB_SERVER_TZ))
-
-    def assert_votes_and_comments_are_correct_for_post_27739(self, test_post):
-        self.assertIsInstance(test_post.votes, int)
-        self.assertIsInstance(test_post.comments, int)
-        self.assertGreater(test_post.votes, TEST_POST_MIN_VOTES)
-        self.assertGreater(test_post.comments, TEST_POST_MIN_COMMENTS)
-
-    def assert_words_and_hyperlinks_are_correct_for_post_27739(self, test_post):
-        self.assertEqual(test_post.words, 183)
-        self.assertEqual(len(test_post.internal_links), 2)
-        self.assertEqual(len(test_post.external_links), 3)
-
-    def assert_post_has_no_votes_or_comments_attributes(self, test_post):
-        self.assertFalse(hasattr(test_post, 'votes'))
-        self.assertFalse(hasattr(test_post, 'comments'))
-
-class TestIsOBPostURL(unittest.TestCase):
-    # The two accepted formats look like this
-    # https://www.overcomingbias.com/?p=32980
-    # https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html
-    def test_accepts_correctly_formatted_urls(self):
-        is_url = extract_post.is_ob_post_url
-        self.assertTrue(is_url('https://www.overcomingbias.com/?p=32980'))
-        self.assertTrue(is_url('https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html'))
-
-    def test_rejects_incorrectly_formatted_urls(self):
-        is_url = extract_post.is_ob_post_url
-        self.assertFalse(is_url('https://www.example.com/'))
-        self.assertFalse(is_url('https://www.overcomingbias.com/p=32980'))
-        self.assertFalse(is_url('https://www.overcomingbias.com/p=32980a'))
-        self.assertFalse(is_url('https://www.overcomingbias.com/what-makes-stuff-rot.html'))
-        self.assertFalse(is_url('https://www.overcomingbias.com/202/10/what-makes-stuff-rot.html'))
-        self.assertFalse(is_url('https://www.overcomingbias.com/2021/10/what-makes-stuff-rot'))
-        self.assertFalse(is_url('www.overcomingbias.com/2021/10/what-makes-stuff-rot'))
-
-class TestDetermineOriginOfHTMLFiles(unittest.TestCase):    
-    def test_is_page_from_origin_functions_work_with_ob_post(self):
-        test_html = download.grab_html_soup('https://overcomingbias.com/?p=27739')
-        self.assertTrue(extract_post.is_ob_site_html(test_html))
-        self.assertTrue(extract_post.is_ob_post_html(test_html))
-
-    def test_is_page_from_origin_functions_work_with_ob_page(self):
-        test_html = download.grab_html_soup('https://www.overcomingbias.com/page/1')
-        self.assertTrue(extract_post.is_ob_site_html(test_html))
-        self.assertFalse(extract_post.is_ob_post_html(test_html))
-
-    def test_is_page_from_origin_functions_work_with_ob_home_page(self):
-        test_html = download.grab_html_soup('https://www.overcomingbias.com/')
-        self.assertTrue(extract_post.is_ob_site_html(test_html))
-        self.assertFalse(extract_post.is_ob_post_html(test_html))
-
-    def test_is_page_from_origin_functions_work_with_example_dot_com_page(self):
-        test_html = download.grab_html_soup('https://example.com/')
-        self.assertFalse(extract_post.is_ob_site_html(test_html))
-        self.assertFalse(extract_post.is_ob_post_html(test_html))
-
-class TestHasPostInId(unittest.TestCase):
-    def test_accepts_tags_with_correctly_formatted_strings(self):
-        self.assertTrue(self.mock_tag_has_post_in_id(id_string='post-33847'))
-        self.assertTrue(self.mock_tag_has_post_in_id(id_string='post-123'))
-
-    def test_rejects_tags_with_incorrectly_formatted_strings(self):
-        self.assertFalse(self.mock_tag_has_post_in_id(id_string=''))
-        self.assertFalse(self.mock_tag_has_post_in_id(id_string='post'))
-
-    def test_rejects_tags_without_id_attribute(self):
-        self.assertFalse(self.mock_tag_has_post_in_id(has_id=False, id_string='post-33847'))
-
-    def mock_tag_has_post_in_id(self, has_id=True, id_string=''):
-        """Create a mock tag with specified id attribute."""
-        tag = MagicMock()
-        tag.has_attr.return_value = has_id
-        tag.__getitem__.return_value = id_string
-        return extract_post.has_post_in_id(tag)
+        # Tags and categories
+        [self.assertRegex(tag, r'^[a-z0-9-]+$') for tag in test_post.tags]
+        [self.assertRegex(cat, r'^[a-z0-9-]+$') for cat in test_post.categories]
+        # Title, author, date
+        self.assertNotEqual(test_post.title, '')
+        self.assertRegex(test_post.author, r'^[A-Za-z0-9\. ]+$')
+        self.assertTrue(utils.is_aware_datetime(test_post.publish_date))
+        # Word count and links
+        self.assertGreater(test_post.word_count, 5)
+        [self.assertTrue(extract_post.is_ob_post_url(url)) for url in test_post.internal_links.keys()]
+        [self.assertGreaterEqual(number, 1) for number in test_post.internal_links.values()]
+        [self.assertFalse(extract_post.is_ob_post_url(url)) for url in test_post.external_links.keys()]
+        [self.assertGreaterEqual(number, 1) for number in test_post.external_links.values()]
+        # Disqus ID string
+        self.assertRegex(
+            test_post.disqus_id,
+            r'''(?x)^(\d{5})\ 
+            (?:http://prod.ob.trike.com.au/\d{4}/\d{2}/\S+\.html$|
+            http://www.overcomingbias.com/\?p=\1|
+            https://www.overcomingbias.com/\?p=\1)$'''
+        )
