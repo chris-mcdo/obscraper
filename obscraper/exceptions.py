@@ -3,3 +3,6 @@ class InvalidResponseError(Exception):
 
 class InvalidAuthCodeError(Exception):
     pass
+
+class AttributeNotFoundError(Exception):
+    pass

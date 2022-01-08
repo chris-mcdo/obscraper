@@ -166,3 +166,8 @@ def is_ob_post_html(html):
     if not is_ob_site_html(html):
         return False
     return "single-post" in html.body['class']
+
+def raise_attribute_not_found_error_if_none(object, message):
+    """Raise an AttributeNotFoundError if an object is None."""
+    if object is None:
+        raise exceptions.AttributeNotFoundError(message)
