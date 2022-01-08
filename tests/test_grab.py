@@ -2,15 +2,9 @@
 import datetime
 import unittest
 from unittest.mock import MagicMock, patch
-from obscraper import extract_post, grab, exceptions, post, utils
+from obscraper import extract_post, grab, exceptions, post
+from .test_extract import TEST_DISQUS_IDS
 
-TEST_DISQUS_IDS = [
-'18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
-'18141 http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html',
-'18423 http://www.overcomingbias.com/?p=18423',
-'32811 http://www.overcomingbias.com/?p=32811',
-'33023 https://www.overcomingbias.com/?p=33023',
-]
 TEST_POST_NUMBER = 27739
 TEST_POST_MIN_VOTES = 150
 TEST_POST_MIN_COMMENTS = 100
@@ -38,7 +32,7 @@ class TestGrabPostByURL(unittest.TestCase):
 
 class TestGrabComments(unittest.TestCase):
     def test_returns_valid_count_for_example_post_numbers(self):
-        for disqus_id in TEST_DISQUS_IDS:
+        for disqus_id in TEST_DISQUS_IDS.values():
             result = grab.grab_comments(disqus_id)
             self.assertIsInstance(result, int)
             self.assertGreater(result, 2)

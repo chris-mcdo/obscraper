@@ -1,19 +1,11 @@
 """Tests for the post and extract_post modules."""
 
 import unittest
-from unittest.mock import MagicMock, patch
 
 import datetime
 
 from obscraper import extract_post, post, download, utils
-
-TEST_POST_NUMBERS = [
-    18402, # first post
-    18141, # early post by another author
-    18423, # just before Disqus API changes 
-    32811, # just before Disqus API changes for 2nd time
-    33023, # recent RH post
-]
+from .test_extract import TEST_POST_NUMBERS
 
 class TestPost(unittest.TestCase):
     @classmethod
