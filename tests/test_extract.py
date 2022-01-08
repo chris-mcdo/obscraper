@@ -102,6 +102,14 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
         for number in [18402, 18141, 18423, 32811, 33023,]:
             self.assertEqual(format(number), 'standard')
 
+    def test_extract_text_returns_correct_start_and_end_for_valid_htmls(self):
+        text = self.function_to_get_attribute_by_number(extract_post.extract_text)
+        self.assertTrue(text(18402).endswith('Copyright is retained by each author.'))
+        self.assertTrue(text(18141).endswith('such beliefs are unlikely to correspond to truth.'))
+        self.assertTrue(text(18423).endswith('even when backed by such publications.'))
+        self.assertTrue(text(32811).endswith('will never be directly evaluated.'))
+        self.assertTrue(text(33023).endswith('goose that lays our golden egg of growth.'))
+
     def test_extract_word_count_returns_correct_results_for_valid_htmls(self):
         words = self.function_to_get_attribute_by_number(extract_post.extract_word_count)
         self.assertEqual(words(18402), 263)
@@ -184,6 +192,7 @@ class TestExtractFunctionsOnFakePost(unittest.TestCase):
         self.assertRaises(not_found, extract_post.extract_type, fake_html)
         self.assertRaises(not_found, extract_post.extract_status, fake_html)
         self.assertRaises(not_found, extract_post.extract_format, fake_html)
+        self.assertRaises(not_found, extract_post.extract_text, fake_html)
         self.assertRaises(not_found, extract_post.extract_word_count, fake_html)
         self.assertRaises(not_found, extract_post.extract_internal_links, fake_html)
         self.assertRaises(not_found, extract_post.extract_external_links, fake_html)

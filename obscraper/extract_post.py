@@ -70,11 +70,15 @@ def extract_status(post_html):
 def extract_format(post_html):
     return extract_meta_header(post_html).get('format', [''])[0]
 
-def extract_word_count(post_html):
+def extract_text(post_html):
     match = post_html.find(attrs = {'class': 'entry-content'})
-    raise_attribute_not_found_error_if_none(match, 'word count')
-    words_to_ignore = ['GD', 'Star', 'Ratingloading']
-    return utils.count_words(match.text, words_to_ignore)
+    raise_attribute_not_found_error_if_none(match, 'text')
+    text = match.text.removesuffix('\nGD Star Ratingloading...\n').replace('\xa0', ' ').strip()
+    return text
+
+def extract_word_count(post_html):
+    text = extract_text(post_html)
+    return utils.count_words(text)
 
 def extract_internal_links(post_html):
     """Extract hyperlinks (to other OB webpages) of an OB post from its HTML.

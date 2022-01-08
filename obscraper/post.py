@@ -21,6 +21,7 @@ def create_post(post_html, votes=False, comments=False):
         author=extract_post.extract_author(post_html),
         publish_date=extract_post.extract_publish_date(post_html),
         # Word count and links
+        text=extract_post.extract_text(post_html),
         word_count=extract_post.extract_word_count(post_html),
         internal_links=extract_post.extract_internal_links(post_html),
         external_links=extract_post.extract_external_links(post_html),
@@ -51,6 +52,7 @@ class Post:
         author: String. The author of the post.
         publish_date: String. The time when the post was first published, according to the page.
         tags: List (string). A list of tags associated with the post.
+        text: String. The full text of the post, as plaintext.
         word_count: Integer. The number of words in the body of the post. Only 
         available for posts which have not moved to other sites.
         internal_links: Dict (string, integer). A dictionary of links to the OB site (and the 
@@ -66,7 +68,7 @@ class Post:
     """
     
     def __init__(self, url, name, number, type, status, format, tags, categories, title, author, publish_date, 
-    word_count, internal_links, external_links, disqus_id):
+    text, word_count, internal_links, external_links, disqus_id):
         """Initialise a Post object."""
         self.url = url
         self.name = name
@@ -79,6 +81,7 @@ class Post:
         self.title = title
         self.author = author
         self.publish_date = publish_date
+        self.text = text
         self.word_count = word_count
         self.internal_links = internal_links
         self.external_links = external_links
