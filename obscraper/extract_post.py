@@ -114,10 +114,10 @@ def extract_vote_auth_code(post_html):
     raise_attribute_not_found_error_if_none(match, 'vote auth code')
     return match.group(2)
 
-def extract_disqus_identifier(post_html):
-    """Extract the Disqus identifier."""
+def extract_disqus_id(post_html):
+    """Extract the Disqus ID string."""
     match = post_html.find(attrs={'class': 'dsq-postid'})
-    raise_attribute_not_found_error_if_none(match, 'disqus identifier')
+    raise_attribute_not_found_error_if_none(match, 'Disqus ID')
     return post_html.find(attrs={'class': 'dsq-postid'})['data-dsqidentifier']
 
 def extract_meta_header(post_html):

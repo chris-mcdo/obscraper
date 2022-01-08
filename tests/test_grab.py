@@ -20,14 +20,14 @@ class TestGrabPostByURL(unittest.TestCase):
         p = grab.grab_post_by_url(f'http://www.overcomingbias.com/?p={TEST_POST_NUMBER}')
         self.assertIsInstance(p, post.Post)
         self.assertEqual(p.number, TEST_POST_NUMBER)
-        self.assertGreater(p.words, 10)
+        self.assertGreater(p.word_count, 10)
 
     def test_grab_post_works_with_string_url(self):
         test_url = 'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html'
         p = grab.grab_post_by_url(test_url)
         self.assertIsInstance(p, post.Post)
         self.assertEqual(p.url, test_url)
-        self.assertGreater(p.words, 10)
+        self.assertGreater(p.word_count, 10)
 
 class TestGrabComments(unittest.TestCase):
     @patch('obscraper.download.http_post_request')

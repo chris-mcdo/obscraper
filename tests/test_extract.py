@@ -8,8 +8,8 @@ from obscraper import exceptions, extract_post, download, utils
 TEST_POST_NUMBERS = [
     18402, # first post
     18141, # early post by another author
-    18423, # just before disqus API changes 
-    32811, # just before disqus API changes for 2nd time
+    18423, # just before Disqus API changes 
+    32811, # just before Disqus API changes for 2nd time
     33023, # recent RH post
 ]
 
@@ -157,7 +157,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
         self.assertRegex(unique_codes.pop(), r'^[a-z0-9]{10}$')
 
     def test_extract_disqus_id_returns_correct_results_for_valid_htmls(self):
-        disqus_id = self.function_to_get_attribute_by_number(extract_post.extract_disqus_identifier)
+        disqus_id = self.function_to_get_attribute_by_number(extract_post.extract_disqus_id)
         self.assertEqual(disqus_id(18402), '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html')
         self.assertEqual(disqus_id(18141), '18141 http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html')
         self.assertEqual(disqus_id(18423), '18423 http://www.overcomingbias.com/?p=18423')
@@ -188,7 +188,7 @@ class TestExtractFunctionsOnFakePost(unittest.TestCase):
         self.assertRaises(not_found, extract_post.extract_internal_links, fake_html)
         self.assertRaises(not_found, extract_post.extract_external_links, fake_html)
         self.assertRaises(not_found, extract_post.extract_vote_auth_code, fake_html)
-        self.assertRaises(not_found, extract_post.extract_disqus_identifier, fake_html)
+        self.assertRaises(not_found, extract_post.extract_disqus_id, fake_html)
 
 class TestIsOBPostURL(unittest.TestCase):
     # The two accepted formats look like this
