@@ -16,10 +16,10 @@ def date_to_utc(localdt, timezone):
 
 def count_words(text, ignore=[]):
     """Count the number of words in a string, ignoring some."""
-    text_without_hyphens = text.replace('-', '')
-    text_without_punctuation = re.sub(r'[^a-zA-Z0-9]+', ' ', text_without_hyphens)
+    text_without_punctuation = re.sub(r'[^a-zA-Z0-9\s]+', '', text)
+    text_without_special_chars = re.sub(r'\s+', ' ', text_without_punctuation)
     words = len(
-        [word for word in str.split(text_without_punctuation) if word not in ignore]
+        [word for word in str.split(text_without_special_chars) if word not in ignore]
         )
     return words
 

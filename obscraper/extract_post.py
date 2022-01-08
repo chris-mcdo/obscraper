@@ -55,7 +55,7 @@ def extract_format(post_html):
     return extract_meta_header(post_html).get('format', [''])[0]
 
 def extract_word_count(post_html):
-    words_to_ignore = ['GD', 'Star', 'Ratingloading...']
+    words_to_ignore = ['GD', 'Star', 'Ratingloading']
     return utils.count_words(post_html.find(attrs = {'class': 'entry-content'}).text, words_to_ignore)
 
 def extract_internal_links(post_html):
