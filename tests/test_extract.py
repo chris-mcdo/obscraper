@@ -1,7 +1,9 @@
 
 import unittest
 
-from obscraper import extract_post, download, utils
+import bs4
+
+from obscraper import exceptions, extract_post, download, utils
 
 TEST_POST_NUMBERS = [
     18402, # first post
@@ -11,7 +13,7 @@ TEST_POST_NUMBERS = [
     33023, # recent RH post
 ]
 
-class TestExtractFunctions(unittest.TestCase):
+class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.post_htmls = {
@@ -166,6 +168,27 @@ class TestExtractFunctions(unittest.TestCase):
         def func(number):
             return extract_func(self.post_htmls[number])
         return func
+
+class TestExtractFunctionsOnFakePost(unittest.TestCase):
+    def test_extract_functions_raise_exception_for_invalid_html(self):
+        fake_html = bs4.BeautifulSoup('Fake HTML')
+        not_found = exceptions.AttributeNotFoundError
+        self.assertRaises(not_found, extract_post.extract_url, fake_html)
+        self.assertRaises(not_found, extract_post.extract_name, fake_html)
+        self.assertRaises(not_found, extract_post.extract_title, fake_html)
+        self.assertRaises(not_found, extract_post.extract_author, fake_html)
+        self.assertRaises(not_found, extract_post.extract_publish_date, fake_html)
+        self.assertRaises(not_found, extract_post.extract_number, fake_html)
+        self.assertRaises(not_found, extract_post.extract_tags, fake_html)
+        self.assertRaises(not_found, extract_post.extract_categories, fake_html)
+        self.assertRaises(not_found, extract_post.extract_type, fake_html)
+        self.assertRaises(not_found, extract_post.extract_status, fake_html)
+        self.assertRaises(not_found, extract_post.extract_format, fake_html)
+        self.assertRaises(not_found, extract_post.extract_word_count, fake_html)
+        self.assertRaises(not_found, extract_post.extract_internal_links, fake_html)
+        self.assertRaises(not_found, extract_post.extract_external_links, fake_html)
+        self.assertRaises(not_found, extract_post.extract_vote_auth_code, fake_html)
+        self.assertRaises(not_found, extract_post.extract_disqus_identifier, fake_html)
 
 class TestIsOBPostURL(unittest.TestCase):
     # The two accepted formats look like this

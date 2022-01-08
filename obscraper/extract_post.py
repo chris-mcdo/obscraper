@@ -17,23 +17,33 @@ def extract_url(post_html):
     Returns:
         String. URL of the post.
     """
-    return post_html.find(attrs={'class': 'st_sharethis'})['st_url']
+    match = post_html.find(attrs={'class': 'st_sharethis'})
+    raise_attribute_not_found_error_if_none(match, 'URL')
+    return match['st_url']
 
 def extract_name(post_html):
     """Extract the name of the post."""
-    return re.search(r'(?<=/)([^/]+)(?=$)', extract_url(post_html)).group().removesuffix('.html')
+    match = re.search(r'(?<=/)[^/]+(?=\.html$)', extract_url(post_html))
+    raise_attribute_not_found_error_if_none(match, 'name')
+    return match.group().removesuffix('.html')
 
 def extract_title(post_html):
     """Extract the title of the post."""
-    return post_html.find(attrs = {'class': 'entry-title'}).text
+    match = post_html.find(attrs = {'class': 'entry-title'})
+    raise_attribute_not_found_error_if_none(match, 'title')
+    return match.text
 
 def extract_author(post_html):
     """Extract the post author's name."""
-    return post_html.find(attrs = {'class': 'url fn n'}).text
+    match = post_html.find(attrs = {'class': 'url fn n'})
+    raise_attribute_not_found_error_if_none(match, 'author')
+    return match.text
 
 def extract_publish_date(post_html):
     """Extract the date the post was published."""
-    messy_date = post_html.find(attrs = {'class': 'entry-date'}).text
+    match = post_html.find(attrs = {'class': 'entry-date'})
+    raise_attribute_not_found_error_if_none(match, 'publish date')
+    messy_date = match.text
     return utils.tidy_date(messy_date, OB_SERVER_TZ)
 
 def extract_number(post_html):
@@ -55,8 +65,10 @@ def extract_format(post_html):
     return extract_meta_header(post_html).get('format', [''])[0]
 
 def extract_word_count(post_html):
+    match = post_html.find(attrs = {'class': 'entry-content'})
+    raise_attribute_not_found_error_if_none(match, 'word count')
     words_to_ignore = ['GD', 'Star', 'Ratingloading']
-    return utils.count_words(post_html.find(attrs = {'class': 'entry-content'}).text, words_to_ignore)
+    return utils.count_words(match.text, words_to_ignore)
 
 def extract_internal_links(post_html):
     """Extract hyperlinks (to other OB webpages) of an OB post from its HTML.
@@ -65,10 +77,10 @@ def extract_internal_links(post_html):
         A dict consisting of hyperlinks to OB webpages, and how many times
         they were repeated (usually 1).
     """
-    all_links = [ tag['href'] for tag in post_html.find(
-        attrs = {'class': 'entry-content'}
-        ).find_all('a') ]
-    
+    match = post_html.find(attrs = {'class': 'entry-content'})
+    raise_attribute_not_found_error_if_none(match, 'internal links')
+
+    all_links = [ tag['href'] for tag in match.find_all('a') ]
     int_links = [ link for link in all_links if is_ob_post_url(link) ]
 
     int_link_dict = {}
@@ -84,11 +96,12 @@ def extract_external_links(post_html):
         A dict consisting of hyperlinks to non-OB webpages, and how many times
         they were repeated (usually 1).
     """
-    all_links = [ tag['href'] for tag in post_html.find(
-        attrs = {'class': 'entry-content'}
-        ).find_all('a') ]
-    
-    ext_links = [ link for link in all_links if not is_ob_post_url(link) ]
+    match = post_html.find(attrs = {'class': 'entry-content'})
+    raise_attribute_not_found_error_if_none(match, 'external links')
+
+    all_links = [tag['href'] for tag in match.find_all('a')]    
+    ext_links = [link for link in all_links if not is_ob_post_url(link)]
+
     ext_link_dict = {}
     for link in ext_links:
         ext_link_dict[link] = ext_link_dict.get(link, 0) + 1
@@ -98,12 +111,13 @@ def extract_external_links(post_html):
 def extract_vote_auth_code(post_html):
     """Extract the vote authorisation code, or return None."""
     match = re.search(r'(gdsr_cnst_nonce\s*=\s*")(\w+)("\s*;)', str(post_html), re.MULTILINE)
-    return match.group(2) if match is not None else None
+    raise_attribute_not_found_error_if_none(match, 'vote auth code')
+    return match.group(2)
 
 def extract_disqus_identifier(post_html):
     """Extract the Disqus identifier."""
     match = post_html.find(attrs={'class': 'dsq-postid'})
-    raise_attribute_not_found_error_if_none(match, 'Disqus identifier not found')
+    raise_attribute_not_found_error_if_none(match, 'disqus identifier')
     return post_html.find(attrs={'class': 'dsq-postid'})['data-dsqidentifier']
 
 def extract_meta_header(post_html):
@@ -116,7 +130,9 @@ def extract_meta_header(post_html):
         others (e.g. post type and status) have only one.
         Some attributes (e.g. "hentry") have no values.
     """
-    raw_headers = post_html.find(has_post_in_id)['class']
+    match = post_html.find(has_post_in_id)
+    raise_attribute_not_found_error_if_none(match, 'metadata')
+    raw_headers = match['class']
     headers = [header.split(sep='-', maxsplit=1) for header in raw_headers]
     keys = [header[0] for header in headers]
     values = [header[1] if len(header) == 2 else None for header in headers]
@@ -173,7 +189,7 @@ def is_ob_post_html(html):
         return False
     return "single-post" in html.body['class']
 
-def raise_attribute_not_found_error_if_none(object, message):
+def raise_attribute_not_found_error_if_none(object, attribute_name):
     """Raise an AttributeNotFoundError if an object is None."""
     if object is None:
-        raise exceptions.AttributeNotFoundError(message)
+        raise exceptions.AttributeNotFoundError(f'{attribute_name} could not be extracted from post HTML')

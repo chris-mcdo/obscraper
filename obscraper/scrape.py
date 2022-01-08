@@ -3,12 +3,7 @@
 import math
 import datetime
 
-from obscraper.exceptions import InvalidResponseError
-from . import grab, extract_post, utils
-
-# Maximum number of pages to look through on a single run. 
-MAX_PAGES = 1000
-MIN_DATE = datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc)
+from . import grab, extract_post, exceptions
 
 def get_posts_by_url(urls):
     """Get list of posts identified by their URLs.
@@ -32,7 +27,7 @@ def get_posts_by_url(urls):
     for url in urls:
         try:
             posts.append(grab.grab_post_by_url(url))
-        except InvalidResponseError:
+        except (exceptions.AttributeNotFoundError, exceptions.InvalidResponseError):
             posts.append(None)
     return attach_edit_dates(posts)
 
