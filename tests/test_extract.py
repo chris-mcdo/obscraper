@@ -229,3 +229,23 @@ class TestDetermineOriginOfHTMLFiles(unittest.TestCase):
         test_html = download.grab_html_soup('https://example.com/')
         self.assertFalse(extract_post.is_ob_site_html(test_html))
         self.assertFalse(extract_post.is_ob_post_html(test_html))
+
+class TestIsValidDisqusID(unittest.TestCase):
+    def test_returns_true_for_valid_ids(self):
+        valid = extract_post.is_valid_disqus_id
+        self.assertTrue(valid('18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html'))
+        self.assertTrue(valid('18141 http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html'))
+        self.assertTrue(valid('18423 http://www.overcomingbias.com/?p=18423'))
+        self.assertTrue(valid('32811 http://www.overcomingbias.com/?p=32811'))
+        self.assertTrue(valid('33023 https://www.overcomingbias.com/?p=33023'))
+
+    def test_returns_false_for_invalid_ids(self):
+        valid = extract_post.is_valid_disqus_id
+        self.assertFalse(valid('18402 http://prod.ob.trike.com.au/how-to-join.html'))
+        self.assertFalse(valid('18402 http://prod.ob.trike.com.au/?p=18402'))
+        self.assertFalse(valid('18402 http://www.overcomingbias.com/2006/11/how-to-join.html'))
+        self.assertFalse(valid('18402 https://www.overcomingbias.com/2006/11/how-to-join.html'))
+        self.assertFalse(valid('how-to-join.html http://prod.ob.trike.com.au/2006/11/how-to-join.html'))
+        self.assertFalse(valid('http://www.overcomingbias.com/?p=32811'))
+        self.assertFalse(valid('18423 http://www.overcomingbias.com/?p=18424'))
+        self.assertFalse(valid('how-to-join.html https://www.overcomingbias.com/2006/11/how-to-join.html'))

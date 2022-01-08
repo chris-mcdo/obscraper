@@ -111,10 +111,4 @@ class TestPost(unittest.TestCase):
         [self.assertFalse(extract_post.is_ob_post_url(url)) for url in test_post.external_links.keys()]
         [self.assertGreaterEqual(number, 1) for number in test_post.external_links.values()]
         # Disqus ID string
-        self.assertRegex(
-            test_post.disqus_id,
-            r'''(?x)^(\d{5})\ 
-            (?:http://prod.ob.trike.com.au/\d{4}/\d{2}/\S+\.html$|
-            http://www.overcomingbias.com/\?p=\1|
-            https://www.overcomingbias.com/\?p=\1)$'''
-        )
+        self.assertTrue(extract_post.is_valid_disqus_id(test_post.disqus_id))

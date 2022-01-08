@@ -6,6 +6,12 @@ from . import utils, exceptions
 
 # timezone of server generating post timestamps
 OB_SERVER_TZ = 'US/Eastern'
+DISQUS_URL_PATTERN = r'''
+(?x)^(\d{5})\ 
+    (?:http://prod.ob.trike.com.au/\d{4}/\d{2}/\S+\.html$|
+    http://www.overcomingbias.com/\?p=\1|
+    https://www.overcomingbias.com/\?p=\1)$
+'''
 
 def extract_url(post_html):
     """Extract the URL of the post.
@@ -25,7 +31,7 @@ def extract_name(post_html):
     """Extract the name of the post."""
     match = re.search(r'(?<=/)[^/]+(?=\.html$)', extract_url(post_html))
     raise_attribute_not_found_error_if_none(match, 'name')
-    return match.group().removesuffix('.html')
+    return match.group()
 
 def extract_title(post_html):
     """Extract the title of the post."""
@@ -188,6 +194,12 @@ def is_ob_post_html(html):
     if not is_ob_site_html(html):
         return False
     return "single-post" in html.body['class']
+
+def is_valid_disqus_id(disqus_id):
+    """Check if a string is a valid Disqus ID string."""
+    if not isinstance(disqus_id, str):
+        return False
+    return re.compile(DISQUS_URL_PATTERN).search(disqus_id) is not None
 
 def raise_attribute_not_found_error_if_none(object, attribute_name):
     """Raise an AttributeNotFoundError if an object is None."""
