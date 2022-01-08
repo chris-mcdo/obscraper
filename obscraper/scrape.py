@@ -1,8 +1,6 @@
 """Get a list of posts by publish date or URL."""
 
-import re
-
-from . import grab, extract_post, exceptions
+from . import grab, extract_post, exceptions, utils
 
 def get_all_posts():
     """Get all posts hosted on the overcomingbias site.
@@ -45,6 +43,30 @@ def get_posts_by_url(urls):
         except (exceptions.AttributeNotFoundError, exceptions.InvalidResponseError):
             posts[url] = None
     return attach_edit_dates(posts)
+
+def get_posts_by_edit_date(start_date, end_date):
+    """Get posts edited within a given date range.
+    
+    Args:
+        start_date: aware datetime.datetime object. The start
+        of the date range. 
+        end_date: aware datetime.datetime object. The end of 
+        the date range.
+    
+    Returns:
+        A dictionary whose keys are the URLs of posts edited
+        within the date range, and whose values are the 
+        corresponding post data as post.Post objects.
+    """
+    raise_exception_if_date_has_incorrect_format(start_date, 'start_date')
+    raise_exception_if_date_has_incorrect_format(end_date, 'end_date')
+    if start_date > end_date:
+        raise ValueError('end date is before start date')
+    
+    edit_dates = grab.grab_edit_dates()
+    selected_urls = [url for url, edit_date in edit_dates.items() if start_date < edit_date < end_date]
+    posts = get_posts_by_url(selected_urls)
+    return attach_edit_dates(posts)    
 
 def get_votes(post_numbers):
     """Get vote counts for some posts.
@@ -123,3 +145,7 @@ def raise_exception_if_disqus_id_has_incorrect_format(disqus_id):
         raise TypeError(f'expected Disqus ID to be string, got {disqus_id}')
     if not extract_post.is_valid_disqus_id(disqus_id):
         raise ValueError(f'Disqus ID {disqus_id} is not valid')
+
+def raise_exception_if_date_has_incorrect_format(d, variable_name):
+    if not utils.is_aware_datetime(d):
+        raise TypeError(f'expected {variable_name} to be aware datetime.datetime object, got {d}')

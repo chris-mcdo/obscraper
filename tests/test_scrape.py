@@ -2,7 +2,9 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from obscraper import post, scrape, utils
+import datetime
+
+from obscraper import extract_post, grab, post, scrape, utils
 
 class TestGetAllPosts(unittest.TestCase):
     @patch('obscraper.grab.grab_edit_dates')
@@ -66,6 +68,29 @@ class TestGetPostsByURL(unittest.TestCase):
         self.assertTrue(hasattr(p, 'word_count'))
         self.assertFalse(hasattr(p, 'votes'))
         self.assertFalse(hasattr(p, 'comments'))
+
+class TestGetPostsByEditDate(unittest.TestCase):
+    def test_returns_valid_results_for_valid_arguments(self):
+        with patch('obscraper.grab.grab_edit_dates', return_value=grab.grab_edit_dates()) as mock_grab_edit_dates:
+            now = datetime.datetime.now(datetime.timezone.utc)
+            dday = datetime.timedelta(days=1)
+            self.assertEqual(scrape.get_posts_by_edit_date(now+dday, now+5*dday), {})
+            last_week = scrape.get_posts_by_edit_date(now-7*dday, now)
+            self.assertIsInstance(last_week, dict)
+            [self.assertTrue(extract_post.is_ob_post_url(url)) for url in last_week.keys()]
+            [self.assertIsInstance(p, post.Post) for p in last_week.values()]
+    
+    def test_raises_type_error_if_dates_are_wrong_type(self):
+        now = datetime.datetime.now(datetime.timezone.utc)
+        dday = datetime.timedelta(days=1)
+        self.assertRaises(TypeError, scrape.get_posts_by_edit_date, start_date=now, end_date=datetime.datetime.now())
+        self.assertRaises(TypeError, scrape.get_posts_by_edit_date, start_date=now - 3 * dday, end_date='hi')
+        self.assertRaises(TypeError, scrape.get_posts_by_edit_date, start_date=12345, end_date=now)
+
+    def test_raises_value_error_if_end_date_before_start_date(self):
+        now = datetime.datetime.now(datetime.timezone.utc)
+        dday = datetime.timedelta(days=1)
+        self.assertRaises(ValueError, scrape.get_posts_by_edit_date, start_date=now+dday, end_date=now-dday)
 
 class TestGetVotes(unittest.TestCase):
     def test_returns_valid_vote_counts_for_valid_post_numbers(self):

@@ -5,7 +5,7 @@ import unittest
 import datetime
 
 from obscraper import extract_post, post, download, utils
-from .test_extract import TEST_POST_NUMBERS
+from test_extract import TEST_POST_NUMBERS
 
 class TestPost(unittest.TestCase):
     @classmethod

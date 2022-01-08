@@ -3,7 +3,7 @@ import datetime
 import unittest
 from unittest.mock import MagicMock, patch
 from obscraper import extract_post, grab, exceptions, post
-from .test_extract import TEST_DISQUS_IDS
+from test_extract import TEST_DISQUS_IDS
 
 TEST_POST_NUMBER = 27739
 TEST_POST_MIN_VOTES = 150
