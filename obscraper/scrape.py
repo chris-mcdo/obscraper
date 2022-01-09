@@ -1,5 +1,6 @@
 """Get a list of posts by publish date or URL."""
 
+from obscraper import future
 from . import grab, extract_post, exceptions, utils
 
 def get_all_posts():
@@ -35,13 +36,17 @@ def get_posts_by_url(urls):
         values are post.Post objects containing data scraped from
         the input URLs.
     """
+    if not isinstance(urls, list):
+        raise TypeError(f'expected urls to be list, got {type(urls)}')
     [raise_exception_if_url_is_not_ob_post_long_url(url) for url in urls]
-    posts = {}
-    for url in urls:
+    def get_post(url):
+        """Get a post given its URL, returning None if not found."""
         try:
-            posts[url] = grab.grab_post_by_url(url)
+            return grab.grab_post_by_url(url)
         except (exceptions.AttributeNotFoundError, exceptions.InvalidResponseError):
-            posts[url] = None
+            return None
+    url_dict = {url: url for url in urls}
+    posts = future.map_with_delay(func=get_post, arg_dict=url_dict, delay=0.02, max_workers=32)
     return attach_edit_dates(posts)
 
 def get_posts_by_edit_date(start_date, end_date):
@@ -85,9 +90,18 @@ def get_votes(post_numbers):
         A dictionary whose keys are the post URLs and values
         are vote counts (0 if the post is not found).
     """
+    if not isinstance(post_numbers, dict):
+        raise TypeError(f'expected post_numbers to be dict, got {type(post_numbers)}')
     [raise_exception_if_url_is_not_ob_post_long_url(url) for url in post_numbers.keys()]
     [raise_exception_if_number_has_incorrect_format(number) for number in post_numbers.values()]
-    return {url: grab.grab_votes(number) for url, number in post_numbers.items()}
+    def get_vote(number):
+        """Get a vote count given its post number, returning None if not found."""
+        try:
+            return grab.grab_votes(number)
+        except (exceptions.AttributeNotFoundError, exceptions.InvalidAuthCodeError, exceptions.InvalidResponseError):
+            return None
+    votes = future.map_with_delay(get_vote, post_numbers, delay=0.02, max_workers=32)
+    return votes
 
 def get_comments(disqus_ids):
     """Get comment counts for some posts.
@@ -104,14 +118,16 @@ def get_comments(disqus_ids):
         A dictionary whose keys are the post URLs and values
         are comment counts (or None if the post is not found).
     """
+    if not isinstance(disqus_ids, dict):
+        raise TypeError(f'expected disqus_ids to be dict, got {type(disqus_ids)}')
     [raise_exception_if_url_is_not_ob_post_long_url(url) for url in disqus_ids.keys()]
     [raise_exception_if_disqus_id_has_incorrect_format(number) for number in disqus_ids.values()]
-    comments = {}
-    for url, disqus_id in disqus_ids.items():
+    def get_comment(disqus_id):
         try:
-            comments[url] = grab.grab_comments(disqus_id)
+            return grab.grab_comments(disqus_id)
         except exceptions.InvalidResponseError:
-            comments[url] = None
+            return None
+    comments = future.map_with_delay(get_comment, disqus_ids, delay=0.01, max_workers=50)
     return comments
 
 def attach_edit_dates(posts):
