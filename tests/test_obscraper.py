@@ -1,35 +1,49 @@
-"""Tests for the post and extract_post modules."""
-
 import unittest
 
 import datetime
 
-from obscraper import extract_post, post, download, utils
-from test_extract import TEST_POST_NUMBERS
+import obscraper
+from obscraper import extract_post, utils, post
 
-class TestPost(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.post_htmls = {
-            number: 
-            download.grab_html_soup(f'https://www.overcomingbias.com/?p={number}') 
-            for number in TEST_POST_NUMBERS
-        }
+# Get post dates list
+# Get first and last 500 URLs
+# Get corresponding posts
+# Get corresponding comments and votes
+# Check each is roughly valid
 
-    def test_create_post_returns_valid_posts_for_valid_htmls(self):
-        for html in self.post_htmls.values():
-            p = post.create_post(html, votes=False, comments=False)
-            self.assert_is_valid_post(p, votes=False, comments=False)
-    
-    def test_create_post_returns_valid_posts_for_valid_htmls_with_votes(self):
-        for html in self.post_htmls.values():
-            p = post.create_post(html, votes=True, comments=False)
-            self.assert_is_valid_post(p, votes=True, comments=False)
+@unittest.skip('skip expensive system tests')
+class TestOBScraper(unittest.TestCase):
+    def test_get_first_year_of_posts(self):
+        # Arrange
+        first_date = datetime.datetime(2006, 10, 1, tzinfo=datetime.timezone.utc)
+        dweek = datetime.timedelta(weeks=1)
 
-    def test_create_post_returns_valid_posts_for_valid_htmls_with_comments(self):
-        for html in self.post_htmls.values():
-            p = post.create_post(html, votes=False, comments=True)
-            self.assert_is_valid_post(p, votes=False, comments=True)
+        # Act
+        all_posts = obscraper.get_posts_by_edit_date(first_date, first_date + 52 * dweek)
+        posts = [p for p in all_posts.values() if p is not None]
+        posts = self.attach_comments_and_votes(posts)
+
+        # Assert
+        [self.assert_is_valid_post(p, votes=True, comments=True) for p in posts]
+
+    def test_get_last_year_of_posts(self):
+        now = datetime.datetime.now(datetime.timezone.utc)
+        dweek = datetime.timedelta(weeks=1)
+
+        # Act
+        all_posts = obscraper.get_posts_by_edit_date(now - 52 * dweek, now)
+        posts = [p for p in all_posts.values() if p is not None]
+        posts = self.attach_comments_and_votes(posts)
+
+        # Assert
+        [self.assert_is_valid_post(p, votes=True, comments=True) for p in posts]
+
+    def attach_comments_and_votes(self, posts):
+        comments = obscraper.get_comments({p.url: p.disqus_id for p in posts})
+        votes = obscraper.get_votes({p.url: p.number for p in posts})
+        [p.set_comments(comments[p.url]) for p in posts]
+        [p.set_votes(votes[p.url]) for p in posts]
+        return posts
 
     def assert_is_valid_post(self, test_post, votes, comments):
         self.assert_post_has_standard_attributes(test_post)
