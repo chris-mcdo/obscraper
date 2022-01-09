@@ -1,5 +1,6 @@
 
-from functools import wraps, cache
+import functools
+import cachetools.func
 import json
 import re
 import bs4
@@ -10,7 +11,12 @@ GDSR_URL = 'https://www.overcomingbias.com/wp-content/plugins/gd-star-rating/aja
 DISQUS_URL = 'https://overcoming-bias.disqus.com/count-data.js'
 # URL used to update the vote auth code
 VOTE_AUTH_UPDATE_URL = 'https://www.overcomingbias.com/2011/12/life-is-good.html'
+# Cache timeouts
+VOTE_AUTH_CODE_CACHE_TIMEOUT = 43200
+POST_DATA_CACHE_TIMEOUT = 3600
+EDIT_DATES_CACHE_TIMEOUT = 300
 
+@cachetools.func.ttl_cache(maxsize=100, ttl=POST_DATA_CACHE_TIMEOUT)
 def grab_post_by_url(url):
     """Download and create a post object from its URL.
     
@@ -29,6 +35,7 @@ def grab_post_by_url(url):
         raise exceptions.InvalidResponseError(f'The document found at {url} was not an overcomingbias post')
     return post.create_post(post_html)
 
+@cachetools.func.ttl_cache(maxsize=1000, ttl=POST_DATA_CACHE_TIMEOUT)
 def grab_comments(disqus_id):
     """Download comment count of overcomingbias post."""
     params = {'1': disqus_id}
@@ -39,6 +46,7 @@ def grab_comments(disqus_id):
     else:
         raise exceptions.InvalidResponseError(f'no comment count was found for Disqus ID {disqus_id}')
 
+@cachetools.func.ttl_cache(maxsize=1, ttl=EDIT_DATES_CACHE_TIMEOUT)
 def grab_edit_dates():
     """Grab list of post URLs and last edit dates.
 
@@ -53,7 +61,7 @@ def grab_edit_dates():
 
 def cache_auth(func):
     """Use a cached authentication code if possible."""
-    @wraps(func)
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -62,6 +70,7 @@ def cache_auth(func):
             return func(*args, **kwargs)
     return wrapper
 
+@cachetools.func.ttl_cache(maxsize=1000, ttl=POST_DATA_CACHE_TIMEOUT)
 @cache_auth
 def grab_votes(number):
     """Download the number of votes given to an OB post.
@@ -97,7 +106,7 @@ def grab_votes(number):
     votes = re.search(r'(Rating:\s*\+{0,1})(\d+)(\s*vote)', html_soup.text).group(2)
     return int(votes)
 
-@cache
+@cachetools.func.ttl_cache(maxsize=1, ttl=VOTE_AUTH_CODE_CACHE_TIMEOUT)
 def vote_auth_code():
     """Authorisation code used to gain access to the vote count API.
     

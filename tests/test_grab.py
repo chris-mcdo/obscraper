@@ -1,7 +1,10 @@
-
-import datetime
 import unittest
 from unittest.mock import MagicMock, patch
+
+import datetime
+import time 
+import cachetools.func
+
 from obscraper import extract_post, grab, exceptions, post
 from test_extract import TEST_DISQUS_IDS
 
@@ -67,7 +70,7 @@ class TestGrabVotes(unittest.TestCase):
     def test_grab_votes_gives_correct_arguments_to_http_post_request(self, mock_auth_code, mock_post_request):
         # Arrange
         # Strip decorator from grab_votes
-        grab_votes_unwrapped = grab.grab_votes.__wrapped__
+        grab_votes_unwrapped = grab.grab_votes.__wrapped__.__wrapped__
         mock_auth_code.return_value = 'notarealcode'
         mock_post_request.return_value.text = '-1'
         headers = {'x-requested-with': 'XMLHttpRequest'}
@@ -144,3 +147,51 @@ class TestVoteAuthCode(unittest.TestCase):
             votes = grab.grab_votes(TEST_POST_NUMBER)
             self.assertIsInstance(votes, int)
             self.assertGreater(votes, TEST_POST_MIN_VOTES)
+
+class TestCaching(unittest.TestCase):
+    @patch('obscraper.download.http_post_request')
+    def test_cached_values_can_be_cleared(self, mock_http_post):
+        mock_http_post.return_value = MagicMock(text=r'DISQUSWIDGETS.displayCount({"counts":[{"comments":5}]});')
+        self.assertEqual(grab.grab_comments('Fake Disqus ID'), 5)
+        
+        mock_http_post.return_value = MagicMock(text=r'DISQUSWIDGETS.displayCount({"counts":[{"comments":10}]});')
+        mock_http_post.assert_called_once()
+        self.assertEqual(grab.grab_comments('Fake Disqus ID'), 5)
+
+        grab.grab_comments.cache_clear()
+        self.assertEqual(grab.grab_comments('Fake Disqus ID'), 10)
+
+    def test_cache_times_out_as_expected(self):
+        # Arrange
+        mock_to_return = MagicMock()
+        @cachetools.func.ttl_cache(maxsize=10, ttl=1)
+        def cached_mock():
+            return mock_to_return()
+
+        # Act and assert
+        mock_to_return.return_value = 'Initial Mock'
+        self.assertEqual(cached_mock(), 'Initial Mock')
+        mock_to_return.assert_called_once()
+        
+        mock_to_return.return_value = 'New Mock'
+        self.assertEqual(cached_mock(), 'Initial Mock')
+        mock_to_return.assert_called_once()
+
+        time.sleep(1)
+        self.assertEqual(cached_mock(), 'New Mock')
+    
+    def test_cache_runs_out_of_size_as_expected(self):
+        # Arrange
+        @cachetools.func.ttl_cache(maxsize=2, ttl=100)
+        def cached_speech(says):
+            return f'Say {says}'
+        
+        # Act and assert
+        self.assertEqual(cached_speech('hi'), 'Say hi')
+        self.assertEqual(cached_speech('bye'), 'Say bye')
+        self.assertEqual(cached_speech('yes'), 'Say yes')
+        self.assertEqual(cached_speech('hi'), 'Say hi')
+        self.assertEqual(cached_speech('yes'), 'Say yes')
+
+        self.assertEqual(cached_speech.cache_info().misses, 4)
+        self.assertEqual(cached_speech.cache_info().hits, 1)
