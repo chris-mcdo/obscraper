@@ -2,7 +2,7 @@
 
 from . import extract_post, grab
 
-def create_post(post_html, votes=False, comments=False):
+def create_post(post_html, votes=True, comments=True):
     """Populate a post object using its HTML."""
     p = Post(
         # URL and title
