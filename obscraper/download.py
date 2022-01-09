@@ -1,42 +1,44 @@
 """Perform general web scraping tasks."""
 
 import functools
+import random
 import time
 import requests
 import bs4
 
-MAX_TRIES = 10
-RETRY_DELAY = 3.6
+START_DELAY = 0.04
+INCREASE_FACTOR = 4
+MAX_DELAY = 3
 
-def retry_request(delay):
+def retry_request(func):
     """Retry http request until 429 response is no longer received."""
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            for i in range(MAX_TRIES):
-                response = func(*args, **kwargs)
-                if response.status_code != 429:
-                    break
-                time.sleep(delay)
-            return response
-        return wrapper
-    return decorator
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        delay = START_DELAY
+        while delay < MAX_DELAY:
+            response = func(*args, **kwargs)
+            if response.status_code != 429:
+                break
+            time.sleep(delay * (1 + random.random()) / 2)
+            delay = delay * INCREASE_FACTOR
+        return response
+    return wrapper
 
-@retry_request(RETRY_DELAY)
+@retry_request
 def http_get_request(url, headers={}):
     """Wrapper around requests.get."""
     headers.setdefault('user-agent', 'Mozilla/5.0',)
     response = requests.get(url, headers=headers)
     return response
 
-@retry_request(RETRY_DELAY)
+@retry_request
 def http_head_request(url, headers={}):
     """Wrapper around requests.head."""
     headers.setdefault('user-agent', 'Mozilla/5.0')
     response = requests.head(url, headers=headers)
     return response
 
-@retry_request(RETRY_DELAY)
+@retry_request
 def http_post_request(url, params, headers={}):
     """Wrapper around requests.post."""
     headers.setdefault('user-agent', 'Mozilla/5.0')

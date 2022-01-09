@@ -2,13 +2,10 @@ from unittest.mock import MagicMock, NonCallableMock, patch
 import unittest
 from obscraper import download
 import time
-
-class Mock():
-    pass
+import math
 
 SUCCESS_RESPONSE = NonCallableMock(status_code=200)
 RETRY_RESPONSE = NonCallableMock(status_code=429)
-TEST_RETRY_DELAY = 0.3
 
 class TestHttpRequests(unittest.TestCase):
     
@@ -53,7 +50,7 @@ class TestRetryRequest(unittest.TestCase):
     def fail_n_times_then_succeed(self, n):
         """Function which fails n times before succeeding."""
         mock_method = MagicMock(side_effect = [RETRY_RESPONSE] * n + [SUCCESS_RESPONSE])
-        @download.retry_request(TEST_RETRY_DELAY)
+        @download.retry_request
         def mock_responder():
             return mock_method()
         return mock_responder
@@ -63,10 +60,9 @@ class TestRetryRequest(unittest.TestCase):
         response = fail_zero_times()
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skipIf(download.MAX_TRIES < 4, 'Maximum tries too small')
     def test_retry_succeeds_after_a_few_unsuccessful_tries(self):
-        fail_three_times = self.fail_n_times_then_succeed(3)
-        response = fail_three_times()
+        fail_two_times = self.fail_n_times_then_succeed(2)
+        response = fail_two_times()
         self.assertEqual(response.status_code, 200)
 
     def test_retry_gives_up_after_max_tries(self):
@@ -75,10 +71,13 @@ class TestRetryRequest(unittest.TestCase):
         self.assertEqual(response.status_code, 429)
 
     def test_retry_waits_long_enough(self):
-        fail_one_time = self.fail_n_times_then_succeed(2)
+        fail_many_times = self.fail_n_times_then_succeed(100)
         start_time = time.time()
-        response = fail_one_time()
+        response = fail_many_times()
         duration = time.time() - start_time
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 429)
         # Check duration of delay is roughly correct
-        self.assertTrue(duration > 0.8 * TEST_RETRY_DELAY)
+        self.assertTrue(duration > 0.5 * download.MAX_DELAY)
+        (dmax, dincrease) = (download.MAX_DELAY, download.INCREASE_FACTOR)
+        max_total_delay = (3 / 2) * dmax * dincrease / (dincrease - 1) # do the math
+        self.assertTrue(duration < max_total_delay)
