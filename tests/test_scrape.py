@@ -209,20 +209,20 @@ class TestAttachEditDates(unittest.TestCase):
     def test_returns_post_with_date_attached_for_fake_posts_and_dates(self):
         # Expect more edit dates than posts
         edit_dates = {f'url {i+1}': f'edit date {i+1}' for i in range(10)}
-        posts = [MagicMock(url=f'url {i+1}') for i in range(5)]
+        posts = {f'url {2*i+2}': MagicMock(url=f'url {2*i+2}') for i in range(5)}
         with patch('obscraper.grab.grab_edit_dates', return_value=edit_dates) as mock_edit_dates:
             posts = scrape.attach_edit_dates(posts)
         mock_edit_dates.assert_called_once()
-        for i, p in enumerate(posts):
-            p.set_edit_date.assert_called_once_with(f'edit date {i+1}')
+        for i, p in enumerate(posts.values()):
+            p.set_edit_date.assert_called_once_with(f'edit date {2*i+2}')
 
     def test_returns_none_for_invalid_post(self):
         # Posts which could not be found are returned as None
         edit_dates = {'fake url': 'fake edit date'}
         with patch('obscraper.grab.grab_edit_dates', return_value=edit_dates) as mock_edit_dates:
-            invalid_post = scrape.attach_edit_dates([None])
+            invalid_post = scrape.attach_edit_dates({'fake url': None})
         mock_edit_dates.assert_called_once()
-        self.assertIsNone(invalid_post[0])
+        self.assertIsNone(invalid_post['fake url'])
 
 class TestRaiseExceptionIfNumberHasIncorrectFormat(unittest.TestCase):
     def test_no_exception_raised_if_number_has_correct_format(self):
