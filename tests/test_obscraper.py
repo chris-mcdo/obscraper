@@ -56,17 +56,15 @@ class TestOBScraper(unittest.TestCase):
         self.assert_post_standard_attributes_have_correct_types(test_post)
         self.assert_post_standard_attributes_have_valid_values(test_post)
         if votes:
-            self.assertTrue(hasattr(test_post, 'votes'))
             self.assertIsInstance(test_post.votes, int)
             self.assertGreaterEqual(test_post.votes, 0)
         else:
-            self.assertFalse(hasattr(test_post, 'votes'))
+            self.assertIsNone(test_post.votes)
         if comments:
-            self.assertTrue(hasattr(test_post, 'comments'))
             self.assertIsInstance(test_post.comments, int)
             self.assertGreaterEqual(test_post.comments, 0)
         else:
-            self.assertFalse(hasattr(test_post, 'comments'))
+            self.assertIsNone(test_post.comments)
 
     def assert_post_has_standard_attributes(self, test_post):
         self.assertIsInstance(test_post, post.Post)

@@ -10,7 +10,7 @@ def map_with_delay(func, arg_dict, delay, max_workers=32, **kwargs):
     ----------
     func : callable
         Function to be evaluated.
-    arg_dict : dict
+    arg_dict : Dict[str, object]
         Dictionary whose keys label each element and whose values are
         passed to func.
     delay : float
@@ -23,7 +23,7 @@ def map_with_delay(func, arg_dict, delay, max_workers=32, **kwargs):
 
     Returns
     -------
-    result : dict
+    result : Dict[str, object]
         Dictionary whose keys are the inputted labels and whose values
         are the outputs of `func`, evaluated at each argument value.
     """

@@ -1,5 +1,8 @@
 """Store information from a single overcomingbias post."""
 
+import datetime
+import dataclasses
+from typing import Dict
 from . import extract_post, grab
 
 
@@ -56,6 +59,7 @@ def create_post(post_html, votes=True, comments=True):
     return new_post
 
 
+@dataclasses.dataclass(order=False)
 class Post:
     """Class representing a single post.
 
@@ -79,56 +83,53 @@ class Post:
         Lots'.
     author : str
         The name of the author of the post. E.g. 'Robin Hanson'
-    publish_date : aware datetime.datetime
-        The datetime when the post was first published, according to the
-        post page.
-    tags : list of str
+    publish_date : datetime.datetime
+        The (aware) datetime when the post was first published,
+        according to the post page.
+    tags : list[str]
         A list of tags associated with the post.
+    categories : list[str]
+        A list of categories associated with the post.
     text : str
         The full text of the post, as plaintext.
     word_count : int
         The number of words in the body of the post.
-    internal_links : dict
+    internal_links : Dict[str, int]
         Dictionary whose keys are the hyperlinks to other posts found in
         the body of the post (str), and whose values are the number of
         times these links are repeated (int).
-    external_links : dict
+    external_links : Dict[str, int]
         Dictionary whose keys are the hyperlinks to non-post webpages
         found in the body of the post (str), and whose values are
         the number of times these links are repeated (int).
     disqus_id : str
         A string which uniquely identifies the post to the Disqus
         comment count API.
-    edit_date : aware datetime.datetime
-        The datetime when the post was last edited, according to the
-        sitemap.
     votes : int
         The number of votes the post has received.
     comments : int
         The number of comments on the post.
+    edit_date : datetime.datetime
+        The (aware) datetime when the post was last edited, according to
+        the sitemap.
     """
-
-    def __init__(self, url, name, number, page_type, page_status, page_format,
-                 tags, categories, title, author, publish_date, text,
-                 word_count, internal_links, external_links, disqus_id,
-                 votes=None, comments=None, edit_date=None):
-        """Initialise a Post object."""
-        self.url = url
-        self.name = name
-        self.number = number
-        self.page_type = page_type
-        self.page_status = page_status
-        self.page_format = page_format
-        self.tags = tags
-        self.categories = categories
-        self.title = title
-        self.author = author
-        self.publish_date = publish_date
-        self.text = text
-        self.word_count = word_count
-        self.internal_links = internal_links
-        self.external_links = external_links
-        self.disqus_id = disqus_id
-        self.votes = votes
-        self.comments = comments
-        self.edit_date = edit_date
+    # pylint: disable=too-many-instance-attributes
+    url: str
+    name: str
+    number: int
+    page_type: str
+    page_status: str
+    page_format: str
+    title: str
+    author: str
+    publish_date: datetime.datetime
+    tags: list[str]
+    categories: list[str]
+    text: str
+    word_count: int
+    internal_links: Dict[str, int]
+    external_links: Dict[str, int]
+    disqus_id: str
+    votes: int = None
+    comments: int = None
+    edit_date: datetime.datetime = None

@@ -95,9 +95,8 @@ def extract_publish_date(post_html):
 
     Returns
     -------
-    date : aware datetime.datetime
-        Date that the post was first published. Not to be confused with
-        the date the post was last edited
+    date : datetime.datetime
+        When the post was first published. An aware datetime object.
     """
     match = post_html.find(attrs={'class': 'entry-date'})
     raise_attribute_not_found_error_if_none(match, 'publish date')
@@ -131,7 +130,7 @@ def extract_tags(post_html):
 
     Returns
     -------
-    tags : list of str
+    tags : list[str]
         List of tags associated with the post.
     """
     return extract_meta_header(post_html).get('tag', [])
@@ -147,7 +146,7 @@ def extract_categories(post_html):
 
     Returns
     -------
-    categories : list of str
+    categories : list[str]
         List of categories associated with the post.
     """
     return extract_meta_header(post_html).get('category', [])
@@ -251,7 +250,7 @@ def extract_internal_links(post_html):
 
     Returns
     -------
-    internal_links : list of str
+    internal_links : list[str]
         A dictionary whose keys record links to OB webpages within the
         post, and whose values record how many times each link is
         repeated (usually 1).
@@ -279,7 +278,7 @@ def extract_external_links(post_html):
 
     Returns
     -------
-    internal_links : list of str
+    internal_links : list[str]
         A dictionary whose keys record links to other webpages within
         the post, and whose values record how many times each link is
         repeated (usually 1).

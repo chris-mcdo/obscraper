@@ -85,9 +85,9 @@ def grab_edit_dates():
 
     Returns
     -------
-    edit_dates : dict
-        Dictionary whose keys are post URLs (str) and values are the
-        last edit dates of each post (str).
+    edit_dates : Dict[str, datetime.datetime]
+        Dictionary whose keys are post URLs and values are the last edit
+        dates of each post as aware datetime.datetime objects.
     """
     xml = download.grab_xml_soup(POST_LIST_URL)
     urls = extract_dates.extract_urls(xml)

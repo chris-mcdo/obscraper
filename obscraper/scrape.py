@@ -9,9 +9,9 @@ def get_all_posts():
 
     Returns
     -------
-    posts : dict
-        A dictionary whose keys are post URLs (str) and whose values are
-        the corresponding posts (post.Post).
+    posts : Dict[str, post.Post]
+        A dictionary whose keys are post URLs and whose values are the
+        corresponding posts.
     """
     edit_dates = grab.grab_edit_dates()
     all_posts = get_posts_by_url(list(edit_dates.keys()))
@@ -31,14 +31,14 @@ def get_posts_by_url(urls):
 
     Parameter
     ---------
-    urls : list of str
+    urls : list[str]
         A list of overcomingbias post "long" URLs to scrape data for.
 
     Returns
     -------
-    posts : dict
-        A dictionary whose keys are the inputted URLs (str) and whose
-        values are the corresponding posts (post.Post).
+    posts : Dict[str, post.Post]
+        A dictionary whose keys are the inputted URLs and whose values
+        are the corresponding posts.
     """
     raise_exception_if_arg_is_not_type(urls, list, 'urls')
     for url in urls:
@@ -62,15 +62,14 @@ def get_posts_by_edit_date(start_date, end_date):
 
     Parameters
     ----------
-    start_date, end_date : aware datetime.datetime
-        The start and end dates of the date range.
+    start_date, end_date : datetime.datetime
+        The start and end dates of the date range, as aware datetimes.
 
     Returns
     -------
-    posts : dict
+    posts : Dict[str, post.Post]
         A dictionary whose keys are the URLs of posts edited within the
-        date range (str), and whose values are the corresponding posts
-        (post.Post).
+        date range, and whose values are the corresponding posts.
 
     Raises
     ------
@@ -100,16 +99,16 @@ def get_votes(post_numbers):
 
     Parameter
     ---------
-    post_numbers : dict
-        Dictionary whose keys are post URLs (str) and whose values are
-        post numbers to get votes for (int).
+    post_numbers : Dict[str, int]
+        Dictionary whose keys are post URLs and whose values are post
+        numbers to get votes for.
 
     Returns
     -------
-    votes : dict
-        A dictionary whose keys are the post URLs (str) and whose values
-        are corresponding vote counts (int). The vote count is 0 if the
-        post is not found.
+    votes : Dict[str, int]
+        A dictionary whose keys are the post URLs and whose values are
+        corresponding vote counts (int). The vote count is 0 if the post
+        is not found.
     """
     raise_exception_if_arg_is_not_type(post_numbers, dict, 'post_numbers')
     for url, number in post_numbers.items():
@@ -138,16 +137,16 @@ def get_comments(disqus_ids):
 
     Parameter
     ---------
-    disqus_ids : dict
-        Dictionary whose keys are post URLs (str) and whose values are
-        Disqus ID strings (str).
+    posts : Dict[str, str]
+        A dictionary whose keys are post URLs and whose values are the
+        the corresponding Disqus ID strings.
 
     Returns
     -------
-    comments : dict
-        A dictionary whose keys are the post URLs (str) and whose values
-        are corresponding comment counts (int). The comment count is
-        None if the post is not found.
+    comments : Dict[str, int]
+        A dictionary whose keys are the post URLs and whose values are
+        corresponding comment counts. The comment count is None if the
+        post is not found.
     """
     raise_exception_if_arg_is_not_type(disqus_ids, dict, 'disqus_ids')
     for url, number in disqus_ids.items():
@@ -169,13 +168,13 @@ def attach_edit_dates(posts):
 
     Parameter
     ---------
-    posts : dict
-        A dictionary whose keys are post URLs (str) and whose values are
-        the corresponding posts (post.Post).
+    posts : Dict[str, post.Post]
+        A dictionary whose keys are post URLs and whose values are the
+        corresponding posts, or None.
 
     Returns
     -------
-    posts : dict
+    posts : Dict[str, post.Post]
         An updated dictionary of posts, with edit dates attached.
     """
     date_list = grab.grab_edit_dates()
