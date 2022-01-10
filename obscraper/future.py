@@ -1,25 +1,38 @@
+"""Multithreading implementation for sending requests."""
 import time
 import concurrent.futures
 
-def map_with_delay(func, arg_dict, delay, max_workers=32, *args, **kwargs):
-    """Map with a time delay between each function evaluation.
-    
-    If exception handling is needed, it should be performed in 
-    func. 
 
-    Args:
-        func: callable. Function to be evaluated.
-        arg_dict: dictionary. Dictionary whose keys identify
-        each element and whose values are passed to func.
-        delay: number. The time delay (in seconds) between
-        function evaluations.
-        max_workers: int. The maximum number of threads used
-        to execute the function evaluations.
+def map_with_delay(func, arg_dict, delay, max_workers=32, **kwargs):
+    """Map with a time delay between each function evaluation.
+
+    Parameters
+    ----------
+    func : callable
+        Function to be evaluated.
+    arg_dict : dict
+        Dictionary whose keys label each element and whose values are
+        passed to func.
+    delay : float
+        The time delay (in seconds) between function evaluations.
+    max_workers : int
+        The maximum number of threads used to execute the function
+        evaluations.
+    **kwargs : dict, optional
+        Extra arguments to be passed to `func`.
+
+    Returns
+    -------
+    result : dict
+        Dictionary whose keys are the inputted labels and whose values
+        are the outputs of `func`, evaluated at each argument value.
     """
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)\
+            as executor:
         arg_futures = {}
-        for id, value in arg_dict.items():
-            arg_futures[id] = executor.submit(func, value, *args, **kwargs)
+        for label, value in arg_dict.items():
+            arg_futures[label] = executor.submit(func, value, **kwargs)
             time.sleep(delay)
-        result = {id: future.result() for id, future in arg_futures.items()}
+        result = {label: future.result()
+                  for label, future in arg_futures.items()}
     return result

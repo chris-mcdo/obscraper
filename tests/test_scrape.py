@@ -6,10 +6,11 @@ import datetime
 
 from obscraper import extract_post, grab, post, scrape, utils
 
+
 class TestGetAllPosts(unittest.TestCase):
     @patch('obscraper.grab.grab_edit_dates')
     def test_returns_correct_result_for_fake_edit_list(self, mock_grab_edit_dates):
-        tidy = lambda d: utils.tidy_date(d, 'US/Eastern')
+        def tidy(d): return utils.tidy_date(d, 'US/Eastern')
         edit_dates = {
             'https://www.overcomingbias.com/2006/11/introduction.html': tidy('November 22, 2006 6:17 am'),
             'https://www.overcomingbias.com/2007/10/a-rational-argu.html': tidy('October 5, 2007 2:31 pm'),
@@ -18,7 +19,9 @@ class TestGetAllPosts(unittest.TestCase):
         mock_grab_edit_dates.return_value = edit_dates
         posts = scrape.get_all_posts()
         self.assertEqual(len(posts), 2)
-        [self.assertEqual(p.edit_date, edit_dates[url]) for url, p in posts.items()]
+        [self.assertEqual(p.edit_date, edit_dates[url])
+         for url, p in posts.items()]
+
 
 class TestGetPostsByURL(unittest.TestCase):
     def test_returns_valid_posts_for_valid_urls(self):
@@ -54,10 +57,10 @@ class TestGetPostsByURL(unittest.TestCase):
 
     def test_returns_none_for_invalid_urls(self):
         urls = [
-            'https://www.overcomingbias.com/2007/10/a-rational-argu.html', # LessWrong URL
-            'https://www.overcomingbias.com/2012/08/not-a-real-post.html', # Fake URL
-            r'https://www.overcomingbias.com/2007/01/the-procrastinator%e2%80%99s-clock.html', # valid URL
-            ]
+            'https://www.overcomingbias.com/2007/10/a-rational-argu.html',  # LessWrong URL
+            'https://www.overcomingbias.com/2012/08/not-a-real-post.html',  # Fake URL
+            r'https://www.overcomingbias.com/2007/01/the-procrastinator%e2%80%99s-clock.html',  # valid URL
+        ]
         posts = scrape.get_posts_by_url(urls)
         self.assertIsNone(posts[urls[0]])
         self.assertIsNone(posts[urls[1]])
@@ -65,32 +68,40 @@ class TestGetPostsByURL(unittest.TestCase):
 
     def assert_is_valid_post(self, p):
         self.assertIsInstance(p, post.Post)
-        self.assertTrue(hasattr(p, 'word_count'))
-        self.assertFalse(hasattr(p, 'votes'))
-        self.assertFalse(hasattr(p, 'comments'))
+        self.assertGreaterEqual(p.word_count, 5)
+        self.assertGreaterEqual(p.votes, 0)
+        self.assertGreaterEqual(p.comments, 0)
+
 
 class TestGetPostsByEditDate(unittest.TestCase):
     def test_returns_valid_results_for_valid_arguments(self):
         with patch('obscraper.grab.grab_edit_dates', return_value=grab.grab_edit_dates()) as mock_grab_edit_dates:
             now = datetime.datetime.now(datetime.timezone.utc)
             dday = datetime.timedelta(days=1)
-            self.assertEqual(scrape.get_posts_by_edit_date(now+dday, now+5*dday), {})
+            self.assertEqual(scrape.get_posts_by_edit_date(
+                now+dday, now+5*dday), {})
             last_week = scrape.get_posts_by_edit_date(now-7*dday, now)
             self.assertIsInstance(last_week, dict)
-            [self.assertTrue(extract_post.is_ob_post_url(url)) for url in last_week.keys()]
+            [self.assertTrue(extract_post.is_valid_post_url(url))
+             for url in last_week.keys()]
             [self.assertIsInstance(p, post.Post) for p in last_week.values()]
-    
+
     def test_raises_type_error_if_dates_are_wrong_type(self):
         now = datetime.datetime.now(datetime.timezone.utc)
         dday = datetime.timedelta(days=1)
-        self.assertRaises(TypeError, scrape.get_posts_by_edit_date, start_date=now, end_date=datetime.datetime.now())
-        self.assertRaises(TypeError, scrape.get_posts_by_edit_date, start_date=now - 3 * dday, end_date='hi')
-        self.assertRaises(TypeError, scrape.get_posts_by_edit_date, start_date=12345, end_date=now)
+        self.assertRaises(TypeError, scrape.get_posts_by_edit_date,
+                          start_date=now, end_date=datetime.datetime.now())
+        self.assertRaises(TypeError, scrape.get_posts_by_edit_date,
+                          start_date=now - 3 * dday, end_date='hi')
+        self.assertRaises(TypeError, scrape.get_posts_by_edit_date,
+                          start_date=12345, end_date=now)
 
     def test_raises_value_error_if_end_date_before_start_date(self):
         now = datetime.datetime.now(datetime.timezone.utc)
         dday = datetime.timedelta(days=1)
-        self.assertRaises(ValueError, scrape.get_posts_by_edit_date, start_date=now+dday, end_date=now-dday)
+        self.assertRaises(ValueError, scrape.get_posts_by_edit_date,
+                          start_date=now+dday, end_date=now-dday)
+
 
 class TestGetVotes(unittest.TestCase):
     def test_returns_valid_vote_counts_for_valid_post_numbers(self):
@@ -133,18 +144,19 @@ class TestGetVotes(unittest.TestCase):
         ]:
             self.assertRaises(ValueError, scrape.get_votes, post_numbers)
 
+
 class TestGetComments(unittest.TestCase):
     def test_returns_valid_comment_counts_for_valid_disqus_ids(self):
         disqus_ids = {
-            'https://www.overcomingbias.com/2006/11/introduction.html': 
+            'https://www.overcomingbias.com/2006/11/introduction.html':
             '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
-            'https://www.overcomingbias.com/2007/03/the_very_worst_.html': 
+            'https://www.overcomingbias.com/2007/03/the_very_worst_.html':
             '18141 http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html',
-            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 
+            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html':
             '18423 http://www.overcomingbias.com/?p=18423',
-            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': 
+            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html':
             '32811 http://www.overcomingbias.com/?p=32811',
-            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html': 
+            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html':
             '33023 https://www.overcomingbias.com/?p=33023',
         }
         comments = scrape.get_comments(disqus_ids)
@@ -152,19 +164,19 @@ class TestGetComments(unittest.TestCase):
             self.assertIn(url, disqus_ids.keys())
             self.assertIsInstance(comment, int)
             self.assertGreater(comment, 1)
-    
+
     def test_raises_type_error_if_arguments_are_wrong_type(self):
         for disqus_ids in [
             {
-                'https://www.overcomingbias.com/2006/11/introduction.html': 
+                'https://www.overcomingbias.com/2006/11/introduction.html':
                 '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
-                'https://www.overcomingbias.com/2007/03/the_very_worst_.html': 
+                'https://www.overcomingbias.com/2007/03/the_very_worst_.html':
                 18481,
             },
             {
-                'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 
+                'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html':
                 '18423 http://www.overcomingbias.com/?p=18423',
-                35618: 
+                35618:
                 '32811 http://www.overcomingbias.com/?p=32811',
             }
         ]:
@@ -174,9 +186,9 @@ class TestGetComments(unittest.TestCase):
         dt = utils.tidy_date('October 15, 2013 6:10 pm', 'US/Eastern')
         for disqus_ids in [
             {
-                'https://www.overcomingbias.com/2006/11/introduction.html': 
+                'https://www.overcomingbias.com/2006/11/introduction.html':
                 '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
-                'https://www.overcomingbias.com/2007/03/the_very_worst_.html': 
+                'https://www.overcomingbias.com/2007/03/the_very_worst_.html':
                 '18141 http://prod.ob.trike.com.au/?p=18141',
             },
             {'https://www.overcomingbias.com/2006/11/introduction.html': ''},
@@ -189,32 +201,35 @@ class TestGetComments(unittest.TestCase):
             'https://www.overcomingbias.com/2007/03/the_very_worst_.html',
             'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html',
         ]
-        real_urls = ['https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html']
+        real_urls = [
+            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html']
         disqus_ids = {
-            'https://www.overcomingbias.com/2007/03/the_very_worst_.html': 
+            'https://www.overcomingbias.com/2007/03/the_very_worst_.html':
             '12345 http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html',
-            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 
+            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html':
             '18423 http://www.overcomingbias.com/?p=18423',
-            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': 
+            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html':
             '65432 http://www.overcomingbias.com/?p=65432',
         }
         comments = scrape.get_comments(disqus_ids)
-        for url in none_urls:            
+        for url in none_urls:
             self.assertIsNone(comments[url])
         for url in real_urls:
             self.assertIsInstance(comments[url], int)
             self.assertGreater(comments[url], 1)
 
+
 class TestAttachEditDates(unittest.TestCase):
     def test_returns_post_with_date_attached_for_fake_posts_and_dates(self):
         # Expect more edit dates than posts
         edit_dates = {f'url {i+1}': f'edit date {i+1}' for i in range(10)}
-        posts = {f'url {2*i+2}': MagicMock(url=f'url {2*i+2}') for i in range(5)}
+        posts = {f'url {2*i+2}': MagicMock(url=f'url {2*i+2}')
+                 for i in range(5)}
         with patch('obscraper.grab.grab_edit_dates', return_value=edit_dates) as mock_edit_dates:
             posts = scrape.attach_edit_dates(posts)
         mock_edit_dates.assert_called_once()
         for i, p in enumerate(posts.values()):
-            p.set_edit_date.assert_called_once_with(f'edit date {2*i+2}')
+            self.assertEqual(p.edit_date, f'edit date {2*i+2}')
 
     def test_returns_none_for_invalid_post(self):
         # Posts which could not be found are returned as None
@@ -223,6 +238,7 @@ class TestAttachEditDates(unittest.TestCase):
             invalid_post = scrape.attach_edit_dates({'fake url': None})
         mock_edit_dates.assert_called_once()
         self.assertIsNone(invalid_post['fake url'])
+
 
 class TestRaiseExceptionIfNumberHasIncorrectFormat(unittest.TestCase):
     def test_no_exception_raised_if_number_has_correct_format(self):

@@ -1,5 +1,4 @@
 """Perform general web scraping tasks."""
-
 import functools
 import random
 import time
@@ -9,6 +8,7 @@ import bs4
 START_DELAY = 0.04
 INCREASE_FACTOR = 4
 MAX_DELAY = 3
+
 
 def retry_request(func):
     """Retry http request until 429 response is no longer received."""
@@ -24,38 +24,51 @@ def retry_request(func):
         return response
     return wrapper
 
+
 @retry_request
-def http_get_request(url, headers={}):
+def http_get_request(url, headers=None):
     """Wrapper around requests.get."""
+    if headers is None:
+        headers = {}
     headers.setdefault('user-agent', 'Mozilla/5.0',)
     response = requests.get(url, headers=headers)
     return response
 
+
 @retry_request
-def http_head_request(url, headers={}):
+def http_head_request(url, headers=None):
     """Wrapper around requests.head."""
+    if headers is None:
+        headers = {}
     headers.setdefault('user-agent', 'Mozilla/5.0')
     response = requests.head(url, headers=headers)
     return response
 
+
 @retry_request
-def http_post_request(url, params, headers={}):
+def http_post_request(url, params, headers=None):
     """Wrapper around requests.post."""
+    if headers is None:
+        headers = {}
     headers.setdefault('user-agent', 'Mozilla/5.0')
     response = requests.post(url, params=params, headers=headers)
     return response
+
 
 def grab_xml_soup(url):
     """Grab an XML file and parse as a BeautifulSoup object."""
     return bs4.BeautifulSoup(grab_page_raw(url), 'lxml-xml')
 
+
 def grab_page_raw(url):
     """Grab the raw HTML of a webpage."""
     return http_get_request(url).text
 
+
 def grab_html_soup(url):
     """Grab an HTML file and parse as a BeautifulSoup object."""
     return bs4.BeautifulSoup(grab_page_raw(url), 'lxml')
+
 
 def grab_status_code(url):
     """Get the status code returned by an arbitrary URL."""
