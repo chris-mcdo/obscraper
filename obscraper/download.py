@@ -36,16 +36,6 @@ def http_get_request(url, headers=None):
 
 
 @retry_request
-def http_head_request(url, headers=None):
-    """Wrapper around requests.head."""
-    if headers is None:
-        headers = {}
-    headers.setdefault('user-agent', 'Mozilla/5.0')
-    response = requests.head(url, headers=headers)
-    return response
-
-
-@retry_request
 def http_post_request(url, params, headers=None):
     """Wrapper around requests.post."""
     if headers is None:
@@ -68,8 +58,3 @@ def grab_page_raw(url):
 def grab_html_soup(url):
     """Grab an HTML file and parse as a BeautifulSoup object."""
     return bs4.BeautifulSoup(grab_page_raw(url), 'lxml')
-
-
-def grab_status_code(url):
-    """Get the status code returned by an arbitrary URL."""
-    return http_head_request(url).status_code

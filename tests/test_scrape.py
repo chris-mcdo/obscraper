@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import datetime
 
-from obscraper import extract_post, grab, post, scrape, utils
+from obscraper import exceptions, extract_post, grab, post, scrape, utils
 
 
 class TestGetAllPosts(unittest.TestCase):
@@ -23,7 +23,20 @@ class TestGetAllPosts(unittest.TestCase):
          for url, p in posts.items()]
 
 
-class TestGetPostsByURL(unittest.TestCase):
+class TestGetPostByURL(unittest.TestCase):
+    def test_returns_valid_post_for_valid_url(self):
+        url = 'https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html'
+        p = scrape.get_post_by_url(url)
+        self.assertIsInstance(p, post.Post)
+        self.assertEqual(p.url, url)
+
+    def test_raises_exception_when_post_not_found(self):
+        url = 'https://www.overcomingbias.com/2016/03/not-a-real-post.html'
+        self.assertRaises(exceptions.InvalidResponseError,
+                          scrape.get_post_by_url, url)
+
+
+class TestGetPostsByURLs(unittest.TestCase):
     def test_returns_valid_posts_for_valid_urls(self):
         urls = [
             'https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html',
@@ -120,6 +133,7 @@ class TestGetVotes(unittest.TestCase):
 
     def test_raises_type_error_if_arguments_are_wrong_type(self):
         for post_numbers in [
+            18402,
             {
                 'https://www.overcomingbias.com/2006/11/introduction.html': 18402,
                 12345: 45678
@@ -167,6 +181,7 @@ class TestGetComments(unittest.TestCase):
 
     def test_raises_type_error_if_arguments_are_wrong_type(self):
         for disqus_ids in [
+            '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
             {
                 'https://www.overcomingbias.com/2006/11/introduction.html':
                 '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
@@ -271,6 +286,8 @@ class TestRaiseExceptionIfNumberHasIncorrectFormat(unittest.TestCase):
 class TestClearCache(unittest.TestCase):
     @patch('obscraper.extract_post.is_ob_post_html', return_value=True)
     def test_clears_grab_post_cache(self, mock_is_ob_post):
+        scrape.clear_cache()
+
         p1 = grab.grab_post_by_url(
             'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html')
         self.assertIsInstance(p1, post.Post)

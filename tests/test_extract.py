@@ -265,7 +265,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
 class TestExtractFunctionsOnFakePost(unittest.TestCase):
     def test_extract_functions_raise_exception_for_invalid_html(self):
-        fake_html = bs4.BeautifulSoup('Fake HTML')
+        fake_html = bs4.BeautifulSoup('Fake HTML', features='lxml')
         not_found = exceptions.AttributeNotFoundError
         self.assertRaises(not_found, extract_post.extract_url, fake_html)
         self.assertRaises(not_found, extract_post.extract_name, fake_html)
@@ -355,6 +355,9 @@ class TestIsValidDisqusID(unittest.TestCase):
 
     def test_returns_false_for_invalid_ids(self):
         valid = extract_post.is_valid_disqus_id
+        self.assertFalse(valid(12345))
+        self.assertFalse(
+            valid(['33014 https://www.overcomingbias.com/?p=33014']))
         self.assertFalse(
             valid('18402 http://prod.ob.trike.com.au/how-to-join.html'))
         self.assertFalse(valid('18402 http://prod.ob.trike.com.au/?p=18402'))
