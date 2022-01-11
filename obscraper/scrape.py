@@ -7,19 +7,55 @@ from . import grab, extract_post, exceptions, utils
 def get_all_posts():
     """Get all posts hosted on the overcomingbias site.
 
+    This includes vote and comment counts for each post. It does not
+    include posts which are no longer hosted on the overcomingbias site
+    (i.e. posts by Eliezer Yudkowsky).
+
     Returns
     -------
     posts : Dict[str, post.Post]
         A dictionary whose keys are post URLs and whose values are the
-        corresponding posts.
+        corresponding posts. "Last edit" dates are attached.
     """
     edit_dates = grab.grab_edit_dates()
-    all_posts = get_posts_by_url(list(edit_dates.keys()))
+    all_posts = get_posts_by_urls(list(edit_dates.keys()))
     ob_posts = {url: p for url, p in all_posts.items() if p is not None}
-    return attach_edit_dates(ob_posts)
+    return ob_posts
 
 
-def get_posts_by_url(urls):
+def get_post_by_url(url):
+    """Get a single post identified by its URL.
+
+    The input should be an overcomingbias post "long" URL. A long URL is
+    one which contains the name of the post, e.g.
+    https://www.overcomingbias.com/2011/05/jobs-kill-big-time.html.
+
+    Parameter
+    ---------
+    url : str
+        An overcomingbias post "long" URL.
+
+    Returns
+    -------
+    post : post.Post
+        The post corresponding to the input URL, with "last edit" date
+        attached.
+
+    Raises
+    ------
+    exceptions.InvalidResponseError
+        If the URL returns a page that does not look like an
+        overcomingbias post.
+    exceptions.AttributeNotFoundError
+        If a post.Post attribute could not be extracted from the
+        downloaded page.
+    """
+    raise_exception_if_url_is_not_ob_post_long_url(url)
+    post = grab.grab_post_by_url(url)
+    return attach_edit_dates({post.url: post})[post.url]
+
+
+def get_posts_by_urls(urls):
     """Get list of posts identified by their URLs.
 
     The input should be a list of overcomingbias post "long"
@@ -38,7 +74,7 @@ def get_posts_by_url(urls):
     -------
     posts : Dict[str, post.Post]
         A dictionary whose keys are the inputted URLs and whose values
-        are the corresponding posts.
+        are the corresponding posts. "Last edit" dates are attached.
     """
     raise_exception_if_arg_is_not_type(urls, list, 'urls')
     for url in urls:
@@ -51,7 +87,7 @@ def get_posts_by_url(urls):
         except (exceptions.AttributeNotFoundError,
                 exceptions.InvalidResponseError):
             return None
-    url_dict = {url: url for url in urls}
+    url_dict = dict(zip(urls, urls))
     posts = future.map_with_delay(
         func=get_post, arg_dict=url_dict, delay=0.02, max_workers=32)
     return attach_edit_dates(posts)
@@ -69,7 +105,8 @@ def get_posts_by_edit_date(start_date, end_date):
     -------
     posts : Dict[str, post.Post]
         A dictionary whose keys are the URLs of posts edited within the
-        date range, and whose values are the corresponding posts.
+        date range, and whose values are the corresponding posts. "Last
+        edit" dates are attached.
 
     Raises
     ------
@@ -84,7 +121,7 @@ def get_posts_by_edit_date(start_date, end_date):
     edit_dates = grab.grab_edit_dates()
     selected_urls = [url for url, edit_date in edit_dates.items(
     ) if start_date < edit_date < end_date]
-    posts = get_posts_by_url(selected_urls)
+    posts = get_posts_by_urls(selected_urls)
     return attach_edit_dates(posts)
 
 

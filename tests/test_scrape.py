@@ -30,7 +30,7 @@ class TestGetPostsByURL(unittest.TestCase):
             'https://www.overcomingbias.com/2014/07/limits-on-generality.html',
             'https://www.overcomingbias.com/2012/02/why-retire.html'
         ]
-        posts = scrape.get_posts_by_url(urls)
+        posts = scrape.get_posts_by_urls(urls)
         self.assertIsInstance(posts, dict)
         self.assertTrue(len(posts), len(urls))
         for p in posts.values():
@@ -42,7 +42,7 @@ class TestGetPostsByURL(unittest.TestCase):
             ['https://www.overcomingbias.com/2007/10/a-rational-argu.html', None],
             [3514, 8293],
         ]:
-            self.assertRaises(TypeError, scrape.get_posts_by_url, urls)
+            self.assertRaises(TypeError, scrape.get_posts_by_urls, urls)
 
     def test_raises_value_error_if_urls_in_wrong_format(self):
         for urls in [
@@ -53,7 +53,7 @@ class TestGetPostsByURL(unittest.TestCase):
             ['https://www.overcomingbias.com/page/20'],
             ['http://www.overcomingbias.com/archives'],
         ]:
-            self.assertRaises(ValueError, scrape.get_posts_by_url, urls)
+            self.assertRaises(ValueError, scrape.get_posts_by_urls, urls)
 
     def test_returns_none_for_invalid_urls(self):
         urls = [
@@ -61,7 +61,7 @@ class TestGetPostsByURL(unittest.TestCase):
             'https://www.overcomingbias.com/2012/08/not-a-real-post.html',  # Fake URL
             r'https://www.overcomingbias.com/2007/01/the-procrastinator%e2%80%99s-clock.html',  # valid URL
         ]
-        posts = scrape.get_posts_by_url(urls)
+        posts = scrape.get_posts_by_urls(urls)
         self.assertIsNone(posts[urls[0]])
         self.assertIsNone(posts[urls[1]])
         self.assert_is_valid_post(posts[urls[2]])
