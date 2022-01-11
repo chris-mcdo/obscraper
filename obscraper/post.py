@@ -45,7 +45,7 @@ def create_post(post_html, votes=True, comments=True):
         author=extract_post.extract_author(post_html),
         publish_date=extract_post.extract_publish_date(post_html),
         # Word count and links
-        text=extract_post.extract_text(post_html),
+        text_html=extract_post.extract_text_html(post_html),
         word_count=extract_post.extract_word_count(post_html),
         internal_links=extract_post.extract_internal_links(post_html),
         external_links=extract_post.extract_external_links(post_html),
@@ -90,8 +90,8 @@ class Post:
         A list of tags associated with the post.
     categories : list[str]
         A list of categories associated with the post.
-    text : str
-        The full text of the post, as plaintext.
+    text_html : str
+        The full text of the post in HTML format.
     word_count : int
         The number of words in the body of the post.
     internal_links : Dict[str, int]
@@ -125,7 +125,7 @@ class Post:
     publish_date: datetime.datetime
     tags: list[str]
     categories: list[str]
-    text: str
+    text_html: str
     word_count: int
     internal_links: Dict[str, int]
     external_links: Dict[str, int]
@@ -133,3 +133,8 @@ class Post:
     votes: int = None
     comments: int = None
     edit_date: datetime.datetime = None
+
+    @property
+    def plaintext(self) -> str:
+        """Get post text as plaintext."""
+        return extract_post.convert_to_plaintext(self.text_html)

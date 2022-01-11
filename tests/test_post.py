@@ -52,13 +52,13 @@ class TestPost(unittest.TestCase):
         self.assertIsInstance(test_post, post.Post)
         for attr in [
             'url', 'name', 'title', 'author', 'publish_date', 'number', 'tags', 'categories',
-            'page_type', 'page_status', 'page_format', 'text', 'word_count', 'internal_links', 'external_links', 'disqus_id',
+            'page_type', 'page_status', 'page_format', 'text_html', 'word_count', 'internal_links', 'external_links', 'disqus_id',
         ]:
             self.assertTrue(hasattr(test_post, attr))
 
     def assert_post_standard_attributes_have_correct_types(self, test_post):
         # str
-        for attr in ['url', 'name', 'title', 'author', 'page_type', 'page_status', 'page_format', 'text', 'disqus_id', ]:
+        for attr in ['url', 'name', 'title', 'author', 'page_type', 'page_status', 'page_format', 'text_html', 'disqus_id', ]:
             self.assertIsInstance(getattr(test_post, attr), str)
         # datetime.datetime
         self.assertIsInstance(test_post.publish_date, datetime.datetime)
@@ -102,7 +102,7 @@ class TestPost(unittest.TestCase):
         self.assertRegex(test_post.author, r'^[A-Za-z0-9\. ]+$')
         self.assertTrue(utils.is_aware_datetime(test_post.publish_date))
         # Word count and links
-        self.assertNotEqual(test_post.text, '')
+        self.assertNotEqual(test_post.plaintext, '')
         self.assertGreater(test_post.word_count, 5)
         [self.assertTrue(extract_post.is_valid_post_url(url))
          for url in test_post.internal_links.keys()]

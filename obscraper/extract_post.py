@@ -1,6 +1,9 @@
 """Extract meta-data from an overcomingbias blog post."""
 
 import re
+import copy
+
+import bs4
 
 from . import utils, exceptions
 
@@ -200,11 +203,8 @@ def extract_page_format(post_html):
     return extract_meta_header(post_html).get('format', [''])[0]
 
 
-def extract_text(post_html):
-    """Extract full text of post as plaintext.
-
-    Returns text of a post, removing leading and trailing whitespace and
-    some special characters.
+def extract_text_html(post_html):
+    """Extract lightly edited HTML of the post text.
 
     Parameter
     ---------
@@ -213,14 +213,15 @@ def extract_text(post_html):
 
     Returns
     -------
-    text : str
-        Full text of post as plaintext.
+    text_html : str
+        Post text HTML, lightly edited.
     """
     match = post_html.find(attrs={'class': 'entry-content'})
     raise_attribute_not_found_error_if_none(match, 'text')
-    text = match.text.removesuffix(
-        '\nGD Star Ratingloading...\n').replace('\xa0', ' ').strip()
-    return text
+    # don't make changes to the original object
+    match_copy = copy.copy(match)
+    match_copy.find(attrs={'class': 'gdsrcacheloader'}).decompose()
+    return str(match_copy)
 
 
 def extract_word_count(post_html):
@@ -236,7 +237,8 @@ def extract_word_count(post_html):
     word_count : int
         The number of words in the body of the post.
     """
-    text = extract_text(post_html)
+    text_html = extract_text_html(post_html)
+    text = convert_to_plaintext(text_html)
     return utils.count_words(text)
 
 
@@ -346,6 +348,25 @@ def extract_meta_header(post_html):
         if value is not None:
             header_dict[key].append(value)
     return header_dict
+
+
+def convert_to_plaintext(text_html):
+    """Convert post text from HTML to plaintext format.
+
+    Parameter
+    ---------
+    text_html : str
+        Post text HTML as given by `extract_text_html`.
+
+    Returns
+    -------
+    text : str
+        Full text of post as plaintext. Leading and trailing whitespace
+        and some special characters are removed.
+    """
+    html = bs4.BeautifulSoup(text_html, 'lxml')
+    text = html.text.replace('\xa0', ' ').strip()
+    return text
 
 
 def has_post_in_id(tag):

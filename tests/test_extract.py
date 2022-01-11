@@ -155,8 +155,10 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
             self.assertEqual(format(number), 'standard')
 
     def test_extract_text_returns_correct_start_and_end_for_valid_htmls(self):
-        text = self.function_to_get_attribute_by_number(
-            extract_post.extract_text)
+        def extract_text(post_html):
+            text_html = extract_post.extract_text_html(post_html)
+            return extract_post.convert_to_plaintext(text_html)
+        text = self.function_to_get_attribute_by_number(extract_text)
         self.assertTrue(text(18402).endswith(
             'Copyright is retained by each author.'))
         self.assertTrue(text(18141).endswith(
@@ -280,7 +282,7 @@ class TestExtractFunctionsOnFakePost(unittest.TestCase):
             not_found, extract_post.extract_page_status, fake_html)
         self.assertRaises(
             not_found, extract_post.extract_page_format, fake_html)
-        self.assertRaises(not_found, extract_post.extract_text, fake_html)
+        self.assertRaises(not_found, extract_post.extract_text_html, fake_html)
         self.assertRaises(
             not_found, extract_post.extract_word_count, fake_html)
         self.assertRaises(
