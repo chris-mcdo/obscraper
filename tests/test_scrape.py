@@ -266,3 +266,23 @@ class TestRaiseExceptionIfNumberHasIncorrectFormat(unittest.TestCase):
         self.assertRaises(ValueError, check_number, 9999)
         self.assertRaises(ValueError, check_number, 100000)
         self.assertRaises(ValueError, check_number, -12594)
+
+
+class TestClearCache(unittest.TestCase):
+    @patch('obscraper.extract_post.is_ob_post_html', return_value=True)
+    def test_clears_grab_post_cache(self, mock_is_ob_post):
+        p1 = grab.grab_post_by_url(
+            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html')
+        self.assertIsInstance(p1, post.Post)
+        mock_is_ob_post.assert_called_once()
+
+        p2 = grab.grab_post_by_url(
+            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html')
+        self.assertEqual(p1, p2)
+        mock_is_ob_post.assert_called_once()
+
+        scrape.clear_cache()
+
+        p3 = grab.grab_post_by_url(
+            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html')
+        self.assertEqual(mock_is_ob_post.call_count, 2)

@@ -184,6 +184,15 @@ def attach_edit_dates(posts):
     return posts
 
 
+def clear_cache():
+    """Clear all cached data."""
+    grab.grab_post_by_url.cache_clear()
+    grab.grab_comments.cache_clear()
+    grab.grab_votes.cache_clear()
+    grab.grab_edit_dates.cache_clear()
+    grab.vote_auth_code.cache_clear()
+
+
 def raise_exception_if_url_is_not_ob_post_long_url(url):
     """Raise an exception if a URL is not a post "long" URL."""
     if not isinstance(url, str):
