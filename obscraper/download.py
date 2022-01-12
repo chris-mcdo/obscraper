@@ -11,7 +11,7 @@ MAX_DELAY = 3
 
 
 def retry_request(func):
-    """Retry http request until 429 response is no longer received."""
+    """Retry HTTP request until 429 response is no longer received."""
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         delay = START_DELAY
@@ -46,15 +46,15 @@ def http_post_request(url, params, headers=None):
 
 
 def grab_xml_soup(url):
-    """Grab an XML file and parse as a BeautifulSoup object."""
+    """Download an XML file and parse as a bs4.BeautifulSoup object."""
     return bs4.BeautifulSoup(grab_page_raw(url), 'lxml-xml')
 
 
 def grab_page_raw(url):
-    """Grab the raw HTML of a webpage."""
+    """Download the raw HTML of a webpage."""
     return http_get_request(url).text
 
 
 def grab_html_soup(url):
-    """Grab an HTML file and parse as a BeautifulSoup object."""
+    """Download an HTML file and parse as a bs4.BeautifulSoup object."""
     return bs4.BeautifulSoup(grab_page_raw(url), 'lxml')
