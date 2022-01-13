@@ -7,9 +7,10 @@ from . import grab, extract_post, exceptions, utils
 def get_all_posts():
     """Get all posts hosted on the overcomingbias site.
 
-    This includes vote and comment counts for each post. It does not
-    include posts which are no longer hosted on the overcomingbias site
-    (i.e. posts by Eliezer Yudkowsky).
+    This includes vote and comment counts for each post.
+
+    Posts which are no longer hosted on the overcomingbias site are not
+    included (i.e. posts by Eliezer Yudkowsky).
 
     Returns
     -------
@@ -26,14 +27,14 @@ def get_all_posts():
 def get_post_by_url(url):
     """Get a single post identified by its URL.
 
-    The input should be an overcomingbias post "long" URL. A long URL is
-    one which contains the name of the post, e.g.
-    https://www.overcomingbias.com/2011/05/jobs-kill-big-time.html.
+    The input should be an overcomingbias post URL, e.g.
+    https://www.overcomingbias.com/2011/05/jobs-kill-big-time.html or
+    https://www.overcomingbias.com/?p=27739.
 
     Parameter
     ---------
     url : str
-        An overcomingbias post "long" URL.
+        An overcomingbias post URL.
 
     Returns
     -------
@@ -50,7 +51,7 @@ def get_post_by_url(url):
         If a post.Post attribute could not be extracted from the
         downloaded page.
     """
-    raise_exception_if_url_is_not_ob_post_long_url(url)
+    raise_exception_if_url_is_not_valid_post_url(url)
     post = grab.grab_post_by_url(url)
     return attach_edit_dates({post.url: post})[post.url]
 
@@ -58,17 +59,13 @@ def get_post_by_url(url):
 def get_posts_by_urls(urls):
     """Get list of posts identified by their URLs.
 
-    The input should be a list of overcomingbias post "long"
-    URLs. A long URL is one which contains the "name" of the post, e.g.
-    https://www.overcomingbias.com/2011/05/jobs-kill-big-time.html.
-
-    If a post or post attribute is not found, "None" is returned for
-    that post.
+    No exceptions are raised if a post or post attribute is not found -
+    instead "None" is returned for that post.
 
     Parameter
     ---------
     urls : list[str]
-        A list of overcomingbias post "long" URLs to scrape data for.
+        A list of overcomingbias post URLs to scrape data for.
 
     Returns
     -------
@@ -78,7 +75,7 @@ def get_posts_by_urls(urls):
     """
     raise_exception_if_arg_is_not_type(urls, list, 'urls')
     for url in urls:
-        raise_exception_if_url_is_not_ob_post_long_url(url)
+        raise_exception_if_url_is_not_valid_post_url(url)
 
     def get_post(url):
         """Get a post given its URL, returning None if not found."""
@@ -129,27 +126,28 @@ def get_votes(post_numbers):
     """Get vote counts for some posts.
 
     If one of the numbers is in an incorrect format, an exception is
-    raised. Unlike other functions, get_votes returns 0 (rather than
-    None) when a post is not found. This is because it is not possible
-    to determine whether a post exists or not from the vote count API;
-    it will just return 0 in this case.
+    raised. Unlike other functions, ``get_votes`` returns 0 (rather than
+    None) when a post is not found. This is because the vote count API
+    returns a vote count of 0 for posts that do not exist - it is
+    not possible to tell whether a post doesn't exist or if it just has
+    zero votes.
 
     Parameter
     ---------
     post_numbers : Dict[str, int]
-        Dictionary whose keys are post URLs and whose values are post
-        numbers to get votes for.
+        Dictionary whose keys are arbitrary labels (e.g. the post URLs)
+        and whose values are post numbers to get votes for.
 
     Returns
     -------
     votes : Dict[str, int]
-        A dictionary whose keys are the post URLs and whose values are
-        corresponding vote counts (int). The vote count is 0 if the post
-        is not found.
+        A dictionary whose keys are the inputted labels URLs and whose
+        values are the corresponding vote counts (int). The vote count
+        is 0 if the post is not found.
     """
     raise_exception_if_arg_is_not_type(post_numbers, dict, 'post_numbers')
     for url, number in post_numbers.items():
-        raise_exception_if_url_is_not_ob_post_long_url(url)
+        raise_exception_if_url_is_not_valid_post_url(url)
         raise_exception_if_number_has_incorrect_format(number)
 
     def get_vote(number):
@@ -175,19 +173,19 @@ def get_comments(disqus_ids):
     Parameter
     ---------
     posts : Dict[str, str]
-        A dictionary whose keys are post URLs and whose values are the
-        the corresponding Disqus ID strings.
+        Dictionary whose keys are arbitrary labels (e.g. the post URLs)
+        and whose values are the the corresponding Disqus ID strings.
 
     Returns
     -------
     comments : Dict[str, int]
-        A dictionary whose keys are the post URLs and whose values are
-        corresponding comment counts. The comment count is None if the
-        post is not found.
+        A dictionary whose keys are the inputted labels and whose values
+        are the corresponding comment counts. The comment count is None
+        if the post is not found.
     """
     raise_exception_if_arg_is_not_type(disqus_ids, dict, 'disqus_ids')
     for url, number in disqus_ids.items():
-        raise_exception_if_url_is_not_ob_post_long_url(url)
+        raise_exception_if_url_is_not_valid_post_url(url)
         raise_exception_if_disqus_id_has_incorrect_format(number)
 
     def get_comment(disqus_id):
@@ -215,9 +213,9 @@ def attach_edit_dates(posts):
         An updated dictionary of posts, with edit dates attached.
     """
     date_list = grab.grab_edit_dates()
-    for url, post_or_none in posts.items():
+    for post_or_none in posts.values():
         if post_or_none is not None:
-            post_or_none.edit_date = date_list[url]
+            post_or_none.edit_date = date_list[post_or_none.url]
     return posts
 
 
@@ -230,11 +228,11 @@ def clear_cache():
     grab.vote_auth_code.cache_clear()
 
 
-def raise_exception_if_url_is_not_ob_post_long_url(url):
-    """Raise an exception if a URL is not a post "long" URL."""
+def raise_exception_if_url_is_not_valid_post_url(url):
+    """Raise an exception if a URL is not valid."""
     if not isinstance(url, str):
         raise TypeError(f'expected URL to be type str, got {type(url)}')
-    if not extract_post.is_valid_post_long_url(url):
+    if not extract_post.is_valid_post_url(url):
         raise ValueError(
             f'expected URL to be overcomingbias post URL, got {url}')
 

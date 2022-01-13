@@ -11,21 +11,22 @@ def map_with_delay(func, arg_dict, delay, max_workers=32, **kwargs):
     func : callable
         Function to be evaluated.
     arg_dict : Dict[str, object]
-        Dictionary whose keys label each element and whose values are
-        passed to func.
+        Dictionary whose keys are (arbitrary) labels and whose values
+        are passed to ``func``.
     delay : float
-        The time delay (in seconds) between function evaluations.
+        The time delay in seconds between function evaluations on
+        different arguments.
     max_workers : int
         The maximum number of threads used to execute the function
         evaluations.
     **kwargs : dict, optional
-        Extra arguments to be passed to `func`.
+        Extra arguments to be passed to ``func``.
 
     Returns
     -------
     result : Dict[str, object]
         Dictionary whose keys are the inputted labels and whose values
-        are the outputs of `func`, evaluated at each argument value.
+        are the outputs of ``func``, evaluated at each argument value.
     """
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)\
             as executor:
