@@ -1,11 +1,14 @@
-"""Grab full posts and their metadata from the web."""
+"""Grab full posts and their metadata from the web.
+
+This interface is internal - implementation details may change.
+"""
 import json
 import re
 import functools
 import bs4
 import cachetools.func
 
-from . import extract_post, extract_dates, download, post, exceptions
+from . import _download, _extract_dates, _extract_post, post, exceptions
 
 POST_LIST_URL = 'https://www.overcomingbias.com/post.xml'
 GDSR_URL = ('https://www.overcomingbias.com/'
@@ -43,11 +46,11 @@ def grab_post_by_url(url):
         If a post.Post attribute could not be extracted from the
         downloaded page.
     """
-    post_html = download.grab_html_soup(url)
-    if not extract_post.is_ob_post_html(post_html):
+    post_html = _download.grab_html_soup(url)
+    if not _extract_post.is_ob_post_html(post_html):
         raise exceptions.InvalidResponseError(
             f'the document found at {url} was not an overcomingbias post')
-    return post.create_post(post_html)
+    return create_post(post_html)
 
 
 @cachetools.func.ttl_cache(maxsize=1000, ttl=POST_DATA_CACHE_TIMEOUT)
@@ -70,7 +73,7 @@ def grab_comments(disqus_id):
         If no comment count is found for the given Disqus ID.
     """
     params = {'1': disqus_id}
-    response = download.http_post_request(DISQUS_URL, params=params)
+    response = _download.http_post_request(DISQUS_URL, params=params)
     raw_json = json.loads(
         re.search(r'(?<=displayCount\()(.*)(?=\))', response.text).group())
     if raw_json['counts'] == []:
@@ -89,9 +92,9 @@ def grab_edit_dates():
         Dictionary whose keys are post URLs and values are the last edit
         dates of each post as aware datetime.datetime objects.
     """
-    xml = download.grab_xml_soup(POST_LIST_URL)
-    urls = extract_dates.extract_urls(xml)
-    dates = extract_dates.extract_edit_dates(xml)
+    xml = _download.grab_xml_soup(POST_LIST_URL)
+    urls = _extract_dates.extract_urls(xml)
+    dates = _extract_dates.extract_edit_dates(xml)
     return dict(zip(urls, dates))
 
 
@@ -140,7 +143,7 @@ def grab_votes(number):
         'votes': vote_identifier(number)
     }
 
-    response = download.http_post_request(
+    response = _download.http_post_request(
         GDSR_URL, params=params, headers=headers)
 
     if response.text == '-1':
@@ -167,10 +170,63 @@ def vote_auth_code():
     vote_auth_code : str
         Authorisation code used to gain access to the vote count API.
     """
-    post_html = download.grab_html_soup(VOTE_AUTH_UPDATE_URL)
-    return extract_post.extract_vote_auth_code(post_html)
+    post_html = _download.grab_html_soup(VOTE_AUTH_UPDATE_URL)
+    return _extract_post.extract_vote_auth_code(post_html)
 
 
 def vote_identifier(number):
     """String used to identify a post to the vote count API."""
     return f'atr.{number}'
+
+
+def create_post(post_html, votes=True, comments=True):
+    """Populate a post object using its HTML.
+
+    Initialises post with all attributes except `edit_date`, which must
+    be attached afterwards.
+
+    Parameters
+    ----------
+    post_html : bs4.BeautifulSoup
+        Full HTML of an overcomingbias post page.
+    votes : bool
+        Whether to collect the vote count when creating the post.
+    comments : bool
+        Whether to collect the comment count when creating the post.
+
+    Returns
+    -------
+    new_post : Post
+        Post initialised from the inputted HTML. Includes vote and
+        comment counts (if the `vote` and `comment` flags are set to
+        True), but does not `edit_date`.
+    """
+    new_post = post.Post(
+        # URL and title
+        url=_extract_post.extract_url(post_html),
+        name=_extract_post.extract_name(post_html),
+        # Metadata
+        number=_extract_post.extract_number(post_html),
+        page_type=_extract_post.extract_page_type(post_html),
+        page_status=_extract_post.extract_page_status(post_html),
+        page_format=_extract_post.extract_page_format(post_html),
+        # Tags and categories
+        tags=_extract_post.extract_tags(post_html),
+        categories=_extract_post.extract_categories(post_html),
+        # Title, author, date
+        title=_extract_post.extract_title(post_html),
+        author=_extract_post.extract_author(post_html),
+        publish_date=_extract_post.extract_publish_date(post_html),
+        # Word count and links
+        text_html=_extract_post.extract_text_html(post_html),
+        word_count=_extract_post.extract_word_count(post_html),
+        internal_links=_extract_post.extract_internal_links(post_html),
+        external_links=_extract_post.extract_external_links(post_html),
+        # Disqus ID string
+        disqus_id=_extract_post.extract_disqus_id(post_html),
+    )
+    if votes:
+        new_post.votes = grab_votes(new_post.number)
+    if comments:
+        new_post.comments = grab_comments(new_post.disqus_id)
+    return new_post

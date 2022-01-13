@@ -1,7 +1,10 @@
-"""Get a list of posts by publish date or URL."""
+"""Get a list of posts by publish date or URL.
 
-from obscraper import future
-from . import grab, extract_post, exceptions, utils
+This interface is internal - implementation details may change.
+"""
+
+from obscraper import _future
+from . import _extract_post, _grab, _utils, exceptions
 
 
 def get_all_posts():
@@ -18,7 +21,7 @@ def get_all_posts():
         A dictionary whose keys are post URLs and whose values are the
         corresponding posts. "Last edit" dates are attached.
     """
-    edit_dates = grab.grab_edit_dates()
+    edit_dates = _grab.grab_edit_dates()
     all_posts = get_posts_by_urls(list(edit_dates.keys()))
     ob_posts = {url: p for url, p in all_posts.items() if p is not None}
     return ob_posts
@@ -52,7 +55,7 @@ def get_post_by_url(url):
         downloaded page.
     """
     raise_exception_if_url_is_not_valid_post_url(url)
-    post = grab.grab_post_by_url(url)
+    post = _grab.grab_post_by_url(url)
     return attach_edit_dates({post.url: post})[post.url]
 
 
@@ -80,12 +83,12 @@ def get_posts_by_urls(urls):
     def get_post(url):
         """Get a post given its URL, returning None if not found."""
         try:
-            return grab.grab_post_by_url(url)
+            return _grab.grab_post_by_url(url)
         except (exceptions.AttributeNotFoundError,
                 exceptions.InvalidResponseError):
             return None
     url_dict = dict(zip(urls, urls))
-    posts = future.map_with_delay(
+    posts = _future.map_with_delay(
         func=get_post, arg_dict=url_dict, delay=0.02, max_workers=32)
     return attach_edit_dates(posts)
 
@@ -115,7 +118,7 @@ def get_posts_by_edit_date(start_date, end_date):
     if start_date > end_date:
         raise ValueError('end date is before start date')
 
-    edit_dates = grab.grab_edit_dates()
+    edit_dates = _grab.grab_edit_dates()
     selected_urls = [url for url, edit_date in edit_dates.items(
     ) if start_date < edit_date < end_date]
     posts = get_posts_by_urls(selected_urls)
@@ -153,12 +156,12 @@ def get_votes(post_numbers):
     def get_vote(number):
         """Get vote count, returning None if the post is not found."""
         try:
-            return grab.grab_votes(number)
+            return _grab.grab_votes(number)
         except (exceptions.AttributeNotFoundError,
                 exceptions.InvalidAuthCodeError,
                 exceptions.InvalidResponseError):
             return None
-    votes = future.map_with_delay(
+    votes = _future.map_with_delay(
         get_vote, post_numbers, delay=0.02, max_workers=32)
     return votes
 
@@ -190,10 +193,10 @@ def get_comments(disqus_ids):
 
     def get_comment(disqus_id):
         try:
-            return grab.grab_comments(disqus_id)
+            return _grab.grab_comments(disqus_id)
         except exceptions.InvalidResponseError:
             return None
-    comments = future.map_with_delay(
+    comments = _future.map_with_delay(
         get_comment, disqus_ids, delay=0.01, max_workers=50)
     return comments
 
@@ -212,7 +215,7 @@ def attach_edit_dates(posts):
     posts : Dict[str, post.Post]
         An updated dictionary of posts, with edit dates attached.
     """
-    date_list = grab.grab_edit_dates()
+    date_list = _grab.grab_edit_dates()
     for post_or_none in posts.values():
         if post_or_none is not None:
             post_or_none.edit_date = date_list[post_or_none.url]
@@ -221,18 +224,18 @@ def attach_edit_dates(posts):
 
 def clear_cache():
     """Clear all cached data."""
-    grab.grab_post_by_url.cache_clear()
-    grab.grab_comments.cache_clear()
-    grab.grab_votes.cache_clear()
-    grab.grab_edit_dates.cache_clear()
-    grab.vote_auth_code.cache_clear()
+    _grab.grab_post_by_url.cache_clear()
+    _grab.grab_comments.cache_clear()
+    _grab.grab_votes.cache_clear()
+    _grab.grab_edit_dates.cache_clear()
+    _grab.vote_auth_code.cache_clear()
 
 
 def raise_exception_if_url_is_not_valid_post_url(url):
     """Raise an exception if a URL is not valid."""
     if not isinstance(url, str):
         raise TypeError(f'expected URL to be type str, got {type(url)}')
-    if not extract_post.is_valid_post_url(url):
+    if not _extract_post.is_valid_post_url(url):
         raise ValueError(
             f'expected URL to be overcomingbias post URL, got {url}')
 
@@ -252,13 +255,13 @@ def raise_exception_if_disqus_id_has_incorrect_format(disqus_id):
     if not isinstance(disqus_id, str):
         raise TypeError(
             f'expected Disqus ID to be type str, got type {type(disqus_id)}')
-    if not extract_post.is_valid_disqus_id(disqus_id):
+    if not _extract_post.is_valid_disqus_id(disqus_id):
         raise ValueError(f'Disqus ID {disqus_id} is not valid')
 
 
 def raise_exception_if_date_has_incorrect_format(date, variable_name):
     """Raise an exception if a datetime has the wrong format."""
-    if not utils.is_aware_datetime(date):
+    if not _utils.is_aware_datetime(date):
         raise TypeError(
             (f'expected {variable_name} to be type aware datetime.datetime, '
              f'got type {type(date)}')

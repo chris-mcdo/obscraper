@@ -1,4 +1,7 @@
-"""Multithreading implementation for sending requests."""
+"""Multithreading implementation for function evaluation.
+
+This interface is internal - implementation details may change.
+"""
 import time
 import concurrent.futures
 

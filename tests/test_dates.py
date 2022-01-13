@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 import datetime
 
-from obscraper import extract_dates
+from obscraper import _extract_dates
 
 
 class TestDateParsing(unittest.TestCase):
@@ -19,5 +19,5 @@ class TestDateParsing(unittest.TestCase):
         mock_xml = MagicMock()
         mock_xml.find_all.return_value = [
             MagicMock(string=raw_date) for raw_date in test_dates.keys()]
-        result = extract_dates.extract_edit_dates(mock_xml)
+        result = _extract_dates.extract_edit_dates(mock_xml)
         self.assertEqual(result, list(test_dates.values()))

@@ -3,13 +3,9 @@ import unittest
 import datetime
 
 import obscraper
-from obscraper import extract_post, utils, post
-
-# Get post dates list
-# Get first and last 500 URLs
-# Get corresponding posts
-# Get corresponding comments and votes
-# Check each is roughly valid
+from obscraper import post
+from obscraper import _utils
+from obscraper import _extract_post
 
 
 @unittest.skip('skip expensive system tests')
@@ -104,7 +100,7 @@ class TestOBScraper(unittest.TestCase):
 
     def assert_post_standard_attributes_have_valid_values(self, test_post):
         # URL and title
-        self.assertTrue(extract_post.is_valid_post_long_url(test_post.url))
+        self.assertTrue(_extract_post.is_valid_post_long_url(test_post.url))
         self.assertRegex(test_post.name, r'^[a-z0-9-_%]+$')
         # Metadata
         self.assertTrue(9999 < test_post.number < 100000)
@@ -118,17 +114,17 @@ class TestOBScraper(unittest.TestCase):
         # Title, author, date
         self.assertNotEqual(test_post.title, '')
         self.assertRegex(test_post.author, r'^[A-Za-z0-9\. ]+$')
-        self.assertTrue(utils.is_aware_datetime(test_post.publish_date))
+        self.assertTrue(_utils.is_aware_datetime(test_post.publish_date))
         # Word count and links
         self.assertNotEqual(test_post.plaintext, '')
         self.assertGreater(test_post.word_count, 5)
-        [self.assertTrue(extract_post.is_valid_post_url(url))
+        [self.assertTrue(_extract_post.is_valid_post_url(url))
          for url in test_post.internal_links.keys()]
         [self.assertGreaterEqual(number, 1)
          for number in test_post.internal_links.values()]
-        [self.assertFalse(extract_post.is_valid_post_url(url))
+        [self.assertFalse(_extract_post.is_valid_post_url(url))
          for url in test_post.external_links.keys()]
         [self.assertGreaterEqual(number, 1)
          for number in test_post.external_links.values()]
         # Disqus ID string
-        self.assertTrue(extract_post.is_valid_disqus_id(test_post.disqus_id))
+        self.assertTrue(_extract_post.is_valid_disqus_id(test_post.disqus_id))

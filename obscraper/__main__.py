@@ -4,7 +4,7 @@ import datetime
 import json
 import dateutil.parser
 
-from . import scrape, serialize
+from . import _scrape, serialize
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -70,14 +70,14 @@ def core(urls, dates, all_posts, outfile):
         # Running the main program
         if isinstance(urls, list) and len(urls) > 0:
             print('Getting posts by their URLs...')
-            posts = scrape.get_posts_by_urls(urls)
+            posts = _scrape.get_posts_by_urls(urls)
         elif dates is not None:
             print(('Getting posts edited between'
                    f' {dates[0]} and {dates[1]}...'))
-            posts = scrape.get_posts_by_edit_date(*dates)
+            posts = _scrape.get_posts_by_edit_date(*dates)
         elif all_posts:
             print('Getting all posts...')
-            posts = scrape.get_all_posts()
+            posts = _scrape.get_all_posts()
 
         # Postprocessing
         output = [{'url': url, 'post': p} for url, p in posts.items()]

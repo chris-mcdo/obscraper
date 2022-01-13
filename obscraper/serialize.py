@@ -4,22 +4,25 @@ import json
 import dataclasses
 import datetime
 import dateutil.parser
-from . import post, utils
+from . import _utils, post
 
 
 class PostEncoder(json.JSONEncoder):
-    """Encode a post.Post object to JSON."""
+    """Encode a post.Post object to JSON.
+
+    Inherits from ``json.JSONEncoder``.
+    """
 
     def default(self, o):
         if isinstance(o, post.Post):
             return dataclasses.asdict(o)
-        if utils.is_aware_datetime(o):
+        if _utils.is_aware_datetime(o):
             time_in_utc = o.astimezone(datetime.timezone.utc)
             return time_in_utc.strftime('%Y-%m-%dT%H:%M:%SZ')
         return super().default(o)
 
 
-def dict_to_post(post_dict):
+def _dict_to_post(post_dict):
     """Convert dictionary to post.Post.
 
     Converts a dictionary representing a post to a real post.Post
@@ -52,8 +55,8 @@ def dict_to_post(post_dict):
 class PostDecoder(json.JSONDecoder):
     """Decode a post.Post object from JSON.
 
-    Returns a json.JSONDecoder with ``dict_to_post`` as the
-    ``object_hook``.
+    Inherits from ``json.JSONDecoder``, implementing a special hook to
+    deserialize post.Post objects.
     """
 
     def __init__(self, *args, **kwargs):
@@ -68,4 +71,4 @@ class PostDecoder(json.JSONDecoder):
             Additional keyword arguments to be passed to
             json.JSONDecoder
         """
-        super().__init__(object_hook=dict_to_post, *args, **kwargs)
+        super().__init__(object_hook=_dict_to_post, *args, **kwargs)

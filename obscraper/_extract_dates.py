@@ -1,4 +1,7 @@
-"""Extract post URLs and last-edit dates from the site post list."""
+"""Extract post URLs and last-edit dates from the site post list.
+
+This interface is internal - implementation details may change.
+"""
 
 import dateutil.parser
 

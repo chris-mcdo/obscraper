@@ -14,9 +14,9 @@ class TestMain(unittest.TestCase):
         self.addCleanup(patch.stopall)
         # patch all scrape functions
         self.patchers = {
-            'all': patch('obscraper.scrape.get_all_posts', return_value={'all': 'all'}),
-            'urls': patch('obscraper.scrape.get_posts_by_urls', return_value={'urls': 'urls'}),
-            'dates': patch('obscraper.scrape.get_posts_by_edit_date', return_value={'dates': 'dates'})
+            'all': patch('obscraper._scrape.get_all_posts', return_value={'all': 'all'}),
+            'urls': patch('obscraper._scrape.get_posts_by_urls', return_value={'urls': 'urls'}),
+            'dates': patch('obscraper._scrape.get_posts_by_edit_date', return_value={'dates': 'dates'})
         }
         self.mocks = {key: patcher.start()
                       for key, patcher in self.patchers.items()}

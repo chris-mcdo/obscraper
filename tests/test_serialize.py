@@ -2,13 +2,13 @@ import unittest
 
 import json
 
-from obscraper import scrape, grab, serialize, post
+from obscraper import _grab, _scrape, serialize, post
 
 
 class TestSerialize(unittest.TestCase):
 
     def test_encode_and_decode_work_with_test_post(self):
-        example_post = scrape.get_post_by_url(
+        example_post = _scrape.get_post_by_url(
             'https://www.overcomingbias.com/2006/11/introduction.html')
 
         encoded = json.dumps(example_post, cls=serialize.PostEncoder)
@@ -20,7 +20,7 @@ class TestSerialize(unittest.TestCase):
         self.assertEqual(decoded, example_post)
 
     def test_encode_and_decode_work_without_edit_date(self):
-        example_post = grab.grab_post_by_url(
+        example_post = _grab.grab_post_by_url(
             'https://www.overcomingbias.com/?p=27739')
 
         encoded = json.dumps(example_post, cls=serialize.PostEncoder)
@@ -39,5 +39,4 @@ class TestSerialize(unittest.TestCase):
         self.assertNotEqual(encoded, '')
 
         decoded = json.loads(encoded, cls=serialize.PostDecoder)
-        self.assertIsInstance(decoded, post.Post)
-        self.assertEqual(decoded, example_post)
+        self.assertIsNone(decoded)

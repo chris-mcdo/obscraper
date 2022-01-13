@@ -1,4 +1,7 @@
-"""Miscellaneous utility functions"""
+"""Miscellaneous utility functions.
+
+This interface is internal - implementation details may change.
+"""
 
 import re
 import datetime

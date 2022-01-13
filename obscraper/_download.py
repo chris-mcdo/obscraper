@@ -1,4 +1,7 @@
-"""Perform general web scraping tasks."""
+"""Perform general web scraping tasks.
+
+This interface is internal - implementation details may change.
+"""
 import functools
 import random
 import time

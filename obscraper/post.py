@@ -3,60 +3,7 @@
 import datetime
 import dataclasses
 from typing import Dict
-from . import extract_post, grab
-
-
-def create_post(post_html, votes=True, comments=True):
-    """Populate a post object using its HTML.
-
-    Initialises post with all attributes except `edit_date`, which must
-    be attached afterwards.
-
-    Parameters
-    ----------
-    post_html : bs4.BeautifulSoup
-        Full HTML of an overcomingbias post page.
-    votes : bool
-        Whether to collect the vote count when creating the post.
-    comments : bool
-        Whether to collect the comment count when creating the post.
-
-    Returns
-    -------
-    new_post : Post
-        Post initialised from the inputted HTML. Includes vote and
-        comment counts (if the `vote` and `comment` flags are set to
-        True), but does not `edit_date`.
-    """
-    new_post = Post(
-        # URL and title
-        url=extract_post.extract_url(post_html),
-        name=extract_post.extract_name(post_html),
-        # Metadata
-        number=extract_post.extract_number(post_html),
-        page_type=extract_post.extract_page_type(post_html),
-        page_status=extract_post.extract_page_status(post_html),
-        page_format=extract_post.extract_page_format(post_html),
-        # Tags and categories
-        tags=extract_post.extract_tags(post_html),
-        categories=extract_post.extract_categories(post_html),
-        # Title, author, date
-        title=extract_post.extract_title(post_html),
-        author=extract_post.extract_author(post_html),
-        publish_date=extract_post.extract_publish_date(post_html),
-        # Word count and links
-        text_html=extract_post.extract_text_html(post_html),
-        word_count=extract_post.extract_word_count(post_html),
-        internal_links=extract_post.extract_internal_links(post_html),
-        external_links=extract_post.extract_external_links(post_html),
-        # Disqus ID string
-        disqus_id=extract_post.extract_disqus_id(post_html),
-    )
-    if votes:
-        new_post.votes = grab.grab_votes(new_post.number)
-    if comments:
-        new_post.comments = grab.grab_comments(new_post.disqus_id)
-    return new_post
+from . import _extract_post
 
 
 @dataclasses.dataclass(order=False)
@@ -137,4 +84,4 @@ class Post:
     @property
     def plaintext(self) -> str:
         """Get post text as plaintext."""
-        return extract_post.convert_to_plaintext(self.text_html)
+        return _extract_post.convert_to_plaintext(self.text_html)

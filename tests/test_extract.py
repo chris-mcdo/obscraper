@@ -3,7 +3,7 @@ import unittest
 
 import bs4
 
-from obscraper import exceptions, extract_post, download, grab, utils
+from obscraper import _download, _extract_post, _grab, _utils, exceptions
 
 TEST_POST_NUMBERS = [
     18402,  # first post
@@ -30,14 +30,14 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
     def setUpClass(cls):
         cls.post_htmls = {
             number:
-            download.grab_html_soup(
+            _download.grab_html_soup(
                 f'https://www.overcomingbias.com/?p={number}')
             for number in TEST_POST_NUMBERS
         }
 
     def test_extract_url_returns_correct_results_for_valid_htmls(self):
         url = self.function_to_get_attribute_by_number(
-            extract_post.extract_url)
+            _extract_post.extract_url)
         self.assertEqual(
             url(18402), 'https://www.overcomingbias.com/2006/11/introduction.html')
         self.assertEqual(
@@ -55,7 +55,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_name_returns_correct_results_for_valid_htmls(self):
         name = self.function_to_get_attribute_by_number(
-            extract_post.extract_name)
+            _extract_post.extract_name)
         self.assertEqual(name(18402), 'introduction')
         self.assertEqual(name(18141), 'the_very_worst_')
         self.assertEqual(name(18115), 'as_good_as_it_g')
@@ -66,7 +66,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_title_returns_correct_results_for_valid_htmls(self):
         title = self.function_to_get_attribute_by_number(
-            extract_post.extract_title)
+            _extract_post.extract_title)
         self.assertEqual(title(18402), 'How To Join')
         self.assertEqual(title(18141), 'The Very Worst Kind of Bias')
         self.assertEqual(title(18115), 'As Good As It Gets')
@@ -77,7 +77,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_author_returns_correct_results_for_valid_htmls(self):
         author = self.function_to_get_attribute_by_number(
-            extract_post.extract_author)
+            _extract_post.extract_author)
         self.assertEqual(author(18402), 'Robin Hanson')
         self.assertEqual(author(18141), 'David J. Balan')
         self.assertEqual(author(18115), 'Robin Hanson')
@@ -88,9 +88,9 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_publish_date_returns_correct_results_for_valid_htmls(self):
         publish_date = self.function_to_get_attribute_by_number(
-            extract_post.extract_publish_date)
+            _extract_post.extract_publish_date)
 
-        def tidy(d): return utils.tidy_date(d, 'US/Eastern')
+        def tidy(d): return _utils.tidy_date(d, 'US/Eastern')
         self.assertEqual(publish_date(18402), tidy(
             'November 20, 2006 6:00 am'))
         self.assertEqual(publish_date(18141), tidy('March 26, 2007 8:53 am'))
@@ -104,7 +104,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_number_returns_correct_results_for_valid_htmls(self):
         number = self.function_to_get_attribute_by_number(
-            extract_post.extract_number)
+            _extract_post.extract_number)
         self.assertEqual(number(18402), 18402)
         self.assertEqual(number(18141), 18141)
         self.assertEqual(number(18115), 18115)
@@ -115,7 +115,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_tags_returns_correct_results_for_valid_htmls(self):
         tags = self.function_to_get_attribute_by_number(
-            extract_post.extract_tags)
+            _extract_post.extract_tags)
         self.assertEqual(tags(18402), ['meta'])
         self.assertEqual(tags(18141), ['morality', 'psychology'])
         self.assertEqual(tags(18115), ['standard-biases'])
@@ -127,7 +127,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_categories_returns_correct_results_for_valid_htmls(self):
         categories = self.function_to_get_attribute_by_number(
-            extract_post.extract_categories)
+            _extract_post.extract_categories)
         self.assertEqual(categories(18402), ['meta'])
         self.assertEqual(categories(18141), ['morality', 'psychology'])
         self.assertEqual(categories(18115), ['standard-biases'])
@@ -138,26 +138,26 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_type_returns_correct_results_for_valid_htmls(self):
         type = self.function_to_get_attribute_by_number(
-            extract_post.extract_page_type)
+            _extract_post.extract_page_type)
         for number in TEST_POST_NUMBERS:
             self.assertEqual(type(number), 'post')
 
     def test_extract_status_returns_correct_results_for_valid_htmls(self):
         status = self.function_to_get_attribute_by_number(
-            extract_post.extract_page_status)
+            _extract_post.extract_page_status)
         for number in TEST_POST_NUMBERS:
             self.assertEqual(status(number), 'publish')
 
     def test_extract_format_returns_correct_results_for_valid_htmls(self):
         format = self.function_to_get_attribute_by_number(
-            extract_post.extract_page_format)
+            _extract_post.extract_page_format)
         for number in TEST_POST_NUMBERS:
             self.assertEqual(format(number), 'standard')
 
     def test_extract_text_returns_correct_start_and_end_for_valid_htmls(self):
         def extract_text(post_html):
-            text_html = extract_post.extract_text_html(post_html)
-            return extract_post.convert_to_plaintext(text_html)
+            text_html = _extract_post.extract_text_html(post_html)
+            return _extract_post.convert_to_plaintext(text_html)
         text = self.function_to_get_attribute_by_number(extract_text)
         self.assertTrue(text(18402).endswith(
             'Copyright is retained by each author.'))
@@ -173,7 +173,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_word_count_returns_correct_results_for_valid_htmls(self):
         words = self.function_to_get_attribute_by_number(
-            extract_post.extract_word_count)
+            _extract_post.extract_word_count)
         self.assertEqual(words(18402), 263)
         self.assertEqual(words(18141), 315)
         self.assertEqual(words(18115), 155)
@@ -184,7 +184,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_internal_links_returns_correct_results_for_valid_htmls(self):
         internal_links = self.function_to_get_attribute_by_number(
-            extract_post.extract_internal_links)
+            _extract_post.extract_internal_links)
         self.assertEqual(internal_links(18402), {
             'http://www.overcomingbias.com/2006/12/contributors_be.html': 1,
             'http://www.overcomingbias.com/2007/02/moderate_modera.html': 1,
@@ -204,7 +204,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_external_links_returns_correct_results_for_valid_htmls(self):
         external_links = self.function_to_get_attribute_by_number(
-            extract_post.extract_external_links)
+            _extract_post.extract_external_links)
         self.assertEqual(external_links(18402), {
             'http://www.fhi.ox.ac.uk/': 1,
         })
@@ -226,7 +226,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_auth_code_returns_result_in_correct_format(self):
         code = self.function_to_get_attribute_by_number(
-            extract_post.extract_vote_auth_code)
+            _extract_post.extract_vote_auth_code)
         for number in TEST_POST_NUMBERS:
             c = code(number)
             self.assertIsInstance(c, str)
@@ -234,14 +234,14 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 
     def test_extract_auth_code_returns_same_result_for_each_post(self):
         code = self.function_to_get_attribute_by_number(
-            extract_post.extract_vote_auth_code)
+            _extract_post.extract_vote_auth_code)
         unique_codes = set([code(number) for number in TEST_POST_NUMBERS])
         self.assertEqual(len(unique_codes), 1)
         self.assertRegex(unique_codes.pop(), r'^[a-z0-9]{10}$')
 
     def test_extract_disqus_id_returns_correct_results_for_valid_htmls(self):
         disqus_id = self.function_to_get_attribute_by_number(
-            extract_post.extract_disqus_id)
+            _extract_post.extract_disqus_id)
         self.assertEqual(
             disqus_id(18402), '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html')
         self.assertEqual(disqus_id(
@@ -267,31 +267,34 @@ class TestExtractFunctionsOnFakePost(unittest.TestCase):
     def test_extract_functions_raise_exception_for_invalid_html(self):
         fake_html = bs4.BeautifulSoup('Fake HTML', features='lxml')
         not_found = exceptions.AttributeNotFoundError
-        self.assertRaises(not_found, extract_post.extract_url, fake_html)
-        self.assertRaises(not_found, extract_post.extract_name, fake_html)
-        self.assertRaises(not_found, extract_post.extract_title, fake_html)
-        self.assertRaises(not_found, extract_post.extract_author, fake_html)
+        self.assertRaises(not_found, _extract_post.extract_url, fake_html)
+        self.assertRaises(not_found, _extract_post.extract_name, fake_html)
+        self.assertRaises(not_found, _extract_post.extract_title, fake_html)
+        self.assertRaises(not_found, _extract_post.extract_author, fake_html)
         self.assertRaises(
-            not_found, extract_post.extract_publish_date, fake_html)
-        self.assertRaises(not_found, extract_post.extract_number, fake_html)
-        self.assertRaises(not_found, extract_post.extract_tags, fake_html)
+            not_found, _extract_post.extract_publish_date, fake_html)
+        self.assertRaises(not_found, _extract_post.extract_number, fake_html)
+        self.assertRaises(not_found, _extract_post.extract_tags, fake_html)
         self.assertRaises(
-            not_found, extract_post.extract_categories, fake_html)
-        self.assertRaises(not_found, extract_post.extract_page_type, fake_html)
+            not_found, _extract_post.extract_categories, fake_html)
         self.assertRaises(
-            not_found, extract_post.extract_page_status, fake_html)
+            not_found, _extract_post.extract_page_type, fake_html)
         self.assertRaises(
-            not_found, extract_post.extract_page_format, fake_html)
-        self.assertRaises(not_found, extract_post.extract_text_html, fake_html)
+            not_found, _extract_post.extract_page_status, fake_html)
         self.assertRaises(
-            not_found, extract_post.extract_word_count, fake_html)
+            not_found, _extract_post.extract_page_format, fake_html)
         self.assertRaises(
-            not_found, extract_post.extract_internal_links, fake_html)
+            not_found, _extract_post.extract_text_html, fake_html)
         self.assertRaises(
-            not_found, extract_post.extract_external_links, fake_html)
+            not_found, _extract_post.extract_word_count, fake_html)
         self.assertRaises(
-            not_found, extract_post.extract_vote_auth_code, fake_html)
-        self.assertRaises(not_found, extract_post.extract_disqus_id, fake_html)
+            not_found, _extract_post.extract_internal_links, fake_html)
+        self.assertRaises(
+            not_found, _extract_post.extract_external_links, fake_html)
+        self.assertRaises(
+            not_found, _extract_post.extract_vote_auth_code, fake_html)
+        self.assertRaises(
+            not_found, _extract_post.extract_disqus_id, fake_html)
 
 
 class TestIsOBPostURL(unittest.TestCase):
@@ -299,12 +302,12 @@ class TestIsOBPostURL(unittest.TestCase):
     # https://www.overcomingbias.com/?p=32980
     # https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html
     def test_accepts_all_ob_post_urls(self):
-        is_url = extract_post.is_valid_post_url
-        edit_dates = grab.grab_edit_dates()
+        is_url = _extract_post.is_valid_post_url
+        edit_dates = _grab.grab_edit_dates()
         [self.assertTrue(is_url(url)) for url in edit_dates.keys()]
 
     def test_rejects_incorrectly_formatted_urls(self):
-        is_url = extract_post.is_valid_post_url
+        is_url = _extract_post.is_valid_post_url
         self.assertFalse(is_url('https://www.example.com/'))
         self.assertFalse(is_url('https://www.overcomingbias.com/p=32980'))
         self.assertFalse(is_url('https://www.overcomingbias.com/p=32980a'))
@@ -320,31 +323,31 @@ class TestIsOBPostURL(unittest.TestCase):
 
 class TestDetermineOriginOfHTMLFiles(unittest.TestCase):
     def test_is_page_from_origin_functions_work_with_ob_post(self):
-        test_html = download.grab_html_soup(
+        test_html = _download.grab_html_soup(
             'https://overcomingbias.com/?p=27739')
-        self.assertTrue(extract_post.is_ob_site_html(test_html))
-        self.assertTrue(extract_post.is_ob_post_html(test_html))
+        self.assertTrue(_extract_post.is_ob_site_html(test_html))
+        self.assertTrue(_extract_post.is_ob_post_html(test_html))
 
     def test_is_page_from_origin_functions_work_with_ob_page(self):
-        test_html = download.grab_html_soup(
+        test_html = _download.grab_html_soup(
             'https://www.overcomingbias.com/page/1')
-        self.assertTrue(extract_post.is_ob_site_html(test_html))
-        self.assertFalse(extract_post.is_ob_post_html(test_html))
+        self.assertTrue(_extract_post.is_ob_site_html(test_html))
+        self.assertFalse(_extract_post.is_ob_post_html(test_html))
 
     def test_is_page_from_origin_functions_work_with_ob_home_page(self):
-        test_html = download.grab_html_soup('https://www.overcomingbias.com/')
-        self.assertTrue(extract_post.is_ob_site_html(test_html))
-        self.assertFalse(extract_post.is_ob_post_html(test_html))
+        test_html = _download.grab_html_soup('https://www.overcomingbias.com/')
+        self.assertTrue(_extract_post.is_ob_site_html(test_html))
+        self.assertFalse(_extract_post.is_ob_post_html(test_html))
 
     def test_is_page_from_origin_functions_work_with_example_dot_com_page(self):
-        test_html = download.grab_html_soup('https://example.com/')
-        self.assertFalse(extract_post.is_ob_site_html(test_html))
-        self.assertFalse(extract_post.is_ob_post_html(test_html))
+        test_html = _download.grab_html_soup('https://example.com/')
+        self.assertFalse(_extract_post.is_ob_site_html(test_html))
+        self.assertFalse(_extract_post.is_ob_post_html(test_html))
 
 
 class TestIsValidDisqusID(unittest.TestCase):
     def test_returns_true_for_valid_ids(self):
-        valid = extract_post.is_valid_disqus_id
+        valid = _extract_post.is_valid_disqus_id
         self.assertTrue(
             valid('18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html'))
         self.assertTrue(valid(
@@ -354,7 +357,7 @@ class TestIsValidDisqusID(unittest.TestCase):
         self.assertTrue(valid('33014 https://www.overcomingbias.com/?p=33014'))
 
     def test_returns_false_for_invalid_ids(self):
-        valid = extract_post.is_valid_disqus_id
+        valid = _extract_post.is_valid_disqus_id
         self.assertFalse(valid(12345))
         self.assertFalse(
             valid(['33014 https://www.overcomingbias.com/?p=33014']))

@@ -1,11 +1,14 @@
-"""Extract meta-data from an overcomingbias blog post."""
+"""Extract meta-data from an overcomingbias blog post.
+
+This interface is internal - implementation details may change.
+"""
 
 import re
 import copy
 
 import bs4
 
-from . import utils, exceptions
+from . import _utils, exceptions
 
 OB_SERVER_TZ = 'US/Eastern'
 # timezone of server generating post timestamps
@@ -104,7 +107,7 @@ def extract_publish_date(post_html):
     match = post_html.find(attrs={'class': 'entry-date'})
     raise_attribute_not_found_error_if_none(match, 'publish date')
     messy_date = match.text
-    return utils.tidy_date(messy_date, OB_SERVER_TZ)
+    return _utils.tidy_date(messy_date, OB_SERVER_TZ)
 
 
 def extract_number(post_html):
@@ -239,7 +242,7 @@ def extract_word_count(post_html):
     """
     text_html = extract_text_html(post_html)
     text = convert_to_plaintext(text_html)
-    return utils.count_words(text)
+    return _utils.count_words(text)
 
 
 def extract_internal_links(post_html):
