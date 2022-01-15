@@ -6,7 +6,7 @@ class InvalidResponseError(Exception):
 
 
 class InvalidAuthCodeError(Exception):
-    """The vote count API was called with an invalid auth code."""
+    """Vote count API called with invalid authorisation code."""
 
 
 class AttributeNotFoundError(Exception):
