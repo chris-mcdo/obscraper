@@ -6,6 +6,7 @@ from ._scrape import get_posts_by_urls
 from ._scrape import get_posts_by_edit_date
 from ._scrape import get_votes
 from ._scrape import get_comments
+from ._scrape import clear_cache
 from ._grab import grab_edit_dates
 from ._serialize import PostEncoder
 from ._serialize import PostDecoder
@@ -22,6 +23,7 @@ __all__ = [
     'get_posts_by_edit_date',
     'get_votes',
     'get_comments',
+    'clear_cache',
     'grab_edit_dates',
     'PostEncoder',
     'PostDecoder',
