@@ -3,7 +3,7 @@ import unittest
 
 import bs4
 
-from obscraper import _download, _extract_post, _grab, _utils, exceptions
+from obscraper import _download, _exceptions, _extract_post, _grab, _utils
 
 TEST_POST_NUMBERS = [
     18402,  # first post
@@ -266,7 +266,7 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
 class TestExtractFunctionsOnFakePost(unittest.TestCase):
     def test_extract_functions_raise_exception_for_invalid_html(self):
         fake_html = bs4.BeautifulSoup('Fake HTML', features='lxml')
-        not_found = exceptions.AttributeNotFoundError
+        not_found = _exceptions.AttributeNotFoundError
         self.assertRaises(not_found, _extract_post.extract_url, fake_html)
         self.assertRaises(not_found, _extract_post.extract_name, fake_html)
         self.assertRaises(not_found, _extract_post.extract_title, fake_html)

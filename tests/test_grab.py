@@ -5,7 +5,7 @@ import datetime
 import time
 import cachetools.func
 
-from obscraper import _extract_post, _grab, exceptions, post, _utils, _download
+from obscraper import _exceptions, _extract_post, _grab, _post, _utils, _download
 from test_extract import TEST_POST_NUMBERS, TEST_DISQUS_IDS
 
 
@@ -17,24 +17,24 @@ TEST_POST_MIN_COMMENTS = 100
 class TestGrabPostByURL(unittest.TestCase):
 
     def test_grab_post_fails_with_lesswrong_post_url(self):
-        self.assertRaises(exceptions.InvalidResponseError, _grab.grab_post_by_url,
+        self.assertRaises(_exceptions.InvalidResponseError, _grab.grab_post_by_url,
                           'https://www.overcomingbias.com/2007/10/a-rational-argu.html')
 
     def test_grab_post_fails_with_fake_post_url(self):
-        self.assertRaises(exceptions.InvalidResponseError, _grab.grab_post_by_url,
+        self.assertRaises(_exceptions.InvalidResponseError, _grab.grab_post_by_url,
                           'http://www.overcomingbias.com/2020/01/not-a-real-post.html')
 
     def test_grab_post_works_with_number_url(self):
         p = _grab.grab_post_by_url(
             f'http://www.overcomingbias.com/?p={TEST_POST_NUMBER}')
-        self.assertIsInstance(p, post.Post)
+        self.assertIsInstance(p, _post.Post)
         self.assertEqual(p.number, TEST_POST_NUMBER)
         self.assertGreater(p.word_count, 10)
 
     def test_grab_post_works_with_string_url(self):
         test_url = 'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html'
         p = _grab.grab_post_by_url(test_url)
-        self.assertIsInstance(p, post.Post)
+        self.assertIsInstance(p, _post.Post)
         self.assertEqual(p.url, test_url)
         self.assertGreater(p.word_count, 10)
 
@@ -48,7 +48,7 @@ class TestGrabComments(unittest.TestCase):
 
     def test_grab_comments_raises_exception_with_invalid_number(self):
         bad_id = '12345 https://www.overcomingbias.com/?p=12345'
-        self.assertRaises(exceptions.InvalidResponseError,
+        self.assertRaises(_exceptions.InvalidResponseError,
                           _grab.grab_comments, bad_id)
 
 
@@ -91,7 +91,7 @@ class TestGrabVotes(unittest.TestCase):
             'votes': f'atr.{TEST_POST_NUMBER}'
         }
         # Act
-        self.assertRaises(exceptions.InvalidAuthCodeError,
+        self.assertRaises(_exceptions.InvalidAuthCodeError,
                           grab_votes_unwrapped, TEST_POST_NUMBER)
         mock_post_request.assert_called_once_with(
             _grab.GDSR_URL, params=params, headers=headers)
@@ -105,7 +105,7 @@ class TestGrabVotes(unittest.TestCase):
     def test_grab_votes_raises_exception_with_invalid_vote_auth_code(self, mock_auth_code):
         grab_votes_unwrapped = _grab.grab_votes.__wrapped__
         mock_auth_code.return_value = 'notarealcode'
-        self.assertRaises(exceptions.InvalidAuthCodeError,
+        self.assertRaises(_exceptions.InvalidAuthCodeError,
                           grab_votes_unwrapped, TEST_POST_NUMBER)
 
 
@@ -113,7 +113,7 @@ class TestCacheAuth(unittest.TestCase):
     def raise_invalid_auth_code_error_n_times_then_succeed(self, n):
         """Function which raises an InvalidAuthCodeError n times before succeeding."""
         mock_function = MagicMock(
-            side_effect=[exceptions.InvalidAuthCodeError] * n + ['Success!'])
+            side_effect=[_exceptions.InvalidAuthCodeError] * n + ['Success!'])
 
         @_grab._auth_cache
         def mock_responder(arg_without_default, arg_with_default='Second Arg'):
@@ -147,7 +147,7 @@ class TestCacheAuth(unittest.TestCase):
     @patch('obscraper._grab.vote_auth_code')
     def test_cache_auth_raises_exception_if_method_raises_exception_twice(self, mock_auth_code):
         (fail_twice, mock_function) = self.raise_invalid_auth_code_error_n_times_then_succeed(2)
-        self.assertRaises(exceptions.InvalidAuthCodeError,
+        self.assertRaises(_exceptions.InvalidAuthCodeError,
                           fail_twice, 'First Arg', arg_with_default='Second Arg')
         mock_auth_code.cache_clear.assert_called_once()
         self.assertEqual(mock_function.call_count, 2)
@@ -262,7 +262,7 @@ class TestCreatePost(unittest.TestCase):
             self.assertIsNone(test_post.comments)
 
     def assert_post_has_standard_attributes(self, test_post):
-        self.assertIsInstance(test_post, post.Post)
+        self.assertIsInstance(test_post, _post.Post)
         for attr in [
             'url', 'name', 'title', 'author', 'publish_date', 'number', 'tags', 'categories',
             'page_type', 'page_status', 'page_format', 'text_html', 'word_count', 'internal_links', 'external_links', 'disqus_id',

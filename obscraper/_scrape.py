@@ -4,7 +4,7 @@ This interface is internal - implementation details may change.
 """
 
 from obscraper import _future
-from . import _extract_post, _grab, _utils, exceptions
+from . import _exceptions, _extract_post, _grab, _utils
 
 
 def get_all_posts():
@@ -17,7 +17,7 @@ def get_all_posts():
 
     Returns
     -------
-    posts : Dict[str, post.Post]
+    Dict[str, obscraper.Post]
         A dictionary whose keys are post URLs and whose values are the
         corresponding posts. "Last edit" dates are attached.
     """
@@ -34,14 +34,14 @@ def get_post_by_url(url):
     https://www.overcomingbias.com/2011/05/jobs-kill-big-time.html or
     https://www.overcomingbias.com/?p=27739.
 
-    Parameter
+    Parameters
     ---------
     url : str
         An overcomingbias post URL.
 
     Returns
     -------
-    post : post.Post
+    obscraper.Post
         The post corresponding to the input URL, with "last edit" date
         attached.
 
@@ -51,7 +51,7 @@ def get_post_by_url(url):
         If the URL returns a page that does not look like an
         overcomingbias post.
     exceptions.AttributeNotFoundError
-        If a post.Post attribute could not be extracted from the
+        If a obscraper.Post attribute could not be extracted from the
         downloaded page.
     """
     raise_exception_if_url_is_not_valid_post_url(url)
@@ -65,14 +65,14 @@ def get_posts_by_urls(urls):
     No exceptions are raised if a post or post attribute is not found -
     instead "None" is returned for that post.
 
-    Parameter
+    Parameters
     ---------
     urls : list[str]
         A list of overcomingbias post URLs to scrape data for.
 
     Returns
     -------
-    posts : Dict[str, post.Post]
+    Dict[str, obscraper.Post]
         A dictionary whose keys are the inputted URLs and whose values
         are the corresponding posts. "Last edit" dates are attached.
     """
@@ -84,8 +84,8 @@ def get_posts_by_urls(urls):
         """Get a post given its URL, returning None if not found."""
         try:
             return _grab.grab_post_by_url(url)
-        except (exceptions.AttributeNotFoundError,
-                exceptions.InvalidResponseError):
+        except (_exceptions.AttributeNotFoundError,
+                _exceptions.InvalidResponseError):
             return None
     url_dict = dict(zip(urls, urls))
     posts = _future.map_with_delay(
@@ -103,7 +103,7 @@ def get_posts_by_edit_date(start_date, end_date):
 
     Returns
     -------
-    posts : Dict[str, post.Post]
+    Dict[str, obscraper.Post]
         A dictionary whose keys are the URLs of posts edited within the
         date range, and whose values are the corresponding posts. "Last
         edit" dates are attached.
@@ -135,7 +135,7 @@ def get_votes(post_numbers):
     not possible to tell whether a post doesn't exist or if it just has
     zero votes.
 
-    Parameter
+    Parameters
     ---------
     post_numbers : Dict[str, int]
         Dictionary whose keys are arbitrary labels (e.g. the post URLs)
@@ -143,7 +143,7 @@ def get_votes(post_numbers):
 
     Returns
     -------
-    votes : Dict[str, int]
+    Dict[str, int]
         A dictionary whose keys are the inputted labels URLs and whose
         values are the corresponding vote counts (int). The vote count
         is 0 if the post is not found.
@@ -157,9 +157,9 @@ def get_votes(post_numbers):
         """Get vote count, returning None if the post is not found."""
         try:
             return _grab.grab_votes(number)
-        except (exceptions.AttributeNotFoundError,
-                exceptions.InvalidAuthCodeError,
-                exceptions.InvalidResponseError):
+        except (_exceptions.AttributeNotFoundError,
+                _exceptions.InvalidAuthCodeError,
+                _exceptions.InvalidResponseError):
             return None
     votes = _future.map_with_delay(
         get_vote, post_numbers, delay=0.02, max_workers=32)
@@ -173,15 +173,15 @@ def get_comments(disqus_ids):
     ID is in an incorrect format, an exception is raised.
     If no post is found, None is returned for that particular post.
 
-    Parameter
+    Parameters
     ---------
-    posts : Dict[str, str]
+    disqus_ids : Dict[str, str]
         Dictionary whose keys are arbitrary labels (e.g. the post URLs)
         and whose values are the the corresponding Disqus ID strings.
 
     Returns
     -------
-    comments : Dict[str, int]
+    Dict[str, int]
         A dictionary whose keys are the inputted labels and whose values
         are the corresponding comment counts. The comment count is None
         if the post is not found.
@@ -194,7 +194,7 @@ def get_comments(disqus_ids):
     def get_comment(disqus_id):
         try:
             return _grab.grab_comments(disqus_id)
-        except exceptions.InvalidResponseError:
+        except _exceptions.InvalidResponseError:
             return None
     comments = _future.map_with_delay(
         get_comment, disqus_ids, delay=0.01, max_workers=50)
@@ -204,15 +204,15 @@ def get_comments(disqus_ids):
 def attach_edit_dates(posts):
     """Attach "last modified" dates to a list of posts.
 
-    Parameter
+    Parameters
     ---------
-    posts : Dict[str, post.Post]
+    posts : Dict[str, obscraper.Post]
         A dictionary whose keys are post URLs and whose values are the
         corresponding posts, or None.
 
     Returns
     -------
-    posts : Dict[str, post.Post]
+    Dict[str, obscraper.Post]
         An updated dictionary of posts, with edit dates attached.
     """
     date_list = _grab.grab_edit_dates()

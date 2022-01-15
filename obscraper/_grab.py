@@ -8,7 +8,7 @@ import functools
 import bs4
 import cachetools.func
 
-from . import _download, _extract_dates, _extract_post, post, exceptions
+from . import _download, _exceptions, _extract_dates, _extract_post, _post
 
 POST_LIST_URL = 'https://www.overcomingbias.com/post.xml'
 GDSR_URL = ('https://www.overcomingbias.com/'
@@ -27,14 +27,14 @@ EDIT_DATES_CACHE_TIMEOUT = 300
 def grab_post_by_url(url):
     """Download and create a post object from its URL.
 
-    Parameter
+    Parameters
     ---------
     url : str
         The URL of the post to grab.
 
     Returns
     -------
-    post : post.Post
+    obscraper.Post
         The post corresponding to the input URL.
 
     Raises
@@ -43,12 +43,12 @@ def grab_post_by_url(url):
         If the URL returns a page that does not look like an
         overcomingbias post.
     exceptions.AttributeNotFoundError
-        If a post.Post attribute could not be extracted from the
+        If a obscraper.Post attribute could not be extracted from the
         downloaded page.
     """
     post_html = _download.grab_html_soup(url)
     if not _extract_post.is_ob_post_html(post_html):
-        raise exceptions.InvalidResponseError(
+        raise _exceptions.InvalidResponseError(
             f'the document found at {url} was not an overcomingbias post')
     return create_post(post_html)
 
@@ -57,15 +57,15 @@ def grab_post_by_url(url):
 def grab_comments(disqus_id):
     """Download comment count of overcomingbias post.
 
-    Parameter
+    Parameters
     ---------
     disqus_id : str
         The Disqus ID string of the post.
 
     Returns
     -------
-    count : post.Post
-        The post corresponding to the input URL.
+    int
+        The comment count corresponding to the input Disqus ID.
 
     Raises
     ------
@@ -77,7 +77,7 @@ def grab_comments(disqus_id):
     raw_json = json.loads(
         re.search(r'(?<=displayCount\()(.*)(?=\))', response.text).group())
     if raw_json['counts'] == []:
-        raise exceptions.InvalidResponseError(
+        raise _exceptions.InvalidResponseError(
             f'no comment count was found for Disqus ID {disqus_id}')
     return raw_json['counts'][0]['comments']
 
@@ -88,7 +88,7 @@ def grab_edit_dates():
 
     Returns
     -------
-    edit_dates : Dict[str, datetime.datetime]
+    Dict[str, datetime.datetime]
         Dictionary whose keys are post URLs and values are the last edit
         dates of each post as aware datetime.datetime objects.
     """
@@ -104,7 +104,7 @@ def _auth_cache(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except exceptions.InvalidAuthCodeError:
+        except _exceptions.InvalidAuthCodeError:
             vote_auth_code.cache_clear()
             return func(*args, **kwargs)
     return wrapper
@@ -127,8 +127,8 @@ def grab_votes(number):
 
     Returns
     -------
-    vote_count : int
-        Integer number of votes the corresponding post has received.
+    int
+        The vote count corresponding to the input post number.
 
     Raises
     ------
@@ -147,7 +147,7 @@ def grab_votes(number):
         GDSR_URL, params=params, headers=headers)
 
     if response.text == '-1':
-        raise exceptions.InvalidAuthCodeError(
+        raise _exceptions.InvalidAuthCodeError(
             'vote auth code is invalid or expired')
 
     raw_json = json.loads(response.text)
@@ -167,7 +167,7 @@ def vote_auth_code():
 
     Returns
     -------
-    vote_auth_code : str
+    str
         Authorisation code used to gain access to the vote count API.
     """
     post_html = _download.grab_html_soup(VOTE_AUTH_UPDATE_URL)
@@ -196,12 +196,12 @@ def create_post(post_html, votes=True, comments=True):
 
     Returns
     -------
-    new_post : Post
+    obscraper.Post
         Post initialised from the inputted HTML. Includes vote and
         comment counts (if the `vote` and `comment` flags are set to
         True), but does not `edit_date`.
     """
-    new_post = post.Post(
+    new_post = _post.Post(
         # URL and title
         url=_extract_post.extract_url(post_html),
         name=_extract_post.extract_name(post_html),

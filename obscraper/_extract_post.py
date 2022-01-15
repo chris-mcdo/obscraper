@@ -8,7 +8,7 @@ import copy
 
 import bs4
 
-from . import _utils, exceptions
+from . import _exceptions, _utils
 
 OB_SERVER_TZ = 'US/Eastern'
 # timezone of server generating post timestamps
@@ -22,7 +22,7 @@ DISQUS_URL_PATTERN = (
 def extract_url(post_html):
     """Extract the URL of the post.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -40,7 +40,7 @@ def extract_url(post_html):
 def extract_name(post_html):
     """Extract the name of the post.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -58,7 +58,7 @@ def extract_name(post_html):
 def extract_title(post_html):
     """Extract the title of the post.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -76,7 +76,7 @@ def extract_title(post_html):
 def extract_author(post_html):
     """Extract the post author's name.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -94,7 +94,7 @@ def extract_author(post_html):
 def extract_publish_date(post_html):
     """Extract the date the post was published.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -113,7 +113,7 @@ def extract_publish_date(post_html):
 def extract_number(post_html):
     """Extract the unique integer identifier of the post.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -129,7 +129,7 @@ def extract_number(post_html):
 def extract_tags(post_html):
     """Extract post tags.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -145,7 +145,7 @@ def extract_tags(post_html):
 def extract_categories(post_html):
     """Extract post categories.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -161,7 +161,7 @@ def extract_categories(post_html):
 def extract_page_type(post_html):
     """Extract page type.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -177,7 +177,7 @@ def extract_page_type(post_html):
 def extract_page_status(post_html):
     """Extract page status.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -193,7 +193,7 @@ def extract_page_status(post_html):
 def extract_page_format(post_html):
     """Extract page format.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -209,7 +209,7 @@ def extract_page_format(post_html):
 def extract_text_html(post_html):
     """Extract lightly edited HTML of the post text.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -230,7 +230,7 @@ def extract_text_html(post_html):
 def extract_word_count(post_html):
     """Extract post word count.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -248,7 +248,7 @@ def extract_word_count(post_html):
 def extract_internal_links(post_html):
     """Extract links to other overcomingbias posts.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -276,7 +276,7 @@ def extract_internal_links(post_html):
 def extract_external_links(post_html):
     """Extract links to other (non- OB post) webpages.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -304,7 +304,7 @@ def extract_external_links(post_html):
 def extract_vote_auth_code(post_html):
     """Extract the vote authorisation code, or return None.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -323,7 +323,7 @@ def extract_vote_auth_code(post_html):
 def extract_disqus_id(post_html):
     """Extract the Disqus ID string.
 
-    Parameter
+    Parameters
     ---------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
@@ -356,7 +356,7 @@ def extract_meta_header(post_html):
 def convert_to_plaintext(text_html):
     """Convert post text from HTML to plaintext format.
 
-    Parameter
+    Parameters
     ---------
     text_html : str
         Post text HTML as given by `extract_text_html`.
@@ -382,7 +382,7 @@ def has_post_in_id(tag):
 def is_valid_post_url(url):
     """Check whether a URL could belong to an overcomingbias post.
 
-    Parameter
+    Parameters
     ---------
     url : str
         A URL.
@@ -402,7 +402,7 @@ def is_valid_post_long_url(url):
     A long URL is one which contains the "name" of the post, e.g.
     https://www.overcomingbias.com/2011/05/jobs-kill-big-time.html.
 
-    Parameter
+    Parameters
     ---------
     url : str
         A URL.
@@ -423,7 +423,7 @@ def is_valid_post_short_url(url):
     A short URL is one which contains the "number" of the post, e.g.
     https://www.overcomingbias.com/?p=26449.
 
-    Parameter
+    Parameters
     ---------
     url : str
         A URL.
@@ -441,7 +441,7 @@ def is_valid_post_short_url(url):
 def is_ob_site_html(html):
     """Check if some HTML looks like it is from the overcomingbias site.
 
-    Parameter
+    Parameters
     ---------
     html : bs4.BeautifulSoup
         An HTML page, possibly from the overcomingbias site.
@@ -461,7 +461,7 @@ def is_ob_site_html(html):
 def is_ob_post_html(html):
     """Check if some HTML looks like an overcomingbias blog post.
 
-    Parameter
+    Parameters
     ---------
     html : bs4.BeautifulSoup
         An HTML page, possibly from the overcomingbias site.
@@ -480,7 +480,7 @@ def is_ob_post_html(html):
 def is_valid_disqus_id(disqus_id):
     """Check whether a string is a valid Disqus ID string.
 
-    Parameter
+    Parameters
     ---------
     disqus_id : str
         A possibly valid Disqus ID string.
@@ -499,5 +499,5 @@ def is_valid_disqus_id(disqus_id):
 def raise_attribute_not_found_error_if_none(obj, attribute_name):
     """Raise an AttributeNotFoundError if an object is None."""
     if obj is None:
-        raise exceptions.AttributeNotFoundError(
+        raise _exceptions.AttributeNotFoundError(
             f'{attribute_name} could not be extracted from post HTML')

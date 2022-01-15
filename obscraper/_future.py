@@ -27,7 +27,7 @@ def map_with_delay(func, arg_dict, delay, max_workers=32, **kwargs):
 
     Returns
     -------
-    result : Dict[str, object]
+    Dict[str, object]
         Dictionary whose keys are the inputted labels and whose values
         are the outputs of ``func``, evaluated at each argument value.
     """

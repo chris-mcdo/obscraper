@@ -1,20 +1,20 @@
-"""Encode and decode post.Post objects."""
+"""Encode and decode Post objects."""
 
 import json
 import dataclasses
 import datetime
 import dateutil.parser
-from . import _utils, post
+from . import _post, _utils
 
 
 class PostEncoder(json.JSONEncoder):
-    """Encode a post.Post object to JSON.
+    """Encode obscraper.Post object to JSON.
 
     Inherits from ``json.JSONEncoder``.
     """
 
     def default(self, o):
-        if isinstance(o, post.Post):
+        if isinstance(o, _post.Post):
             return dataclasses.asdict(o)
         if _utils.is_aware_datetime(o):
             time_in_utc = o.astimezone(datetime.timezone.utc)
@@ -23,20 +23,20 @@ class PostEncoder(json.JSONEncoder):
 
 
 def _dict_to_post(post_dict):
-    """Convert dictionary to post.Post.
+    """Convert dictionary to obscraper.Post.
 
     Converts a dictionary representing a post to a real post.Post
     object. Mainly useful for deserialization.
 
-    Parameter
+    Parameters
     ---------
     post_dict : dict
-        A dictionary whose keys are post.Post attribute names and whose
-        values valid post.Post attribute values.
+        A dictionary whose keys are obscraper.Post attribute names and
+        whose values valid obscraper.Post attribute values.
 
     Returns
     -------
-    post : post.Post
+    obscraper.Post
         The post object corresponding to the inputted dictionary.
     """
     if 'publish_date' not in post_dict.keys():
@@ -49,14 +49,14 @@ def _dict_to_post(post_dict):
     if post_dict['edit_date'] is not None:
         post_dict['edit_date'] = dateutil.parser.isoparse(
             post_dict['edit_date'])
-    return post.Post(**post_dict)
+    return _post.Post(**post_dict)
 
 
 class PostDecoder(json.JSONDecoder):
-    """Decode a post.Post object from JSON.
+    """Decode a obscraper.Post object from JSON.
 
     Inherits from ``json.JSONDecoder``, implementing a special hook to
-    deserialize post.Post objects.
+    deserialize obscraper.Post objects.
     """
 
     def __init__(self, *args, **kwargs):

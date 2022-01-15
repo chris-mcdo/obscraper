@@ -3,7 +3,7 @@ import unittest
 import datetime
 
 import obscraper
-from obscraper import post
+from obscraper import _post
 from obscraper import _utils
 from obscraper import _extract_post
 
@@ -63,7 +63,7 @@ class TestOBScraper(unittest.TestCase):
             self.assertIsNone(test_post.comments)
 
     def assert_post_has_standard_attributes(self, test_post):
-        self.assertIsInstance(test_post, post.Post)
+        self.assertIsInstance(test_post, _post.Post)
         for attr in [
             'url', 'name', 'title', 'author', 'publish_date', 'number', 'tags', 'categories',
             'page_type', 'page_status', 'page_format', 'text_html', 'word_count', 'internal_links', 'external_links', 'disqus_id',

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import datetime
 
-from obscraper import _extract_post, _grab, _scrape, _utils, exceptions, post
+from obscraper import _exceptions, _extract_post, _grab, _post, _scrape, _utils
 
 
 class TestGetAllPosts(unittest.TestCase):
@@ -27,12 +27,12 @@ class TestGetPostByURL(unittest.TestCase):
     def test_returns_valid_post_for_valid_url(self):
         url = 'https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html'
         p = _scrape.get_post_by_url(url)
-        self.assertIsInstance(p, post.Post)
+        self.assertIsInstance(p, _post.Post)
         self.assertEqual(p.url, url)
 
     def test_raises_exception_when_post_not_found(self):
         url = 'https://www.overcomingbias.com/2016/03/not-a-real-post.html'
-        self.assertRaises(exceptions.InvalidResponseError,
+        self.assertRaises(_exceptions.InvalidResponseError,
                           _scrape.get_post_by_url, url)
 
 
@@ -80,7 +80,7 @@ class TestGetPostsByURLs(unittest.TestCase):
         self.assert_is_valid_post(posts[urls[2]])
 
     def assert_is_valid_post(self, p):
-        self.assertIsInstance(p, post.Post)
+        self.assertIsInstance(p, _post.Post)
         self.assertGreaterEqual(p.word_count, 5)
         self.assertGreaterEqual(p.votes, 0)
         self.assertGreaterEqual(p.comments, 0)
@@ -97,7 +97,7 @@ class TestGetPostsByEditDate(unittest.TestCase):
             self.assertIsInstance(last_week, dict)
             [self.assertTrue(_extract_post.is_valid_post_url(url))
              for url in last_week.keys()]
-            [self.assertIsInstance(p, post.Post) for p in last_week.values()]
+            [self.assertIsInstance(p, _post.Post) for p in last_week.values()]
 
     def test_raises_type_error_if_dates_are_wrong_type(self):
         now = datetime.datetime.now(datetime.timezone.utc)
@@ -290,7 +290,7 @@ class TestClearCache(unittest.TestCase):
 
         p1 = _grab.grab_post_by_url(
             'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html')
-        self.assertIsInstance(p1, post.Post)
+        self.assertIsInstance(p1, _post.Post)
         mock_is_ob_post.assert_called_once()
 
         p2 = _grab.grab_post_by_url(

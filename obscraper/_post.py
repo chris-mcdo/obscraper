@@ -52,11 +52,11 @@ class Post:
     disqus_id : str
         A string which uniquely identifies the post to the Disqus
         comment count API.
-    votes : int
+    votes : int, optional
         The number of votes the post has received.
-    comments : int
+    comments : int, optional
         The number of comments on the post.
-    edit_date : datetime.datetime
+    edit_date : datetime.datetime, optional
         The (aware) datetime when the post was last edited, according to
         the sitemap.
     """
