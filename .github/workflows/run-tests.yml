@@ -15,19 +15,23 @@ jobs:
           "ubuntu-py39",
           "macos-py39",
         ]
-        python: "3.9"
-        tox_env: "py39"
 
         include:
           - name: "windows-py39"
             os: windows-latest
+            python: "3.9"
+            tox_env: "py39"
             use_coverage: true
 
           - name: "ubuntu-py39"
             os: ubuntu-latest
+            python: "3.9"
+            tox_env: "py39"
 
           - name: "macos-py39"
             os: macos-latest
+            python: "3.9"
+            tox_env: "py39"
 
     steps:
     - name: Check out current commit
