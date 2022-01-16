@@ -1,6 +1,13 @@
 obscraper: scrape posts from the overcomingbias blog
 ====================================================
 
+.. image:: https://github.com/chris-mcdo/obscraper/workflows/tests/badge.svg
+  :target: https://github.com/chris-mcdo/obscraper/actions?query=workflow%3Atests
+
+.. image:: https://codecov.io/gh/chris-mcdo/obscraper/branch/main/graph/badge.svg
+    :target: https://codecov.io/gh/chris-mcdo/obscraper
+    :alt: Unit test coverage
+  
 .. TODO add badges. See pytest for version on pypi, supported py versions 3.9, docs, coverage? tests? Licence
 
 ``obscraper`` lets you scrape blog posts and associated metadata from the
