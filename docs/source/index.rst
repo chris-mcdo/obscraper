@@ -24,13 +24,24 @@ And even easier to get all posts:
 
 .. code-block:: python
 
-    >>> all_posts = obscraper.get_all_posts()
+Or a full list of post URLs and edit dates::
+
+    >>> import obscraper
+    >>> edit_dates = obscraper.grab_edit_dates()
     ...
-    >>> len(all_posts)
-    4353
-    >>> [post.title for post in all_posts.values() if 'music' in post.tags]
-    ['Silent Line-Videos Pick Music Winners', 'Classical Music As Tax',
-    'Seek Superstar Slavery', 'I’ll Think of a Reason Later']
+    >>> len(edit_dates)
+    4352
+    >>> {url: str(edit_dates[url]) for url in list(edit_dates)[:5]}
+    {'https://www.overcomingbias.com/2022/01/much-talk-is-sales-patter.html': 
+    '2022-01-14 20:46:35+00:00', 
+    'https://www.overcomingbias.com/2022/01/old-man-rant.html': 
+    '2022-01-13 15:21:33+00:00', 
+    'https://www.overcomingbias.com/2022/01/my-11-bets-at-10-1-odds-on-10m-covid-deaths-by-2022.html': 
+    '2022-01-12 19:15:10+00:00', 
+    'https://www.overcomingbias.com/2022/01/to-innovate-unify-or-fragment.html': 
+    '2022-01-11 01:03:44+00:00', 
+    'https://www.overcomingbias.com/2022/01/on-what-is-advice-useful.html': 
+    '2022-01-10 18:46:26+00:00'}
 
 For more, see :doc:`Getting Started <getting-started>`.
 

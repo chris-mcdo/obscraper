@@ -3,7 +3,8 @@ obscraper: scrape posts from the overcomingbias blog
 
 .. TODO add badges. See pytest for version on pypi, supported py versions 3.9, docs, coverage? tests? Licence
 
-``obscraper`` provides a basic API for posts on the `overcomingbias <https://www.overcomingbias.com/>`_ blog.
+``obscraper`` lets you scrape blog posts and associated metadata from the
+`overcomingbias <https://www.overcomingbias.com/>`_ blog.
 
 It's easy to get a single post::
 
@@ -27,11 +28,16 @@ Or a full list of post URLs and edit dates::
     >>> len(edit_dates)
     4352
     >>> {url: str(edit_dates[url]) for url in list(edit_dates)[:5]}
-    {'https://www.overcomingbias.com/2022/01/much-talk-is-sales-patter.html': '2022-01-14 20:46:35+00:00', 
-    'https://www.overcomingbias.com/2022/01/old-man-rant.html': '2022-01-13 15:21:33+00:00', 
-    'https://www.overcomingbias.com/2022/01/my-11-bets-at-10-1-odds-on-10m-covid-deaths-by-2022.html': '2022-01-12 19:15:10+00:00', 
-    'https://www.overcomingbias.com/2022/01/to-innovate-unify-or-fragment.html': '2022-01-11 01:03:44+00:00', 
-    'https://www.overcomingbias.com/2022/01/on-what-is-advice-useful.html': '2022-01-10 18:46:26+00:00'}
+    {'https://www.overcomingbias.com/2022/01/much-talk-is-sales-patter.html': 
+    '2022-01-14 20:46:35+00:00', 
+    'https://www.overcomingbias.com/2022/01/old-man-rant.html': 
+    '2022-01-13 15:21:33+00:00', 
+    'https://www.overcomingbias.com/2022/01/my-11-bets-at-10-1-odds-on-10m-covid-deaths-by-2022.html': 
+    '2022-01-12 19:15:10+00:00', 
+    'https://www.overcomingbias.com/2022/01/to-innovate-unify-or-fragment.html': 
+    '2022-01-11 01:03:44+00:00', 
+    'https://www.overcomingbias.com/2022/01/on-what-is-advice-useful.html': 
+    '2022-01-10 18:46:26+00:00'}
 
 Features
 ********
