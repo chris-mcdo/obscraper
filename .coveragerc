@@ -1,0 +1,8 @@
+[run]
+include = 
+  obscraper/*
+  */lib/python*/site-packages/obscraper/*
+  *\Lib\site-packages\obscraper\*
+branch = True
+# parallel = True
+
