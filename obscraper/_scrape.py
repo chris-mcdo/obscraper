@@ -150,7 +150,7 @@ def get_votes(post_numbers):
     """
     raise_exception_if_arg_is_not_type(post_numbers, dict, 'post_numbers')
     for url, number in post_numbers.items():
-        raise_exception_if_url_is_not_valid_post_url(url)
+        raise_exception_if_arg_is_not_type(url, str, 'post_numbers label')
         raise_exception_if_number_has_incorrect_format(number)
 
     def get_vote(number):
@@ -188,7 +188,7 @@ def get_comments(disqus_ids):
     """
     raise_exception_if_arg_is_not_type(disqus_ids, dict, 'disqus_ids')
     for url, number in disqus_ids.items():
-        raise_exception_if_url_is_not_valid_post_url(url)
+        raise_exception_if_arg_is_not_type(url, str, 'disqus_ids label')
         raise_exception_if_disqus_id_has_incorrect_format(number)
 
     def get_comment(disqus_id):

@@ -126,8 +126,8 @@ class TestGetVotes(unittest.TestCase):
             'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html': 33023,
         }
         votes = _scrape.get_votes(post_numbers)
-        for url, vote in votes.items():
-            self.assertIn(url, post_numbers.keys())
+        for label, vote in votes.items():
+            self.assertIn(label, post_numbers.keys())
             self.assertIsInstance(vote, int)
             self.assertGreaterEqual(vote, 0)
 
@@ -148,8 +148,8 @@ class TestGetVotes(unittest.TestCase):
     def test_raises_value_error_if_arguments_have_wrong_value(self):
         for post_numbers in [
             {
-                'https://www.overcomingbias.com/2006/11/introduction.html': 18402,
-                'https://www.overcomingbias.com/2006/introduction.html': 45678
+                'intro': 18402,
+                'new': 4567
             },
             {
                 'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 18423,
@@ -174,8 +174,8 @@ class TestGetComments(unittest.TestCase):
             '33023 https://www.overcomingbias.com/?p=33023',
         }
         comments = _scrape.get_comments(disqus_ids)
-        for url, comment in comments.items():
-            self.assertIn(url, disqus_ids.keys())
+        for label, comment in comments.items():
+            self.assertIn(label, disqus_ids.keys())
             self.assertIsInstance(comment, int)
             self.assertGreater(comment, 1)
 
@@ -207,7 +207,6 @@ class TestGetComments(unittest.TestCase):
                 '18141 http://prod.ob.trike.com.au/?p=18141',
             },
             {'https://www.overcomingbias.com/2006/11/introduction.html': ''},
-            {'': '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html'}
         ]:
             self.assertRaises(ValueError, _scrape.get_comments, disqus_ids)
 
