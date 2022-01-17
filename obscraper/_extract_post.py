@@ -245,6 +245,27 @@ def extract_word_count(post_html):
     return _utils.count_words(text)
 
 
+def extract_all_links(post_html):
+    """Extract all hyperlinks in the body of a post.
+
+    Parameters
+    ---------
+    post_html : bs4.BeautifulSoup
+        Full HTML of an overcomingbias post page.
+
+    Returns
+    -------
+    all_links : list[str]
+        A list of hyperlinks found in the body of the post.
+    """
+    match = post_html.find(attrs={'class': 'entry-content'})
+    raise_attribute_not_found_error_if_none(match, 'links')
+
+    link_tags = [tag for tag in match.find_all('a') if tag.has_attr('href')]
+    all_links = [tag['href'] for tag in link_tags]
+    return all_links
+
+
 def extract_internal_links(post_html):
     """Extract links to other overcomingbias posts.
 
@@ -255,15 +276,12 @@ def extract_internal_links(post_html):
 
     Returns
     -------
-    internal_links : list[str]
+    internal_links : Dict[str, int]
         A dictionary whose keys record links to OB webpages within the
         post, and whose values record how many times each link is
         repeated (usually 1).
     """
-    match = post_html.find(attrs={'class': 'entry-content'})
-    raise_attribute_not_found_error_if_none(match, 'internal links')
-
-    all_links = [tag['href'] for tag in match.find_all('a')]
+    all_links = extract_all_links(post_html)
     int_links = [link for link in all_links if is_valid_post_url(link)]
 
     int_link_dict = {}
@@ -283,15 +301,12 @@ def extract_external_links(post_html):
 
     Returns
     -------
-    internal_links : list[str]
+    internal_links : Dict[str, int]
         A dictionary whose keys record links to other webpages within
         the post, and whose values record how many times each link is
         repeated (usually 1).
     """
-    match = post_html.find(attrs={'class': 'entry-content'})
-    raise_attribute_not_found_error_if_none(match, 'external links')
-
-    all_links = [tag['href'] for tag in match.find_all('a')]
+    all_links = extract_all_links(post_html)
     ext_links = [link for link in all_links if not is_valid_post_url(link)]
 
     ext_link_dict = {}
