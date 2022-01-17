@@ -67,7 +67,7 @@ def get_posts_by_urls(urls):
 
     Parameters
     ---------
-    urls : list[str]
+    urls : List[str]
         A list of overcomingbias post URLs to scrape data for.
 
     Returns

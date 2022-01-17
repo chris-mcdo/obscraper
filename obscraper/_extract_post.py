@@ -136,7 +136,7 @@ def extract_tags(post_html):
 
     Returns
     -------
-    tags : list[str]
+    tags : List[str]
         List of tags associated with the post.
     """
     return extract_meta_header(post_html).get('tag', [])
@@ -152,7 +152,7 @@ def extract_categories(post_html):
 
     Returns
     -------
-    categories : list[str]
+    categories : List[str]
         List of categories associated with the post.
     """
     return extract_meta_header(post_html).get('category', [])
@@ -255,7 +255,7 @@ def extract_all_links(post_html):
 
     Returns
     -------
-    all_links : list[str]
+    all_links : List[str]
         A list of hyperlinks found in the body of the post.
     """
     match = post_html.find(attrs={'class': 'entry-content'})

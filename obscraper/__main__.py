@@ -61,7 +61,7 @@ def main(cli_args, prog=None):
 
     Parameters
     ----------
-    cli_args : list[str]
+    cli_args : List[str]
         Command line interface arguments.
     prog : str
         Program name (to show in help text).

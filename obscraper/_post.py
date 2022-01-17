@@ -2,7 +2,7 @@
 
 import datetime
 import dataclasses
-from typing import Dict
+from typing import Dict, List
 from . import _extract_post
 
 
@@ -33,9 +33,9 @@ class Post:
     publish_date : datetime.datetime
         The (aware) datetime when the post was first published,
         according to the post page.
-    tags : list[str]
+    tags : List[str]
         A list of tags associated with the post.
-    categories : list[str]
+    categories : List[str]
         A list of categories associated with the post.
     text_html : str
         The full text of the post in HTML format.
@@ -70,8 +70,8 @@ class Post:
     title: str
     author: str
     publish_date: datetime.datetime
-    tags: list[str]
-    categories: list[str]
+    tags: List[str]
+    categories: List[str]
     text_html: str
     word_count: int
     internal_links: Dict[str, int]
