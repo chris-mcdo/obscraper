@@ -20,10 +20,6 @@ It's easy to get a single post:
     >>> intro.comments
     20
 
-And even easier to get all posts:
-
-.. code-block:: python
-
 Or a full list of post URLs and edit dates::
 
     >>> import obscraper
@@ -43,7 +39,7 @@ Or a full list of post URLs and edit dates::
     'https://www.overcomingbias.com/2022/01/on-what-is-advice-useful.html': 
     '2022-01-10 18:46:26+00:00'}
 
-For more, see :doc:`Getting Started <getting-started>`.
+For more on how to use the package, see :doc:`Getting Started <getting-started>`.
 
 Features
 ********
@@ -68,22 +64,22 @@ Features
 Documentation
 *************
 
-.. TODO
+See :doc:`Getting Started <getting-started>` for an introduction to the package. 
 
-See :doc:`getting-started` for an introduction to the package. 
+A full reference to the obscraper public API can be found at :doc:`Public API Reference <api>`.
 
-.. Documentation is available at <LINK>, and includes
-.. (bullet points for each doc type)
+For the full details, check out the well-documented `code <https://github.com/chris-mcdo/obscraper>`_.
 
 Bugs/Requests
 *************
 
-.. TODO Please use the GitHub <issue tracker> to submit bugs or request features.
+Please use the `GitHub issue tracker <https://github.com/chris-mcdo/obscraper/issues>`_
+to submit bugs or request features.
 
 Changelog
 *********
 
-.. TODO See the changelog for a list of fixes and enhancements of each version.
+See the :doc:`Changelog <changelog>` for a list of fixes and enhancements of each version.
 
 License
 *******
