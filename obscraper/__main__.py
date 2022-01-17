@@ -28,10 +28,10 @@ class _CustomHelpFormatter(argparse.HelpFormatter):
 
 def _main_parser():
     """Construct parser for the obscraper command line interface."""
-    description = ('Download posts and write them to a file.\n'
-                   'Posts can be downloaded via their URLs or their edit'
-                   ' dates, or you can download all posts.\n'
-                   'Datetimes are specified using the format'
+    description = ('Download posts and write them to a file.'
+                   ' Posts can be downloaded via their URLs or their edit'
+                   ' dates, or you can download all posts.'
+                   ' Datetimes are specified using the format'
                    ' YYYY-MM-DD[ hh:mm:ss[±HH]] or any other format understood'
                    ' by the flexible dateutil.parser.parse parser. (If no'
                    ' timezone is specified, datetimes are assumed to be UTC.)')
@@ -51,7 +51,7 @@ def _main_parser():
                        type=parse_date_with_utc_as_default)
     group.add_argument('-a', '--all', action='store_true',
                        help='get all posts')
-    parser.add_argument('-o', '--outfile', default='outputs/posts.json',
+    parser.add_argument('-o', '--outfile', default='posts.json',
                         help='output file path')
     return parser
 
