@@ -1,17 +1,10 @@
 name: release
 
-on: [push]
+on: [workflow_call]
 
 jobs:
-  run-tests:
-    uses: chris-mcdo/obscraper/.github/workflows/run-tests.yml@main
-  
   publish:
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
-
     runs-on: ubuntu-latest
-
-    needs: [run-tests]
 
     steps:
     - uses: actions/checkout@v2

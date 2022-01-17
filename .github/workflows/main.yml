@@ -1,0 +1,12 @@
+name: main
+
+on: [push]
+
+jobs:
+  run-tests:
+    uses: chris-mcdo/obscraper/.github/workflows/run-tests.yml@main
+  
+  release:
+    needs: [run-tests]
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+    uses: chris-mcdo/obscraper/.github/workflows/release.yml@main
