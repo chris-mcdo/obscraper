@@ -11,27 +11,27 @@ jobs:
       fail-fast: false
       matrix:
         name: [
-          "windows-py37",
-          "ubuntu-py37",
-          "macos-py37",
+          "windows-py38",
+          "ubuntu-py38",
+          "macos-py38",
         ]
 
         include:
-          - name: "windows-py37"
+          - name: "windows-py38"
             os: windows-latest
-            python: "3.7"
-            tox_env: "py37"
+            python: "3.8"
+            tox_env: "py38"
             use_coverage: true
 
-          - name: "ubuntu-py37"
+          - name: "ubuntu-py38"
             os: ubuntu-latest
-            python: "3.7"
-            tox_env: "py37"
+            python: "3.8"
+            tox_env: "py38"
 
-          - name: "macos-py37"
+          - name: "macos-py38"
             os: macos-latest
-            python: "3.7"
-            tox_env: "py37"
+            python: "3.8"
+            tox_env: "py38"
 
     steps:
     - name: Check out current commit
