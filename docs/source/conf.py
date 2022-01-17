@@ -12,6 +12,8 @@
 # absolute, like shown here.
 import pathlib
 import sys
+from importlib.metadata import version
+
 sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 
 
@@ -20,6 +22,8 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 project = 'obscraper'
 copyright = '2022, Christopher McDonald'
 author = 'Christopher McDonald'
+release = version('obscraper')
+version = '.'.join(release.split('.')[:2])
 
 
 # -- General configuration ---------------------------------------------
@@ -54,9 +58,6 @@ master_doc = 'contents'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-
-# Mock imports to prevent autodoc failing
-autodoc_mock_imports = ['bs4', 'requests', 'dateutil', 'pytz', 'cachetools']
 
 # -- Options for HTML output -------------------------------------------
 
