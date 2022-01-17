@@ -13,6 +13,10 @@ obscraper: scrape posts from the overcomingbias blog
   :target: https://github.com/chris-mcdo/obscraper/blob/main/LICENSE
   :alt: MIT License
 
+.. image:: https://readthedocs.org/projects/obscraper/badge/?version=latest
+  :target: https://obscraper.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
+
 .. TODO add badges. See pytest for version on pypi, supported py versions 3.9, docs, coverage? tests? Licence
 
 ``obscraper`` lets you scrape blog posts and associated metadata from the
