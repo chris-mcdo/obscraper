@@ -160,7 +160,7 @@ This is useful for storing posts for later:
 
 Also, the attributes of the post can be examined more easily in a file:
 
-.. code-block:: json
+.. code-block:: javascript
     :caption: 2006-11-introduction.json
 
     {
@@ -169,6 +169,7 @@ Also, the attributes of the post can be examined more easily in a file:
         "number": 18402,
         "page_type": "post",
         ...
+    }
 
 To convert the JSON back into an :ref:`obscraper.Post <post>` object, use
 the :ref:`obscraper.PostDecoder <post-decoder>` class:
@@ -200,7 +201,7 @@ to download all posts.
 By default the results are stored in a posts.json file in the current
 directory:
 
-.. code-block:: json
+.. code-block:: javascript
     :caption: posts.json
 
     [
@@ -212,6 +213,10 @@ directory:
                 "number": 31449,
                 "page_type": "post",
                 ...
+            }
+        },
+        ...
+    ]
 
 To see a full list of commands, use the -h / --help option.
 
