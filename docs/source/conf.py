@@ -12,6 +12,8 @@
 # absolute, like shown here.
 import pathlib
 import sys
+from importlib.metadata import version
+
 sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 
 
@@ -20,6 +22,8 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 project = 'obscraper'
 copyright = '2022, Christopher McDonald'
 author = 'Christopher McDonald'
+release = version('obscrcaper')
+version = '.'.join(release.split('.')[:2])
 
 
 # -- General configuration ---------------------------------------------
@@ -41,6 +45,9 @@ napoleon_numpy_docstring = True
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
+# Path for static HTML
+html_static_path = []
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
@@ -51,6 +58,9 @@ master_doc = 'contents'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+
+# Mock imports to prevent autodoc failing
+autodoc_mock_imports = ['bs4', 'requests', 'dateutil', 'pytz', 'cachetools']
 
 # -- Options for HTML output -------------------------------------------
 
