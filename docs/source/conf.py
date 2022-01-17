@@ -12,8 +12,6 @@
 # absolute, like shown here.
 import pathlib
 import sys
-from importlib.metadata import version
-
 sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 
 
@@ -22,8 +20,6 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 project = 'obscraper'
 copyright = '2022, Christopher McDonald'
 author = 'Christopher McDonald'
-release = version('obscrcaper')
-version = '.'.join(release.split('.')[:2])
 
 
 # -- General configuration ---------------------------------------------
