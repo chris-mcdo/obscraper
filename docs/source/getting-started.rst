@@ -129,7 +129,13 @@ You can download all posts indirectly by using :ref:`obscraper.get_posts_by_edit
 
     >>> all_posts = obscraper.get_all_posts()
     >>> len(all_posts)
-    4353
+    3702
+    >>> [p.title for p in all_posts.values() if 'Liability' in p.title]
+    ['Innovation Liability Nightmare', 'Liability Insurance For All', 
+    'Between Property and Liability', 'All Pay Liability', 
+    'Require Legal Liability Insurance', 'For Doc Liability']
+
+This may take a few (<10) minutes.
 
 :ref:`obscraper.get_all_posts <get-all-posts>` will send more than 4000 requests
 to the overcomingbias site, and download ~100MB-1GB of data.
