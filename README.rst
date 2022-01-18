@@ -8,23 +8,29 @@
 obscraper: scrape posts from the overcomingbias blog
 ====================================================
 
+.. image:: https://img.shields.io/pypi/v/obscraper.svg
+    :target: https://pypi.org/project/obscraper/
+    :alt: Project Version on PyPI
+
+.. image:: https://img.shields.io/pypi/pyversions/obscraper.svg
+    :target: https://pypi.org/project/obscraper/
+    :alt: Supported Python Versions
+
 .. image:: https://github.com/chris-mcdo/obscraper/workflows/tests/badge.svg
   :target: https://github.com/chris-mcdo/obscraper/actions?query=workflow%3Atests
-  :alt: Unit tests
-
-.. image:: https://codecov.io/gh/chris-mcdo/obscraper/branch/main/graph/badge.svg
-  :target: https://codecov.io/gh/chris-mcdo/obscraper
-  :alt: Unit test coverage
-  
-.. image:: https://img.shields.io/badge/license-MIT-purple
-  :target: https://github.com/chris-mcdo/obscraper/blob/main/LICENSE
-  :alt: MIT License
+  :alt: Unit Tests
 
 .. image:: https://readthedocs.org/projects/obscraper/badge/?version=latest
   :target: https://obscraper.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
 
-.. TODO add badges. See pytest for version on pypi, supported py versions 3.8+
+.. image:: https://codecov.io/gh/chris-mcdo/obscraper/branch/main/graph/badge.svg
+  :target: https://codecov.io/gh/chris-mcdo/obscraper
+  :alt: Unit Test Coverage
+  
+.. image:: https://img.shields.io/badge/license-MIT-purple
+  :target: https://github.com/chris-mcdo/obscraper/blob/main/LICENSE
+  :alt: MIT License
 
 ``obscraper`` lets you scrape blog posts and associated metadata from the
 `overcomingbias <https://www.overcomingbias.com/>`_ blog.
@@ -80,15 +86,16 @@ Features
 
 - Comprehensively tested
 
-.. TODO python versions support
+- Supports python 3.8+
 
 Documentation
 *************
 
-.. TODO
+Read the full documentation `here <https://obscraper.readthedocs.io/en/stable/>`_,
+including the `Installation and Getting Started Guide
+<https://obscraper.readthedocs.io/en/stable/getting-started.html>`_ and the
+`Public API Reference <https://obscraper.readthedocs.io/en/stable/api.html>`_.
 
-.. Documentation is available at <LINK>, and includes
-.. (bullet points for each doc type)
 
 Bugs/Requests
 *************
@@ -99,7 +106,8 @@ to submit bugs or request features.
 Changelog
 *********
 
-See the changelog for a list of fixes and enhancements of each version.
+See the `Changelog <https://obscraper.readthedocs.io/en/stable/changelog.html>`_
+for a list of fixes and enhancements at each version.
 
 License
 *******
