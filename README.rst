@@ -24,7 +24,7 @@ obscraper: scrape posts from the overcomingbias blog
   :target: https://obscraper.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
 
-.. TODO add badges. See pytest for version on pypi, supported py versions 3.9, docs, coverage? tests? Licence
+.. TODO add badges. See pytest for version on pypi, supported py versions 3.8+
 
 ``obscraper`` lets you scrape blog posts and associated metadata from the
 `overcomingbias <https://www.overcomingbias.com/>`_ blog.

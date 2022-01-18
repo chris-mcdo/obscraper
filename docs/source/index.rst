@@ -1,7 +1,8 @@
 obscraper: scrape posts from the overcomingbias blog
 ====================================================
 
-``obscraper`` provides a basic API for posts on the `overcomingbias <https://www.overcomingbias.com/>`_ blog.
+``obscraper`` lets you scrape blog posts and associated metadata from the
+`overcomingbias <https://www.overcomingbias.com/>`_ blog.
 
 It's easy to get a single post:
 
