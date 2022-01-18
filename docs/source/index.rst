@@ -60,7 +60,7 @@ Features
 
 - Comprehensively tested
 
-.. TODO python versions support
+- Supports python 3.8+
 
 Documentation
 *************

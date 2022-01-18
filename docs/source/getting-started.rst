@@ -1,16 +1,16 @@
 Installation and Getting Started
 ================================
 
-**Supported Python versions**: 3.9
+**Supported Python Versions**: 3.8+
 
-**Supported platforms**: Linux, Windows, MacOS
+**Supported Platforms**: Linux, Windows, MacOS
 
 This page explains how to install obscraper and run some basic commands.
 
 Install ``obscraper``
 *********************
 
-Install from pypi:
+Install from PyPI:
 
 .. code-block:: console
 
