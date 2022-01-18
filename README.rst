@@ -1,3 +1,10 @@
+.. image:: https://github.com/chris-mcdo/obscraper/raw/main/docs/img/obscraper-logo.svg
+   :target: https://obscraper.readthedocs.io/en/stable/
+   :align: center
+   :height: 200
+   :alt: obscraper
+
+
 obscraper: scrape posts from the overcomingbias blog
 ====================================================
 
