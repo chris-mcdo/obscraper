@@ -3,7 +3,7 @@ Changelog
 
 Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_ standard.
 
-obscraper v0.1.3 (2022-01-18)
+obscraper 0.1.3 (2022-01-18)
 *****************************
 
 First public release!
