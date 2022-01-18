@@ -45,9 +45,6 @@ napoleon_numpy_docstring = True
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
-# Path for static HTML
-html_static_path = []
-
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
@@ -70,4 +67,31 @@ html_theme = 'alabaster'
 # here, relative to this directory. They are copied after the builtin
 # static files, so a file named "default.css" will overwrite the builtin
 # "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
+
+# The name for this set of Sphinx documents.  If None, it defaults to
+# "<project> v<release> documentation".
+html_title = "obscraper documentation"
+
+
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+html_logo = "img/logo.svg"
+
+# Custom sidebar templates, maps document names to template names.
+# html_sidebars = {}
+
+html_sidebars = {
+    "index": [
+        "searchbox.html",
+        "sidebarintro.html",
+        "sidebartoc.html",
+        "links.html",
+    ],
+    "**": [
+        "searchbox.html",
+        "sidebartoc.html",
+        "relations.html",
+        "links.html",
+    ],
+}
