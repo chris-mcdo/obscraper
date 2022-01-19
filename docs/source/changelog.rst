@@ -13,13 +13,14 @@ Breaking Changes
   attribute can not be extracted from the post HTML, since this situation is
   technically a bug. Previously it returned None.
 
-
 Improvements
 ############
 
 - Let users specify the maximum number of threads used to download posts, via
   the ``max_workers`` optional argument.
 
+- Remove repeated whitespace within the text, when getting post text as
+  plaintext.
 
 obscraper 0.1.3 (2022-01-18)
 *****************************

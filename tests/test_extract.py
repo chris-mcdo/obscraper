@@ -375,3 +375,12 @@ class TestIsValidDisqusID(unittest.TestCase):
         self.assertFalse(valid('18423 http://www.overcomingbias.com/?p=18424'))
         self.assertFalse(valid(
             'how-to-join.html https://www.overcomingbias.com/2006/11/how-to-join.html'))
+
+
+class TestConvertToPlaintext(unittest.TestCase):
+    def test_removes_correct_characters(self):
+        example_string = ('<p> Remove this   but not  this’.\n'
+                          'And clear trailing whitespace...   </p>')
+        result = _extract_post.convert_to_plaintext(example_string)
+        self.assertEqual(result,
+                         'Remove this but not this’.\nAnd clear trailing whitespace...')

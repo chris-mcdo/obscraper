@@ -371,6 +371,10 @@ def extract_meta_header(post_html):
 def convert_to_plaintext(text_html):
     """Convert post text from HTML to plaintext format.
 
+    Leading whitespace, trailing whitespace, repeated whitespace and
+    some special characters are removed. Line breaks within the text are
+    not removed.
+
     Parameters
     ---------
     text_html : str
@@ -379,12 +383,12 @@ def convert_to_plaintext(text_html):
     Returns
     -------
     text : str
-        Full text of post as plaintext. Leading and trailing whitespace
-        and some special characters are removed.
+        Full text of post as plaintext.
     """
     html = bs4.BeautifulSoup(text_html, 'lxml')
-    text = html.text.replace('\xa0', ' ').strip()
-    return text
+    text_with_whitespace = html.text.replace('\xa0', ' ')
+    squished_text = re.sub(' {2,}', ' ', text_with_whitespace.strip())
+    return squished_text
 
 
 def has_post_in_id(tag):
