@@ -15,8 +15,8 @@ class Post:
     url : str
         The URL of the post.
     name : str
-        The original name of the post found in its url, e.g.
-        'jobs-explain-lots'.
+        The original year, month and abbreviated name of the post, as
+        found in its url. E.g. '/2010/09/jobs-explain-lots'.
     number : int
         The unique integer identifier of the post.
     page_type : str

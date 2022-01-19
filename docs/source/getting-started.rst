@@ -171,7 +171,7 @@ Also, the attributes of the post can be examined more easily in a file:
 
     {
         "url": "https://www.overcomingbias.com/2006/11/introduction.html",
-        "name": "introduction",
+        "name": "/2006/11/introduction",
         "number": 18402,
         "page_type": "post",
         ...
@@ -215,7 +215,7 @@ directory:
             "url": "https://www.overcomingbias.com/2016/11/myplay.html",
             "post": {
                 "url": "https://www.overcomingbias.com/2016/11/myplay.html",
-                "name": "myplay",
+                "name": "/2016/11/myplay",
                 "number": 31449,
                 "page_type": "post",
                 ...

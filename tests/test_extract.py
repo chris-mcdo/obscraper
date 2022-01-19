@@ -56,13 +56,14 @@ class TestExtractFunctionsOnExamplePosts(unittest.TestCase):
     def test_extract_name_returns_correct_results_for_valid_htmls(self):
         name = self.function_to_get_attribute_by_number(
             _extract_post.extract_name)
-        self.assertEqual(name(18402), 'introduction')
-        self.assertEqual(name(18141), 'the_very_worst_')
-        self.assertEqual(name(18115), 'as_good_as_it_g')
-        self.assertEqual(name(18423), 'we-only-need-a-handshake')
-        self.assertEqual(name(30613), 'me-on-rt-america-4pm-est-today')
-        self.assertEqual(name(32811), 'shoulda-listened-futures')
-        self.assertEqual(name(33014), 'we-dont-have-to-die')
+        self.assertEqual(name(18402), '/2006/11/introduction')
+        self.assertEqual(name(18141), '/2007/03/the_very_worst_')
+        self.assertEqual(name(18115), '/2007/04/as_good_as_it_g')
+        self.assertEqual(name(18423), '/2009/05/we-only-need-a-handshake')
+        self.assertEqual(
+            name(30613), '/2013/11/me-on-rt-america-4pm-est-today')
+        self.assertEqual(name(32811), '/2021/04/shoulda-listened-futures')
+        self.assertEqual(name(33014), '/2021/12/we-dont-have-to-die')
 
     def test_extract_title_returns_correct_results_for_valid_htmls(self):
         title = self.function_to_get_attribute_by_number(

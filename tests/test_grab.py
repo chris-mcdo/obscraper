@@ -300,7 +300,7 @@ class TestCreatePost(unittest.TestCase):
     def assert_post_standard_attributes_have_valid_values(self, test_post):
         # URL and title
         self.assertTrue(_extract_post.is_valid_post_long_url(test_post.url))
-        self.assertRegex(test_post.name, r'^[a-z0-9-_%]+$')
+        self.assertRegex(test_post.name, r'^/\d{4}/\d{2}/[a-z0-9-_%]+$')
         # Metadata
         self.assertTrue(9999 < test_post.number < 100000)
         self.assertEqual(test_post.page_type, 'post')

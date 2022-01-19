@@ -13,6 +13,11 @@ Breaking Changes
   attribute can not be extracted from the post HTML, since this situation is
   technically a bug. Previously it returned None.
 
+- The :ref:`Post <post>` name attribute now contains the year and month of
+  publication, as in URLs. E.g. 'jobs-explain-lots' becomes
+  '/2010/09/jobs-explain-lots'. This ensures the post URL can be reconstructed
+  from the post name.
+
 Improvements
 ############
 

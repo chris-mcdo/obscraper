@@ -48,11 +48,14 @@ def extract_name(post_html):
     Returns
     -------
     name : str
-        Name of the post.
+        Name of the post, e.g. '/2006/11/introduction'.
     """
-    match = re.search(r'(?<=/)[^/]+(?=\.html$)', extract_url(post_html))
+    pattern = (r'(^https{0,1}://www.overcomingbias.com)'
+               r'(/\d{4}/\d{2}/[a-z0-9-_%]+)'
+               r'(\.html$)')
+    match = re.search(pattern, extract_url(post_html))
     raise_attribute_not_found_error_if_none(match, 'name')
-    return match.group()
+    return match.group(2)
 
 
 def extract_title(post_html):
