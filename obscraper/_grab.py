@@ -203,7 +203,6 @@ def create_post(post_html, votes=True, comments=True):
     """
     new_post = _post.Post(
         # URL and title
-        url=_extract_post.extract_url(post_html),
         name=_extract_post.extract_name(post_html),
         # Metadata
         number=_extract_post.extract_number(post_html),

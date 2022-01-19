@@ -12,8 +12,6 @@ class Post:
 
     Attributes
     ----------
-    url : str
-        The URL of the post.
     name : str
         The original year, month and abbreviated name of the post, as
         found in its url. E.g. '/2010/09/jobs-explain-lots'.
@@ -61,7 +59,6 @@ class Post:
         the sitemap.
     """
     # pylint: disable=too-many-instance-attributes
-    url: str
     name: str
     number: int
     page_type: str
@@ -80,6 +77,11 @@ class Post:
     votes: int = None
     comments: int = None
     edit_date: datetime.datetime = None
+
+    @property
+    def url(self):
+        """str : The URL of the post."""
+        return f'https://www.overcomingbias.com{self.name}.html'
 
     @property
     def plaintext(self):

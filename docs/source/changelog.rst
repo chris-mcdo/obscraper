@@ -27,6 +27,12 @@ Improvements
 - Remove repeated whitespace within the text, when getting post text as
   plaintext.
 
+Trivial/Internal Changes
+########################
+
+- :ref:`Post <post>` now represents the post URL as a property rather than
+  an attribute.
+
 obscraper 0.1.3 (2022-01-18)
 *****************************
 
