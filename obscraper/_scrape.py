@@ -7,13 +7,19 @@ from obscraper import _future
 from . import _exceptions, _extract_post, _grab, _utils
 
 
-def get_all_posts():
+def get_all_posts(max_workers=32):
     """Get all posts hosted on the overcomingbias site.
 
     This includes vote and comment counts for each post.
 
     Posts which are no longer hosted on the overcomingbias site are not
     included (i.e. posts by Eliezer Yudkowsky).
+
+    Parameters
+    ----------
+    max_workers : int
+        The maximum number of threads used to download posts. The actual
+        number of threads used might be lower than this.
 
     Returns
     -------
@@ -22,7 +28,8 @@ def get_all_posts():
         corresponding posts. "Last edit" dates are attached.
     """
     edit_dates = _grab.grab_edit_dates()
-    all_posts = get_posts_by_urls(list(edit_dates.keys()))
+    all_posts = get_posts_by_urls(
+        list(edit_dates.keys()), max_workers=max_workers)
     ob_posts = {url: p for url, p in all_posts.items() if p is not None}
     return ob_posts
 
@@ -59,7 +66,7 @@ def get_post_by_url(url):
     return attach_edit_dates({post.url: post})[post.url]
 
 
-def get_posts_by_urls(urls):
+def get_posts_by_urls(urls, max_workers=32):
     """Get list of posts identified by their URLs.
 
     No exceptions are raised if a post or post attribute is not found -
@@ -69,6 +76,9 @@ def get_posts_by_urls(urls):
     ---------
     urls : List[str]
         A list of overcomingbias post URLs to scrape data for.
+    max_workers : int
+        The maximum number of threads used to download posts. The actual
+        number of threads used might be lower than this.
 
     Returns
     -------
@@ -89,17 +99,20 @@ def get_posts_by_urls(urls):
             return None
     url_dict = dict(zip(urls, urls))
     posts = _future.map_with_delay(
-        func=get_post, arg_dict=url_dict, delay=0.02, max_workers=32)
+        func=get_post, arg_dict=url_dict, delay=0.02, max_workers=max_workers)
     return attach_edit_dates(posts)
 
 
-def get_posts_by_edit_date(start_date, end_date):
+def get_posts_by_edit_date(start_date, end_date, max_workers=32):
     """Get posts edited within a given date range.
 
     Parameters
     ----------
     start_date, end_date : datetime.datetime
         The start and end dates of the date range, as aware datetimes.
+    max_workers : int
+        The maximum number of threads used to download posts. The actual
+        number of threads used might be lower than this.
 
     Returns
     -------
@@ -119,13 +132,13 @@ def get_posts_by_edit_date(start_date, end_date):
         raise ValueError('end date is before start date')
 
     edit_dates = _grab.grab_edit_dates()
-    selected_urls = [url for url, edit_date in edit_dates.items(
-    ) if start_date < edit_date < end_date]
-    posts = get_posts_by_urls(selected_urls)
+    selected_urls = [url for url, edit_date in edit_dates.items()
+                     if start_date < edit_date < end_date]
+    posts = get_posts_by_urls(selected_urls, max_workers=max_workers)
     return attach_edit_dates(posts)
 
 
-def get_votes(post_numbers):
+def get_votes(post_numbers, max_workers=32):
     """Get vote counts for some posts.
 
     If one of the numbers is in an incorrect format, an exception is
@@ -140,6 +153,9 @@ def get_votes(post_numbers):
     post_numbers : Dict[str, int]
         Dictionary whose keys are arbitrary labels (e.g. the post URLs)
         and whose values are post numbers to get votes for.
+    max_workers : int
+        The maximum number of threads used to download posts. The actual
+        number of threads used might be lower than this.
 
     Returns
     -------
@@ -162,11 +178,11 @@ def get_votes(post_numbers):
                 _exceptions.InvalidResponseError):
             return None
     votes = _future.map_with_delay(
-        get_vote, post_numbers, delay=0.02, max_workers=32)
+        get_vote, post_numbers, delay=0.02, max_workers=max_workers)
     return votes
 
 
-def get_comments(disqus_ids):
+def get_comments(disqus_ids, max_workers=50):
     """Get comment counts for some posts.
 
     Takes a dictionary of Disqus ID strings. If the Disqus
@@ -178,6 +194,9 @@ def get_comments(disqus_ids):
     disqus_ids : Dict[str, str]
         Dictionary whose keys are arbitrary labels (e.g. the post URLs)
         and whose values are the the corresponding Disqus ID strings.
+    max_workers : int
+        The maximum number of threads used to download posts. The actual
+        number of threads used might be lower than this.
 
     Returns
     -------
@@ -197,7 +216,7 @@ def get_comments(disqus_ids):
         except _exceptions.InvalidResponseError:
             return None
     comments = _future.map_with_delay(
-        get_comment, disqus_ids, delay=0.01, max_workers=50)
+        get_comment, disqus_ids, delay=0.01, max_workers=max_workers)
     return comments
 
 

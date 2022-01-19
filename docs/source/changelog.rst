@@ -3,6 +3,16 @@ Changelog
 
 Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_ standard.
 
+obscraper 0.2.0 (2022-01-19)
+****************************
+
+Improvements
+############
+
+- Let users specify the maximum number of threads used to download posts, via
+  the ``max_workers`` optional argument.
+
+
 obscraper 0.1.3 (2022-01-18)
 *****************************
 
