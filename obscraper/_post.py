@@ -82,6 +82,6 @@ class Post:
     edit_date: datetime.datetime = None
 
     @property
-    def plaintext(self) -> str:
-        """Get post text as plaintext."""
+    def plaintext(self):
+        """str : The full text of the post in plaintext format."""
         return _extract_post.convert_to_plaintext(self.text_html)
