@@ -6,6 +6,14 @@ Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_ standard.
 obscraper 0.2.0 (2022-01-19)
 ****************************
 
+Breaking Changes
+################
+
+- :ref:`get_posts_by_urls <get-posts-by-urls>` will now fail when a post
+  attribute can not be extracted from the post HTML, since this situation is
+  technically a bug. Previously it returned None.
+
+
 Improvements
 ############
 

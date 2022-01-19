@@ -94,8 +94,7 @@ def get_posts_by_urls(urls, max_workers=32):
         """Get a post given its URL, returning None if not found."""
         try:
             return _grab.grab_post_by_url(url)
-        except (_exceptions.AttributeNotFoundError,
-                _exceptions.InvalidResponseError):
+        except _exceptions.InvalidResponseError:
             return None
     url_dict = dict(zip(urls, urls))
     posts = _future.map_with_delay(
