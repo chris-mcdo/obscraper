@@ -158,6 +158,25 @@ class TestGetVotes(unittest.TestCase):
         ]:
             self.assertRaises(ValueError, _scrape.get_votes, post_numbers)
 
+    def test_calls_map_with_delay_with_correct_arguments(self):
+        with patch('obscraper._future.map_with_delay') as mock_map_with_delay:
+            intro_number = {'intro': 18402}
+            mock_map_with_delay.return_value = 5
+            fake_votes = _scrape.get_votes(intro_number, max_workers=3)
+        mock_map_with_delay.assert_called_once()
+        self.assertEqual(mock_map_with_delay.call_args.args[1], intro_number)
+        self.assertEqual(
+            mock_map_with_delay.call_args.kwargs['max_workers'], 3)
+        self.assertEqual(fake_votes, 5)
+
+    def test_exception_raised_when_invalid_max_workers_passed(self):
+        get_votes = _scrape.get_votes
+        intro_numbers = {'intro': 18402}
+        self.assertRaises(TypeError, get_votes,
+                          intro_numbers, max_workers='string')
+        self.assertRaises(ValueError, get_votes,
+                          intro_numbers, max_workers=-0.5)
+
 
 class TestGetComments(unittest.TestCase):
     def test_returns_valid_comment_counts_for_valid_disqus_ids(self):
