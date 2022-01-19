@@ -35,7 +35,7 @@ Scrape data from a single post:
     >>> f'{intro.title}, by {intro.author} ({intro.word_count} words)'
     'How To Join, by Robin Hanson (263 words)'
 
-The post is represented as an :ref:`obscraper.Post <post>` object:
+The post is represented as a :ref:`Post <post>` object:
 
 .. code-block:: python
 
@@ -55,7 +55,7 @@ A full list of post attributes can be found in the :doc:`API Reference <api>`.
 Get Multiple Posts
 ******************
 
-To get multiple posts by their URLs, use :ref:`obscraper.get_posts_by_urls <get-posts-by-urls>`:
+To get multiple posts by their URLs, use :ref:`get_posts_by_urls <get-posts-by-urls>`:
 
 .. code-block:: python
 
@@ -67,7 +67,7 @@ To get multiple posts by their URLs, use :ref:`obscraper.get_posts_by_urls <get-
     >>> posts = obscraper.get_posts_by_urls(urls)
 
 This returns a dictionary whose keys are the original URLs, and whose values
-are the corresponding :ref:`obscraper.Post <post>` objects:
+are the corresponding :ref:`Post <post>` objects:
 
 .. code-block:: python
 
@@ -93,9 +93,9 @@ Alternatively, you can get posts by their "last edited" dates:
     'My 11 Bets at 10-1 Odds On 10M Covid deaths by 2022', 
     'To Innovate, Unify or Fragment?']
 
-Like :ref:`obscraper.get_posts_by_urls <get-posts-by-urls>`,
-:ref:`obscraper.get_posts_by_edit_date <get-posts-by-edit-date>` also returns
-a dictionary of labels (URLs) and posts.
+Both :ref:`get_posts_by_urls <get-posts-by-urls>` and
+:ref:`get_posts_by_edit_date <get-posts-by-edit-date>` return a dictionary of
+labels (URLs) and posts.
 This is the standard format for responses from the ``obscraper`` API.
 
 Get All Posts
@@ -103,7 +103,7 @@ Get All Posts
 
 To get a list of URLs and "last edited" dates for all posts (including
 some no longer hosted on the overcomingbias site), you can use
-:ref:`obscraper.grab_edit_dates <grab-edit-dates>`:
+:ref:`grab_edit_dates <grab-edit-dates>`:
 
 .. code-block:: python
 
@@ -122,8 +122,8 @@ some no longer hosted on the overcomingbias site), you can use
     'https://www.overcomingbias.com/2022/01/to-innovate-unify-or-fragment.html': 
     '2022-01-11 01:03:44+00:00'}
 
-You can download all posts indirectly by using :ref:`obscraper.get_posts_by_edit_date
-<get-posts-by-edit-date>`, or directly using :ref:`obscraper.get_all_posts <get-all-posts>`:
+You can download all posts indirectly by using :ref:`get_posts_by_edit_date
+<get-posts-by-edit-date>`, or directly using :ref:`get_all_posts <get-all-posts>`:
 
 .. code-block:: python
 
@@ -137,17 +137,17 @@ You can download all posts indirectly by using :ref:`obscraper.get_posts_by_edit
 
 This may take a few (<10) minutes.
 
-:ref:`obscraper.get_all_posts <get-all-posts>` will send more than 4000 requests
+:ref:`get_all_posts <get-all-posts>` will send more than 4000 requests
 to the overcomingbias site, and download ~100MB-1GB of data.
-:ref:`obscraper.grab_edit_dates <grab-edit-dates>` requires only 1 request to
+:ref:`grab_edit_dates <grab-edit-dates>` requires only 1 request to
 the overcomingbias site, so should probably be preferred where possible.
 
 Representing Post Objects using JSON
 ************************************
 
-To convert a list of :ref:`obscraper.Post <post>` objects (or just one)
+To convert a list of :ref:`Post <post>` objects (or just one)
 to the `JSON <https://www.json.org/>`_ format, use the
-:ref:`obscraper.PostEncoder <post-encoder>` class:
+:ref:`PostEncoder <post-encoder>` class:
 
 .. code-block:: python
 
@@ -177,8 +177,8 @@ Also, the attributes of the post can be examined more easily in a file:
         ...
     }
 
-To convert the JSON back into an :ref:`obscraper.Post <post>` object, use
-the :ref:`obscraper.PostDecoder <post-decoder>` class:
+To convert the JSON back into a :ref:`Post <post>` object, use
+the :ref:`PostDecoder <post-decoder>` class:
 
 .. code-block:: python
 
@@ -231,7 +231,7 @@ Caching
 
 By default, ``obscraper`` caches recently accessed sites to increase
 speed and reduce the load on the overcomingbias site. 
-This cache can be cleared using :ref:`obscraper.clear_cache <clear-cache>`.
+This cache can be cleared using :ref:`clear_cache <clear-cache>`.
 You may want to do this if the site has recently been updated, or a post
 has been added.
 
@@ -241,8 +241,8 @@ Updating Vote and Comment Counts
 Vote and comment counts are collected from separate APIs to the rest of
 the post data.
 
-They can be updated using the :ref:`obscraper.get_votes <get-votes>` and
-:ref:`obscraper.get_comments <get-comments>` functions:
+They can be updated using :ref:`get_votes <get-votes>` and
+:ref:`get_comments <get-comments>`:
 
 .. code-block:: python
 
@@ -273,10 +273,10 @@ anything. For example:
     https://www.overcomingbias.com/blah
 
 When a URL is not found on the overcomingbias site,
-:ref:`obscraper.get_post_by_url <get-post-by-url>` will raise an
-:ref:`obscraper.InvalidResponseError <invalid-response-error>`. 
+:ref:`get_post_by_url <get-post-by-url>` will raise an
+:ref:`InvalidResponseError <invalid-response-error>`. 
 
-By contrast, :ref:`obscraper.get_posts_by_urls <get-posts-by-urls>` will
+By contrast, :ref:`get_posts_by_urls <get-posts-by-urls>` will
 just return None for that particular post:
 
 .. code-block:: python
