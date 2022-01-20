@@ -21,7 +21,7 @@ class PostEncoder(json.JSONEncoder):
             attributes = dataclasses.asdict(o)
             properties = {name: getattr(o, name)
                           for name in _utils.property_names(_post.Post)}
-            return attributes | properties
+            return attributes.update(properties)
         if _utils.is_aware_datetime(o):
             time_in_utc = o.astimezone(datetime.timezone.utc)
             return time_in_utc.strftime('%Y-%m-%dT%H:%M:%SZ')
