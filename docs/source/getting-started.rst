@@ -154,7 +154,7 @@ to the `JSON <https://www.json.org/>`_ format, use the
     >>> import json
     >>> intro_json = json.dumps(intro, cls=obscraper.PostEncoder)
     >>> intro_json
-    '{"url": "https://www.overcomingbias.com/2006/11/introduction.html", ...'
+    '{"name": "/2006/11/introduction", "number": 18402, ...}'
 
 This is useful for storing posts for later:
 
@@ -170,7 +170,6 @@ Also, the attributes of the post can be examined more easily in a file:
     :caption: 2006-11-introduction.json
 
     {
-        "url": "https://www.overcomingbias.com/2006/11/introduction.html",
         "name": "/2006/11/introduction",
         "number": 18402,
         "page_type": "post",
@@ -183,7 +182,7 @@ the :ref:`PostDecoder <post-decoder>` class:
 .. code-block:: python
 
     >>> intro_json
-    '{"url": "https://www.overcomingbias.com/2006/11/introduction.html", ...'
+    '{"name": "/2006/11/introduction", "number": 18402, ...}'
     >>> intro_decoded = json.loads(intro_json, cls=obscraper.PostDecoder)
     >>> type(intro_decoded)
     <class 'obscraper._post.Post'>
@@ -197,7 +196,7 @@ Command Line Interface
 
 .. code-block:: console
 
-    $ python -m obscraper --dates "November 25, 2016" "November 30, 2016"
+    $ obscraper --dates "November 25, 2016" "November 30, 2016"
     Getting posts edited between 2016-11-25 00:00:00+00:00 and 2016-11-30 00:00:00+00:00...
     Writing posts to posts.json...
     Posts successfully written to file.
@@ -214,7 +213,6 @@ directory:
         {
             "url": "https://www.overcomingbias.com/2016/11/myplay.html",
             "post": {
-                "url": "https://www.overcomingbias.com/2016/11/myplay.html",
                 "name": "/2016/11/myplay",
                 "number": 31449,
                 "page_type": "post",
@@ -230,7 +228,7 @@ Caching
 *******
 
 By default, ``obscraper`` caches recently accessed sites to increase
-speed and reduce the load on the overcomingbias site. 
+post retrieval speed and reduce the load on the overcomingbias site. 
 This cache can be cleared using :ref:`clear_cache <clear-cache>`.
 You may want to do this if the site has recently been updated, or a post
 has been added.
@@ -298,4 +296,5 @@ not exist.
 Continue Reading
 ****************
 
-For more details on the ``obscraper`` public API, see the :doc:`Public API Reference <api>`.
+For more details on the ``obscraper`` public API, see the
+:doc:`Public API Reference <api>`.

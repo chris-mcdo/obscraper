@@ -38,3 +38,20 @@ def is_aware_datetime(date):
     if not isinstance(date, datetime.datetime):
         return False
     return date.tzinfo is not None and date.tzinfo.utcoffset(date) is not None
+
+
+def property_names(cls):
+    """Get the properties of a class.
+
+    Parameters
+    ----------
+    cls : type
+        An arbitrary class.
+
+    Returns
+    -------
+    List[str]
+        A list of the properties defined by the input class.
+    """
+    return [name for name in dir(cls)
+            if isinstance(getattr(cls, name), property)]

@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import datetime
 
-from obscraper import _utils
+from obscraper import _utils, _post
 
 
 class TestDateTidying(unittest.TestCase):
@@ -52,3 +52,9 @@ class TestCountWords(unittest.TestCase):
         self.assertEqual(count('2 numbers 2s'), 3)
         self.assertEqual(count('hyphenated-words are counted as-one'), 4)
         self.assertEqual(count('email@adress.com is one word'), 4)
+
+
+class TestPropertyNames(unittest.TestCase):
+    def test_returns_valid_result_for_post(self):
+        self.assertListEqual(_utils.property_names(_post.Post),
+                             ['plaintext', 'url'])
