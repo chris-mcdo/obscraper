@@ -24,13 +24,14 @@ def get_all_posts(max_workers=32):
     Returns
     -------
     Dict[str, obscraper.Post]
-        A dictionary whose keys are post URLs and whose values are the
+        A dictionary whose keys are post names and whose values are the
         corresponding posts. "Last edit" dates are attached.
     """
     edit_dates = _grab.grab_edit_dates()
-    all_posts = get_posts_by_urls(
+    all_posts = get_posts_by_names(
         list(edit_dates.keys()), max_workers=max_workers)
-    ob_posts = {url: p for url, p in all_posts.items() if p is not None}
+    ob_posts = {name: post 
+                for name, post in all_posts.items() if post is not None}
     return ob_posts
 
 
