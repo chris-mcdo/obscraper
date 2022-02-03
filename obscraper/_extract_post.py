@@ -24,7 +24,7 @@ def extract_url(post_html):
     """Extract the URL of the post.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -42,7 +42,7 @@ def extract_name(post_html):  # pylint: disable=inconsistent-return-statements
     """Extract the name of the post.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -62,7 +62,7 @@ def extract_title(post_html):
     """Extract the title of the post.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -80,7 +80,7 @@ def extract_author(post_html):
     """Extract the post author's name.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -98,7 +98,7 @@ def extract_publish_date(post_html):
     """Extract the date the post was published.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -117,7 +117,7 @@ def extract_number(post_html):
     """Extract the unique integer identifier of the post.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -133,7 +133,7 @@ def extract_tags(post_html):
     """Extract post tags.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -149,7 +149,7 @@ def extract_categories(post_html):
     """Extract post categories.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -165,7 +165,7 @@ def extract_page_type(post_html):
     """Extract page type.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -181,7 +181,7 @@ def extract_page_status(post_html):
     """Extract page status.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -197,7 +197,7 @@ def extract_page_format(post_html):
     """Extract page format.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -213,7 +213,7 @@ def extract_text_html(post_html):
     """Extract lightly edited HTML of the post text.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -234,7 +234,7 @@ def extract_word_count(post_html):
     """Extract post word count.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -252,7 +252,7 @@ def extract_all_links(post_html):
     """Extract all hyperlinks in the body of a post.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -273,7 +273,7 @@ def extract_internal_links(post_html):
     """Extract links to other overcomingbias posts.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -298,7 +298,7 @@ def extract_external_links(post_html):
     """Extract links to other (non- OB post) webpages.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -323,7 +323,7 @@ def extract_vote_auth_code(post_html):
     """Extract the vote authorisation code, or return None.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -342,7 +342,7 @@ def extract_disqus_id(post_html):
     """Extract the Disqus ID string.
 
     Parameters
-    ---------
+    ----------
     post_html : bs4.BeautifulSoup
         Full HTML of an overcomingbias post page.
 
@@ -422,7 +422,7 @@ def convert_to_plaintext(text_html):
     not removed.
 
     Parameters
-    ---------
+    ----------
     text_html : str
         Post text HTML as given by `extract_text_html`.
 
@@ -444,11 +444,29 @@ def has_post_in_id(tag):
     return bool(re.compile(r'^post-\d+$').search(tag['id']))
 
 
+def is_valid_post_name(name):
+    """Check whether a string could be an overcomingbias post name.
+
+    Parameters
+    ----------
+    name : str
+        A string, maybe a post name.
+
+    Returns
+    -------
+    bool
+        True if the name is a valid overcomingbias post name, and False
+        otherwise.
+    """
+    pattern = r'^/\d{4}/\d{2}/[a-z0-9-_%]+$'
+    return re.search(pattern, name) is not None
+
+
 def is_valid_post_url(url):
     """Check whether a URL could belong to an overcomingbias post.
 
     Parameters
-    ---------
+    ----------
     url : str
         A URL.
 
@@ -468,7 +486,7 @@ def is_valid_post_long_url(url):
     https://www.overcomingbias.com/2011/05/jobs-kill-big-time.html.
 
     Parameters
-    ---------
+    ----------
     url : str
         A URL.
 
@@ -489,7 +507,7 @@ def is_valid_post_short_url(url):
     https://www.overcomingbias.com/?p=26449.
 
     Parameters
-    ---------
+    ----------
     url : str
         A URL.
 
@@ -507,7 +525,7 @@ def is_ob_site_html(html):
     """Check if some HTML looks like it is from the overcomingbias site.
 
     Parameters
-    ---------
+    ----------
     html : bs4.BeautifulSoup
         An HTML page, possibly from the overcomingbias site.
 
@@ -527,7 +545,7 @@ def is_ob_post_html(html):
     """Check if some HTML looks like an overcomingbias blog post.
 
     Parameters
-    ---------
+    ----------
     html : bs4.BeautifulSoup
         An HTML page, possibly from the overcomingbias site.
 
@@ -546,7 +564,7 @@ def is_valid_disqus_id(disqus_id):
     """Check whether a string is a valid Disqus ID string.
 
     Parameters
-    ---------
+    ----------
     disqus_id : str
         A possibly valid Disqus ID string.
 
