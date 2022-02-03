@@ -10,17 +10,18 @@ from obscraper import _exceptions, _extract_post, _grab, _post, _scrape, _utils
 class TestGetAllPosts(unittest.TestCase):
     @patch('obscraper._grab.grab_edit_dates')
     def test_returns_correct_result_for_fake_edit_list(self, mock_grab_edit_dates):
-        def tidy(d): return _utils.tidy_date(d, 'US/Eastern')
+        def tidy(d):
+            return _utils.tidy_date(d, 'US/Eastern')
         edit_dates = {
-            'https://www.overcomingbias.com/2006/11/introduction.html': tidy('November 22, 2006 6:17 am'),
-            'https://www.overcomingbias.com/2007/10/a-rational-argu.html': tidy('October 5, 2007 2:31 pm'),
-            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': tidy('July 2, 2021 9:15 am')
+            '/2006/11/introduction': tidy('November 22, 2006 6:17 am'),
+            '/2007/10/a-rational-argu': tidy('October 5, 2007 2:31 pm'),
+            '/2021/04/shoulda-listened-futures': tidy('July 2, 2021 9:15 am')
         }
         mock_grab_edit_dates.return_value = edit_dates
         posts = _scrape.get_all_posts()
         self.assertEqual(len(posts), 2)
-        [self.assertEqual(p.edit_date, edit_dates[url])
-         for url, p in posts.items()]
+        for name, p in posts.items():
+            self.assertEqual(p.edit_date, edit_dates[name])
 
 
 class TestGetPostsByURLs(unittest.TestCase):

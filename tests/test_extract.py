@@ -306,7 +306,9 @@ class TestIsOBPostURL(unittest.TestCase):
     def test_accepts_all_ob_post_urls(self):
         is_url = _extract_post.is_valid_post_url
         edit_dates = _grab.grab_edit_dates()
-        [self.assertTrue(is_url(url)) for url in edit_dates.keys()]
+        for name in edit_dates.keys():
+            url = _extract_post.name_to_url(name)
+            self.assertTrue(is_url(url))
 
     def test_rejects_incorrectly_formatted_urls(self):
         is_url = _extract_post.is_valid_post_url

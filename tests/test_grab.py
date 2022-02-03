@@ -49,21 +49,21 @@ class TestGrabEditDates(unittest.TestCase):
     def test_grab_edit_dates_returns_expected_result(self):
         # Arrange
         utc = datetime.timezone.utc
+        year_2000 = datetime.datetime(2000, 1, 1, tzinfo=utc)
+        now = datetime.datetime.now(utc)
+        is_url = _extract_post.is_valid_post_url
         # Act
         edit_dates = _grab.grab_edit_dates()
-        urls = list(edit_dates.keys())
-        dates = list(edit_dates.values())
         # Assert
-        # Check result is dict
         self.assertIsInstance(edit_dates, dict)
-        self.assertIsInstance(dates[0], datetime.datetime)
-        # Check elements are dates between 2000 and tomorrow
-        self.assertGreater(
-            dates[-1], datetime.datetime(2000, 1, 1, tzinfo=utc))
-        self.assertLess(dates[0], datetime.datetime.now(utc))
-        # Test first and last elements is valid post urls
-        self.assertTrue(_extract_post.is_valid_post_url(urls[0]))
-        self.assertTrue(_extract_post.is_valid_post_url(urls[-10]))
+        for name in edit_dates.keys():
+            self.assertIsInstance(name, str)
+            url = _extract_post.url_to_name(name)
+            self.assertTrue(is_url(url))
+        for date in edit_dates.values():
+            self.assertIsInstance(date, datetime.datetime)
+            self.assertGreater(date, year_2000)
+            self.assertLess(date, now)
 
 
 class TestGrabVotes(unittest.TestCase):

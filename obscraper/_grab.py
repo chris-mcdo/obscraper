@@ -85,18 +85,19 @@ def grab_comments(disqus_id):
 
 @cachetools.func.ttl_cache(maxsize=1, ttl=EDIT_DATES_CACHE_TIMEOUT)
 def grab_edit_dates():
-    """Download list of post URLs and last edit dates.
+    """Download list of post names and last edit dates.
 
     Returns
     -------
     Dict[str, datetime.datetime]
-        Dictionary whose keys are post URLs and values are the last edit
-        dates of each post as aware datetime.datetime objects.
+        Dictionary whose keys are post names and values are the last
+        edit dates of each post as aware datetime.datetime objects.
     """
     xml = _download.grab_xml_soup(POST_LIST_URL)
     urls = _extract_dates.extract_urls(xml)
+    names = [_extract_post.url_to_name(url) for url in urls]
     dates = _extract_dates.extract_edit_dates(xml)
-    return dict(zip(urls, dates))
+    return dict(zip(names, dates))
 
 
 def _auth_cache(func):
