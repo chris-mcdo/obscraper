@@ -38,7 +38,7 @@ def extract_url(post_html):
     return match['st_url']
 
 
-def extract_name(post_html):
+def extract_name(post_html):  # pylint: disable=inconsistent-return-statements
     """Extract the name of the post.
 
     Parameters
@@ -53,37 +53,9 @@ def extract_name(post_html):
     """
     url = extract_url(post_html)
     try:
-        return extract_name_from_url(url)
+        return url_to_name(url)
     except ValueError:
         raise_attribute_not_found_error_if_none(None, 'name')
-        return  # to shut pylint up
-
-
-def extract_name_from_url(post_url):
-    """Extract the name of a post given its URL.
-
-    Parameters
-    ----------
-    post_url : str
-        The URL of the post.
-
-    Returns
-    -------
-    name : str
-        Name of the post, e.g. '/2006/11/introduction'.
-
-    Raises
-    ------
-    ValueError
-        If the input URL is not a valid overcomingbias post URL.
-    """
-    pattern = (r'(^https{0,1}://www.overcomingbias.com)'
-               r'(/\d{4}/\d{2}/[a-z0-9-_%]+)'
-               r'(\.html$)')
-    match = re.search(pattern, post_url)
-    if match is None:
-        raise ValueError("Invalid post URL.")
-    return match.group(2)
 
 
 def extract_title(post_html):
@@ -397,6 +369,49 @@ def extract_meta_header(post_html):
         if value is not None:
             header_dict[key].append(value)
     return header_dict
+
+
+def url_to_name(post_url):
+    """Get the name of a post from its URL.
+
+    Parameters
+    ----------
+    post_url : str
+        The URL of the post.
+
+    Returns
+    -------
+    name : str
+        Name of the post, e.g. '/2006/11/introduction'.
+
+    Raises
+    ------
+    ValueError
+        If the input URL is not a valid overcomingbias post URL.
+    """
+    pattern = (r'(^https{0,1}://www.overcomingbias.com)'
+               r'(/\d{4}/\d{2}/[a-z0-9-_%]+)'
+               r'(\.html$)')
+    match = re.search(pattern, post_url)
+    if match is None:
+        raise ValueError("Invalid post URL.")
+    return match.group(2)
+
+
+def name_to_url(post_name):
+    """Get the URL of a post from its name.
+
+    Parameters
+    ----------
+    post_name : str
+        The name of the post. E.g. '/2010/09/jobs-explain-lots'.
+
+    Returns
+    -------
+    url : str
+        The URL of the post.
+    """
+    return f'https://www.overcomingbias.com{post_name}.html'
 
 
 def convert_to_plaintext(text_html):

@@ -1,5 +1,5 @@
 """obscraper: scrape posts from the overcomingbias blog."""
-from ._post import Post, name_to_url
+from ._post import Post
 from ._scrape import (get_all_posts,
                       get_post_by_url,
                       get_posts_by_urls,
@@ -8,6 +8,7 @@ from ._scrape import (get_all_posts,
                       get_comments,
                       clear_cache,)
 from ._grab import grab_edit_dates
+from ._extract_post import url_to_name, name_to_url
 from ._serialize import PostEncoder, PostDecoder
 from ._exceptions import (InvalidResponseError,
                           InvalidAuthCodeError,
@@ -16,7 +17,6 @@ from ._exceptions import (InvalidResponseError,
 
 __all__ = [
     'Post',
-    'name_to_url',
     'get_all_posts',
     'get_post_by_url',
     'get_posts_by_urls',
@@ -25,6 +25,8 @@ __all__ = [
     'get_comments',
     'clear_cache',
     'grab_edit_dates',
+    'url_to_name',
+    'name_to_url',
     'PostEncoder',
     'PostDecoder',
     'InvalidResponseError',
@@ -33,7 +35,7 @@ __all__ = [
     'OB_POST_URL_PATTERN',
 ]
 
-
+# taken from _extract_post.url_to_name
 OB_POST_URL_PATTERN = (
     r'(^https{0,1}://www.overcomingbias.com)'
     r'(/\d{4}/\d{2}/[a-z0-9-_%]+)'
