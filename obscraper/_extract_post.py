@@ -51,11 +51,38 @@ def extract_name(post_html):
     name : str
         Name of the post, e.g. '/2006/11/introduction'.
     """
+    url = extract_url(post_html)
+    try:
+        return extract_name_from_url(url)
+    except ValueError:
+        raise_attribute_not_found_error_if_none(None, 'name')
+        return  # to shut pylint up
+
+
+def extract_name_from_url(post_url):
+    """Extract the name of a post given its URL.
+
+    Parameters
+    ----------
+    post_url : str
+        The URL of the post.
+
+    Returns
+    -------
+    name : str
+        Name of the post, e.g. '/2006/11/introduction'.
+
+    Raises
+    ------
+    ValueError
+        If the input URL is not a valid overcomingbias post URL.
+    """
     pattern = (r'(^https{0,1}://www.overcomingbias.com)'
                r'(/\d{4}/\d{2}/[a-z0-9-_%]+)'
                r'(\.html$)')
-    match = re.search(pattern, extract_url(post_html))
-    raise_attribute_not_found_error_if_none(match, 'name')
+    match = re.search(pattern, post_url)
+    if match is None:
+        raise ValueError("Invalid post URL.")
     return match.group(2)
 
 
