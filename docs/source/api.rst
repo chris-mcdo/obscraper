@@ -118,3 +118,11 @@ AttributeNotFoundError
 ######################
 
 .. autoexception:: obscraper.AttributeNotFoundError
+
+
+Constants
+*********
+
+.. _ob-post-url-pattern:
+
+.. autodata:: obscraper.OB_POST_URL_PATTERN
