@@ -77,6 +77,13 @@ grab_edit_dates
 
 .. autofunction:: obscraper.grab_edit_dates
 
+.. _url-to-name:
+
+url_to_name
+###########
+
+.. autofunction:: obscraper.url_to_name
+
 .. _name-to-url:
 
 name_to_url
