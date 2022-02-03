@@ -13,7 +13,7 @@ from ._serialize import PostDecoder
 from ._exceptions import InvalidResponseError
 from ._exceptions import InvalidAuthCodeError
 from ._exceptions import AttributeNotFoundError
-
+from ._extract_post import OB_POST_URL_PATTERN
 
 __all__ = [
     'Post',
@@ -30,4 +30,5 @@ __all__ = [
     'InvalidResponseError',
     'InvalidAuthCodeError',
     'AttributeNotFoundError',
+    'OB_POST_URL_PATTERN',
 ]
