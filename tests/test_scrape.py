@@ -293,18 +293,15 @@ class TestClearCache(unittest.TestCase):
     def test_clears_grab_post_cache(self, mock_is_ob_post):
         _scrape.clear_cache()
 
-        p1 = _grab.grab_post_by_url(
-            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html')
+        p1 = _grab.grab_post_by_name('/2021/12/innovation-liability-nightmare')
         self.assertIsInstance(p1, _post.Post)
         mock_is_ob_post.assert_called_once()
 
-        p2 = _grab.grab_post_by_url(
-            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html')
+        p2 = _grab.grab_post_by_name('/2021/12/innovation-liability-nightmare')
         self.assertEqual(p1, p2)
         mock_is_ob_post.assert_called_once()
 
         _scrape.clear_cache()
 
-        p3 = _grab.grab_post_by_url(
-            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html')
+        p3 = _grab.grab_post_by_name('/2021/12/innovation-liability-nightmare')
         self.assertEqual(mock_is_ob_post.call_count, 2)

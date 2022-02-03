@@ -24,32 +24,33 @@ EDIT_DATES_CACHE_TIMEOUT = 300
 
 
 @cachetools.func.ttl_cache(maxsize=100, ttl=POST_DATA_CACHE_TIMEOUT)
-def grab_post_by_url(url):
-    """Download and create a post object from its URL.
+def grab_post_by_name(name):
+    """Download and create a post object from its name.
 
     Parameters
     ---------
-    url : str
-        The URL of the post to grab.
+    name : str
+        The name of the post to grab. E.g. '/2010/09/jobs-explain-lots'.
 
     Returns
     -------
     obscraper.Post
-        The post corresponding to the input URL.
+        The post corresponding to the input name.
 
     Raises
     ------
     exceptions.InvalidResponseError
-        If the URL returns a page that does not look like an
-        overcomingbias post.
+        If the URL corresponding to the name returns a page that does
+        not look like an overcomingbias post.
     exceptions.AttributeNotFoundError
-        If a obscraper.Post attribute could not be extracted from the
+        If an obscraper.Post attribute could not be extracted from the
         downloaded page.
     """
-    post_html = _download.grab_html_soup(url)
+    post_url = _extract_post.name_to_url(name)
+    post_html = _download.grab_html_soup(post_url)
     if not _extract_post.is_ob_post_html(post_html):
         raise _exceptions.InvalidResponseError(
-            f'the document found at {url} was not an overcomingbias post')
+            'The downloaded page is not an overcomingbias post.')
     return create_post(post_html)
 
 

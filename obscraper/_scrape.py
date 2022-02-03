@@ -66,7 +66,7 @@ def get_posts_by_urls(urls, max_workers=32):
     def get_post(url):
         """Get a post given its URL, returning None if not found."""
         try:
-            return _grab.grab_post_by_url(url)
+            return _grab.grab_post_by_name(url)
         except _exceptions.InvalidResponseError:
             return None
     url_dict = dict(zip(urls, urls))
@@ -225,7 +225,7 @@ def attach_edit_dates(posts):
 
 def clear_cache():
     """Clear all cached data."""
-    _grab.grab_post_by_url.cache_clear()
+    _grab.grab_post_by_name.cache_clear()
     _grab.grab_comments.cache_clear()
     _grab.grab_votes.cache_clear()
     _grab.grab_edit_dates.cache_clear()

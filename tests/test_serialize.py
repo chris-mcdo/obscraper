@@ -21,8 +21,7 @@ class TestSerialize(unittest.TestCase):
         # self.assertEqual(decoded, example_post)
 
     def test_encode_and_decode_work_without_edit_date(self):
-        example_post = _grab.grab_post_by_url(
-            'https://www.overcomingbias.com/?p=27739')
+        example_post = _grab.grab_post_by_name('/2006/11/introduction')
 
         encoded = json.dumps(example_post, cls=_serialize.PostEncoder)
         self.assertIsInstance(encoded, str)

@@ -14,28 +14,21 @@ TEST_POST_MIN_VOTES = 150
 TEST_POST_MIN_COMMENTS = 100
 
 
-class TestGrabPostByURL(unittest.TestCase):
+class TestGrabPostByName(unittest.TestCase):
 
-    def test_grab_post_fails_with_lesswrong_post_url(self):
-        self.assertRaises(_exceptions.InvalidResponseError, _grab.grab_post_by_url,
-                          'https://www.overcomingbias.com/2007/10/a-rational-argu.html')
+    def test_grab_post_fails_with_lesswrong_post_name(self):
+        self.assertRaises(_exceptions.InvalidResponseError, _grab.grab_post_by_name,
+                          '/2007/10/a-rational-argu')
 
-    def test_grab_post_fails_with_fake_post_url(self):
-        self.assertRaises(_exceptions.InvalidResponseError, _grab.grab_post_by_url,
-                          'http://www.overcomingbias.com/2020/01/not-a-real-post.html')
+    def test_grab_post_fails_with_fake_post_name(self):
+        self.assertRaises(_exceptions.InvalidResponseError, _grab.grab_post_by_name,
+                          '/2020/01/not-a-real-post')
 
-    def test_grab_post_works_with_number_url(self):
-        p = _grab.grab_post_by_url(
-            f'http://www.overcomingbias.com/?p={TEST_POST_NUMBER}')
+    def test_grab_post_works_with_string_name(self):
+        test_name = '/2021/12/innovation-liability-nightmare'
+        p = _grab.grab_post_by_name(test_name)
         self.assertIsInstance(p, _post.Post)
-        self.assertEqual(p.number, TEST_POST_NUMBER)
-        self.assertGreater(p.word_count, 10)
-
-    def test_grab_post_works_with_string_url(self):
-        test_url = 'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html'
-        p = _grab.grab_post_by_url(test_url)
-        self.assertIsInstance(p, _post.Post)
-        self.assertEqual(p.url, test_url)
+        self.assertEqual(p.name, test_name)
         self.assertGreater(p.word_count, 10)
 
 
