@@ -34,40 +34,6 @@ def get_all_posts(max_workers=32):
     return ob_posts
 
 
-def get_post_by_url(url):
-    """Get a single post identified by its URL.
-
-    The input should be an overcomingbias post URL, e.g.
-    https://www.overcomingbias.com/2011/05/jobs-kill-big-time.html or
-    https://www.overcomingbias.com/?p=27739.
-
-    Parameters
-    ---------
-    url : str
-        An overcomingbias post URL.
-
-    Returns
-    -------
-    obscraper.Post
-        The post corresponding to the input URL, with "last edit" date
-        attached.
-
-    Raises
-    ------
-    ValueError
-        If the input URL is not a valid overcomingbias post URL.
-    exceptions.InvalidResponseError
-        If the URL returns a page that does not look like an
-        overcomingbias post.
-    exceptions.AttributeNotFoundError
-        If a obscraper.Post attribute could not be extracted from the
-        downloaded page.
-    """
-    raise_exception_if_url_is_not_valid_post_url(url)
-    post = _grab.grab_post_by_url(url)
-    return attach_edit_dates({post.url: post})[post.url]
-
-
 def get_posts_by_urls(urls, max_workers=32):
     """Get list of posts identified by their URLs.
 

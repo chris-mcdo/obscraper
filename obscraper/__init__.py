@@ -1,7 +1,6 @@
 """obscraper: scrape posts from the overcomingbias blog."""
 from ._post import Post
 from ._scrape import (get_all_posts,
-                      get_post_by_url,
                       get_posts_by_urls,
                       get_posts_by_edit_date,
                       get_votes,
@@ -18,7 +17,6 @@ from ._exceptions import (InvalidResponseError,
 __all__ = [
     'Post',
     'get_all_posts',
-    'get_post_by_url',
     'get_posts_by_urls',
     'get_posts_by_edit_date',
     'get_votes',

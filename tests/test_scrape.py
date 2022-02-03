@@ -23,19 +23,6 @@ class TestGetAllPosts(unittest.TestCase):
          for url, p in posts.items()]
 
 
-class TestGetPostByURL(unittest.TestCase):
-    def test_returns_valid_post_for_valid_url(self):
-        url = 'https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html'
-        p = _scrape.get_post_by_url(url)
-        self.assertIsInstance(p, _post.Post)
-        self.assertEqual(p.url, url)
-
-    def test_raises_exception_when_post_not_found(self):
-        url = 'https://www.overcomingbias.com/2016/03/not-a-real-post.html'
-        self.assertRaises(_exceptions.InvalidResponseError,
-                          _scrape.get_post_by_url, url)
-
-
 class TestGetPostsByURLs(unittest.TestCase):
     def test_returns_valid_posts_for_valid_urls(self):
         urls = [
