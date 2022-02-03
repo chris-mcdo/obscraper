@@ -6,6 +6,22 @@ from typing import Dict, List
 from . import _extract_post
 
 
+def name_to_url(post_name):
+    """Get the URL of a post from its name.
+
+    Parameters
+    ----------
+    post_name : str
+        The name of the post. E.g. '/2010/09/jobs-explain-lots'.
+
+    Returns
+    -------
+    str
+        The URL of the post.
+    """
+    return f'https://www.overcomingbias.com{post_name}.html'
+
+
 @dataclasses.dataclass(order=False)
 class Post:
     """Class representing a single post.
@@ -81,7 +97,7 @@ class Post:
     @property
     def url(self):
         """str : The URL of the post."""
-        return f'https://www.overcomingbias.com{self.name}.html'
+        return name_to_url(self.name)
 
     @property
     def plaintext(self):
