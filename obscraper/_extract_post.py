@@ -19,16 +19,6 @@ DISQUS_URL_PATTERN = (
     r'http://www.overcomingbias.com/\?p=\1|'
     r'https://www.overcomingbias.com/\?p=\1)$')
 
-OB_POST_URL_PATTERN = (
-    r'(^https{0,1}://www.overcomingbias.com)'
-    r'(/\d{4}/\d{2}/[a-z0-9-_%]+)'
-    r'(\.html$)')
-"""str : Regex pattern for "long" format overcomingbias URLs.
-
-It consists of 3 capturing groups. The second group captures the post
-name.
-"""
-
 
 def extract_url(post_html):
     """Extract the URL of the post.
@@ -61,7 +51,10 @@ def extract_name(post_html):
     name : str
         Name of the post, e.g. '/2006/11/introduction'.
     """
-    match = re.search(OB_POST_URL_PATTERN, extract_url(post_html))
+    pattern = (r'(^https{0,1}://www.overcomingbias.com)'
+               r'(/\d{4}/\d{2}/[a-z0-9-_%]+)'
+               r'(\.html$)')
+    match = re.search(pattern, extract_url(post_html))
     raise_attribute_not_found_error_if_none(match, 'name')
     return match.group(2)
 

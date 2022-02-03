@@ -13,7 +13,6 @@ from ._serialize import PostDecoder
 from ._exceptions import InvalidResponseError
 from ._exceptions import InvalidAuthCodeError
 from ._exceptions import AttributeNotFoundError
-from ._extract_post import OB_POST_URL_PATTERN
 
 __all__ = [
     'Post',
@@ -32,3 +31,14 @@ __all__ = [
     'AttributeNotFoundError',
     'OB_POST_URL_PATTERN',
 ]
+
+
+OB_POST_URL_PATTERN = (
+    r'(^https{0,1}://www.overcomingbias.com)'
+    r'(/\d{4}/\d{2}/[a-z0-9-_%]+)'
+    r'(\.html$)')
+"""str : Regex pattern for "long" format overcomingbias URLs.
+
+It consists of 3 capturing groups. The second group captures the post
+name.
+"""
