@@ -243,9 +243,13 @@ class TestGetComments(unittest.TestCase):
 class TestAttachEditDates(unittest.TestCase):
     def test_returns_post_with_date_attached_for_fake_posts_and_dates(self):
         # Expect more edit dates than posts
-        edit_dates = {f'url {i+1}': f'edit date {i+1}' for i in range(10)}
-        posts = {f'url {2*i+2}': MagicMock(url=f'url {2*i+2}')
-                 for i in range(5)}
+        edit_dates = {f'name {i+1}': f'edit date {i+1}' for i in range(10)}
+        posts = {}
+        for i in range(5):
+            # name attribute is special for mocks - it must be set after init
+            mock = MagicMock()
+            mock.name=f'name {2*i+2}'
+            posts[f"name {2*i+2}"] = mock
         with patch('obscraper._grab.grab_edit_dates', return_value=edit_dates) as mock_edit_dates:
             posts = _scrape.attach_edit_dates(posts)
         mock_edit_dates.assert_called_once()
@@ -254,11 +258,11 @@ class TestAttachEditDates(unittest.TestCase):
 
     def test_returns_none_for_invalid_post(self):
         # Posts which could not be found are returned as None
-        edit_dates = {'fake url': 'fake edit date'}
+        edit_dates = {'fake name': 'fake edit date'}
         with patch('obscraper._grab.grab_edit_dates', return_value=edit_dates) as mock_edit_dates:
-            invalid_post = _scrape.attach_edit_dates({'fake url': None})
+            invalid_post = _scrape.attach_edit_dates({'fake name': None})
         mock_edit_dates.assert_called_once()
-        self.assertIsNone(invalid_post['fake url'])
+        self.assertIsNone(invalid_post['fake name'])
 
 
 class TestRaiseExceptionIfNumberHasIncorrectFormat(unittest.TestCase):

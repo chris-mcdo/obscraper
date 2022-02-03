@@ -208,7 +208,7 @@ def attach_edit_dates(posts):
     Parameters
     ---------
     posts : Dict[str, obscraper.Post]
-        A dictionary whose keys are post URLs and whose values are the
+        A dictionary whose keys are post names and whose values are the
         corresponding posts, or None.
 
     Returns
@@ -219,7 +219,7 @@ def attach_edit_dates(posts):
     date_list = _grab.grab_edit_dates()
     for post_or_none in posts.values():
         if post_or_none is not None:
-            post_or_none.edit_date = date_list[post_or_none.url]
+            post_or_none.edit_date = date_list[post_or_none.name]
     return posts
 
 
