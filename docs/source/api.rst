@@ -77,6 +77,14 @@ grab_edit_dates
 
 .. autofunction:: obscraper.grab_edit_dates
 
+.. _name-to-url:
+
+name_to_url
+###########
+
+.. autofunction:: obscraper.name_to_url
+
+
 Serializers
 ***********
 
