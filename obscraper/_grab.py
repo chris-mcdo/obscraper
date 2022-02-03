@@ -39,10 +39,10 @@ def grab_post_by_name(name):
 
     Raises
     ------
-    exceptions.InvalidResponseError
+    obscraper.InvalidResponseError
         If the URL corresponding to the name returns a page that does
         not look like an overcomingbias post.
-    exceptions.AttributeNotFoundError
+    obscraper.AttributeNotFoundError
         If an obscraper.Post attribute could not be extracted from the
         downloaded page.
     """
@@ -70,7 +70,7 @@ def grab_comments(disqus_id):
 
     Raises
     ------
-    exceptions.InvalidResponseError
+    obscraper.InvalidResponseError
         If no comment count is found for the given Disqus ID.
     """
     params = {'1': disqus_id}
@@ -133,7 +133,7 @@ def grab_votes(number):
 
     Raises
     ------
-    exceptions.InvalidAuthCodeError
+    obscraper.InvalidAuthCodeError
         If the vote auth code returned by `vote_auth_code` is invalid.
     """
     headers = {'x-requested-with': 'XMLHttpRequest'}
