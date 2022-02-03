@@ -104,10 +104,10 @@ def get_posts_by_edit_date(start_date, end_date, max_workers=32):
         raise ValueError('end date is before start date')
 
     edit_dates = _grab.grab_edit_dates()
-    selected_urls = [url for url, edit_date in edit_dates.items()
-                     if start_date < edit_date < end_date]
-    posts = get_posts_by_urls(selected_urls, max_workers=max_workers)
-    return attach_edit_dates(posts)
+    selected_names = [name for name, edit_date in edit_dates.items()
+                      if start_date < edit_date < end_date]
+    posts = get_posts_by_names(selected_names, max_workers=max_workers)
+    return posts
 
 
 def get_votes(post_numbers, max_workers=32):

@@ -83,8 +83,8 @@ class TestGetPostsByEditDate(unittest.TestCase):
                 now+dday, now+5*dday), {})
             last_week = _scrape.get_posts_by_edit_date(now-7*dday, now)
             self.assertIsInstance(last_week, dict)
-            [self.assertTrue(_extract_post.is_valid_post_url(url))
-             for url in last_week.keys()]
+            [self.assertTrue(_extract_post.is_valid_post_name(name))
+             for name in last_week.keys()]
             [self.assertIsInstance(p, _post.Post) for p in last_week.values()]
 
     def test_raises_type_error_if_dates_are_wrong_type(self):
