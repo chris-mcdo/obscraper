@@ -61,18 +61,57 @@ def get_posts_by_urls(urls, max_workers=32):
         If any of the input URLs are not valid overcomingbias post URLs.
     """
     raise_exception_if_arg_is_not_type(urls, list, 'urls')
-    for url in urls:
-        raise_exception_if_url_is_not_valid_post_url(url)
 
-    def get_post(url):
-        """Get a post given its URL, returning None if not found."""
+    names = [_extract_post.url_to_name(url) for url in urls]
+    posts_by_names = get_posts_by_names(names, max_workers)
+    posts_by_urls = {_extract_post.name_to_url(name): post
+                     for name, post in posts_by_names.items()}
+    return posts_by_urls
+
+
+def get_posts_by_names(names, max_workers=32):
+    """Get list of posts identified by their names.
+
+    No exceptions are raised if a post or post attribute is not found -
+    instead "None" is returned for that post.
+
+    Parameters
+    ---------
+    names : List[str]
+        A list of overcomingbias post names to scrape data for.
+    max_workers : int
+        The maximum number of threads used to download posts. The actual
+        number of threads used might be lower than this.
+
+    Returns
+    -------
+    Dict[str, obscraper.Post]
+        A dictionary whose keys are the inputted names and whose values
+        are the corresponding posts. "Last edit" dates are attached.
+
+    Raises
+    ------
+    ValueError
+        If any of the input names are not valid overcomingbias post
+        names.
+    """
+    raise_exception_if_arg_is_not_type(names, list, 'names')
+    for name in names:
+        raise_exception_if_name_is_not_valid_post_name(name)
+
+    def get_post(name):
+        """Get a post given its name, returning None if not found."""
         try:
-            return _grab.grab_post_by_name(url)
+            return _grab.grab_post_by_name(name)
         except _exceptions.InvalidResponseError:
             return None
-    url_dict = dict(zip(urls, urls))
+
     posts = _future.map_with_delay(
-        func=get_post, arg_dict=url_dict, delay=0.02, max_workers=max_workers)
+        func=get_post,
+        arg_dict=dict(zip(names, names)),
+        delay=0.02,
+        max_workers=max_workers)
+
     return attach_edit_dates(posts)
 
 
@@ -233,13 +272,13 @@ def clear_cache():
     _grab.vote_auth_code.cache_clear()
 
 
-def raise_exception_if_url_is_not_valid_post_url(url):
-    """Raise an exception if a URL is not valid."""
-    if not isinstance(url, str):
-        raise TypeError(f'expected URL to be type str, got {type(url)}')
-    if not _extract_post.is_valid_post_url(url):
+def raise_exception_if_name_is_not_valid_post_name(name):
+    """Raise an exception if a post name is not valid."""
+    if not isinstance(name, str):
+        raise TypeError(f'expected name to be type str, got {type(name)}')
+    if not _extract_post.is_valid_post_name(name):
         raise ValueError(
-            f'expected URL to be overcomingbias post URL, got {url}')
+            f'expected name to be overcomingbias post name, got {name}')
 
 
 def raise_exception_if_number_has_incorrect_format(number):
