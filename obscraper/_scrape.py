@@ -54,6 +54,8 @@ def get_post_by_url(url):
 
     Raises
     ------
+    ValueError
+        If the input URL is not a valid overcomingbias post URL.
     exceptions.InvalidResponseError
         If the URL returns a page that does not look like an
         overcomingbias post.
@@ -85,6 +87,11 @@ def get_posts_by_urls(urls, max_workers=32):
     Dict[str, obscraper.Post]
         A dictionary whose keys are the inputted URLs and whose values
         are the corresponding posts. "Last edit" dates are attached.
+
+    Raises
+    ------
+    ValueError
+        If any of the input URLs are not valid overcomingbias post URLs.
     """
     raise_exception_if_arg_is_not_type(urls, list, 'urls')
     for url in urls:
@@ -162,6 +169,11 @@ def get_votes(post_numbers, max_workers=32):
         A dictionary whose keys are the inputted labels URLs and whose
         values are the corresponding vote counts (int). The vote count
         is 0 if the post is not found.
+
+    Raises
+    ------
+    ValueError
+        If any of the input post numbers are not valid.
     """
     raise_exception_if_arg_is_not_type(post_numbers, dict, 'post_numbers')
     for url, number in post_numbers.items():
@@ -203,6 +215,11 @@ def get_comments(disqus_ids, max_workers=50):
         A dictionary whose keys are the inputted labels and whose values
         are the corresponding comment counts. The comment count is None
         if the post is not found.
+
+    Raises
+    ------
+    ValueError
+        If any of the input Disqus IDs are not valid.
     """
     raise_exception_if_arg_is_not_type(disqus_ids, dict, 'disqus_ids')
     for url, number in disqus_ids.items():
