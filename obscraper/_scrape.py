@@ -30,7 +30,7 @@ def get_all_posts(max_workers=32):
     edit_dates = _grab.grab_edit_dates()
     all_posts = get_posts_by_names(
         list(edit_dates.keys()), max_workers=max_workers)
-    ob_posts = {name: post 
+    ob_posts = {name: post
                 for name, post in all_posts.items() if post is not None}
     return ob_posts
 
@@ -99,7 +99,11 @@ def get_posts_by_names(names, max_workers=32):
     for name in names:
         raise_exception_if_name_is_not_valid_post_name(name)
 
-    def get_post(name):
+    # Short-circuit if list is empty
+    if names == []:
+        return {}
+
+    def get_post_or_none(name):
         """Get a post given its name, returning None if not found."""
         try:
             return _grab.grab_post_by_name(name)
@@ -107,7 +111,7 @@ def get_posts_by_names(names, max_workers=32):
             return None
 
     posts = _future.map_with_delay(
-        func=get_post,
+        func=get_post_or_none,
         arg_dict=dict(zip(names, names)),
         delay=0.02,
         max_workers=max_workers)
