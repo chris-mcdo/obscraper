@@ -42,6 +42,20 @@ get_posts_by_urls
 
 .. autofunction:: obscraper.get_posts_by_urls
 
+.. _get-post-by-name:
+
+get_post_by_name
+################
+
+.. autofunction:: obscraper.get_post_by_name
+
+.. _get-posts-by-names:
+
+get_posts_by_names
+##################
+
+.. autofunction:: obscraper.get_posts_by_names
+
 .. _get-posts-by-edit-date:
 
 get_posts_by_edit_date

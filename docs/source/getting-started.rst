@@ -55,19 +55,22 @@ A full list of post attributes can be found in the :doc:`API Reference <api>`.
 Get Multiple Posts
 ******************
 
-To get multiple posts by their URLs, use :ref:`get_posts_by_urls <get-posts-by-urls>`:
+:ref:`get_posts_by_urls <get-posts-by-urls>` and
+:ref:`get_posts_by_names <get-posts-by-names>` let you get multiple posts by
+their URLs or names.
+The name of a post is its URL with the same-y parts chopped off:
 
 .. code-block:: python
 
-    >>> urls = [
-    ... 'https://www.overcomingbias.com/2006/11/quiz_fox_or_hed.html',
-    ... 'https://www.overcomingbias.com/2011/04/the-seti-game.html',   
-    ... 'https://www.overcomingbias.com/2013/10/stories-change-goals.html',
+    >>> names = [
+    ... '/2006/11/quiz_fox_or_hed',
+    ... '/2011/04/the-seti-game',
+    ... '/2013/10/stories-change-goals',
     ... ]
-    >>> posts = obscraper.get_posts_by_urls(urls)
+    >>> posts = obscraper.get_posts_by_names(names)
 
-This returns a dictionary whose keys are the original URLs, and whose values
-are the corresponding :ref:`Post <post>` objects:
+This returns a dictionary whose keys are the original URLs / names, and whose
+values are the corresponding :ref:`Post <post>` objects:
 
 .. code-block:: python
 
@@ -95,7 +98,7 @@ Alternatively, you can get posts by their "last edited" dates:
 
 Both :ref:`get_posts_by_urls <get-posts-by-urls>` and
 :ref:`get_posts_by_edit_date <get-posts-by-edit-date>` return a dictionary of
-labels (URLs) and posts.
+labels (URLs / names) and posts.
 This is the standard format for responses from the ``obscraper`` API.
 
 Get All Posts
@@ -111,15 +114,15 @@ some no longer hosted on the overcomingbias site), you can use
     >>> len(urls_and_dates)
     4353
     >>> {url: str(urls_and_dates[url]) for url in list(urls_and_dates)[:5]}
-    {'https://www.overcomingbias.com/2022/01/best-case-contrarians.html': 
+    {'/2022/01/best-case-contrarians': 
     '2022-01-16 21:55:04+00:00', 
-    'https://www.overcomingbias.com/2022/01/much-talk-is-sales-patter.html': 
+    '/2022/01/much-talk-is-sales-patter': 
     '2022-01-14 20:46:35+00:00', 
-    'https://www.overcomingbias.com/2022/01/old-man-rant.html': 
+    '/2022/01/old-man-rant': 
     '2022-01-13 15:21:33+00:00', 
-    'https://www.overcomingbias.com/2022/01/my-11-bets-at-10-1-odds-on-10m-covid-deaths-by-2022.html': 
+    '/2022/01/my-11-bets-at-10-1-odds-on-10m-covid-deaths-by-2022': 
     '2022-01-12 19:15:10+00:00', 
-    'https://www.overcomingbias.com/2022/01/to-innovate-unify-or-fragment.html': 
+    '/2022/01/to-innovate-unify-or-fragment': 
     '2022-01-11 01:03:44+00:00'}
 
 You can download all posts indirectly by using :ref:`get_posts_by_edit_date
@@ -156,7 +159,7 @@ to the `JSON <https://www.json.org/>`_ format, use the
     >>> intro_json
     '{"name": "/2006/11/introduction", "number": 18402, ...}'
 
-This is useful for storing posts for later:
+This is useful when storing posts for later:
 
 ..  code-block:: python
 
@@ -290,6 +293,8 @@ just return None for that particular post:
     >>> posts[urls[2]]
     None
 
+The behaviour is similar for :ref:`get_post_by_name <get-post-by-name>` and
+:ref:`get_posts_by_names <get-posts-by-names>`.
 This is useful when you intend to download many posts, some of which may
 not exist.
 
