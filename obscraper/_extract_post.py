@@ -496,8 +496,11 @@ def is_valid_post_long_url(url):
         True if the URL is a valid overcomingbias post long URL, and
         False otherwise.
     """
-    pattern = r'^https{0,1}://www.overcomingbias.com/\d{4}/\d{2}/\S+\.html$'
-    return re.search(pattern, url) is not None
+    try:
+        url_to_name(url)
+        return True
+    except ValueError:
+        return False
 
 
 def is_valid_post_short_url(url):
