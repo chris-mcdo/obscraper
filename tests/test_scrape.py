@@ -24,54 +24,109 @@ class TestGetAllPosts(unittest.TestCase):
             self.assertEqual(p.edit_date, edit_dates[name])
 
 
-class TestGetPostsByURLs(unittest.TestCase):
-    def test_returns_valid_posts_for_valid_urls(self):
-        urls = [
-            'https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html',
-            'https://www.overcomingbias.com/2014/07/limits-on-generality.html',
-            'https://www.overcomingbias.com/2012/02/why-retire.html'
+class TestGetPostsByNames(unittest.TestCase):
+    def test_returns_valid_posts_for_valid_names(self):
+        names = [
+            '/2021/10/what-makes-stuff-rot',
+            '/2014/07/limits-on-generality',
+            r'/2007/01/the-procrastinator%e2%80%99s-clock',  # valid
         ]
-        posts = _scrape.get_posts_by_urls(urls)
+        posts = _scrape.get_posts_by_names(names)
         self.assertIsInstance(posts, dict)
-        self.assertTrue(len(posts), len(urls))
+        self.assertTrue(len(posts), len(names))
         for p in posts.values():
             self.assert_is_valid_post(p)
-            self.assertIn(p.url, urls)
+            self.assertIn(p.name, names)
 
-    def test_raises_type_error_if_urls_are_wrong_type(self):
-        for urls in [
-            ['https://www.overcomingbias.com/2007/10/a-rational-argu.html', None],
+    def test_returns_empty_dict_for_empty_list(self):
+        names = []
+        posts = _scrape.get_posts_by_names(names)
+        self.assertEqual(posts, {})
+
+    def test_raises_type_error_if_names_are_wrong_type(self):
+        for names in [
+            ['/2007/10/a-rational-argu', None],
             [3514, 8293],
         ]:
-            self.assertRaises(TypeError, _scrape.get_posts_by_urls, urls)
+            self.assertRaises(TypeError, _scrape.get_posts_by_names, names)
 
-    def test_raises_value_error_if_urls_in_wrong_format(self):
-        for urls in [
-            ['Not a URL'],
-            ['https://example.com/'],
-            ['http://overcomingbias.com/'],
-            ['https://www.overcomingbias.com/post.xml'],
-            ['https://www.overcomingbias.com/page/20'],
-            ['http://www.overcomingbias.com/archives'],
+    def test_raises_value_error_if_names_in_wrong_format(self):
+        for names in [
+            ['Not a name'],
+            ['/'],
+            ['/123/456/ok'],
+            ['/post'],
+            ['/page/20/post'],
+            ['/archives'],
         ]:
-            self.assertRaises(ValueError, _scrape.get_posts_by_urls, urls)
+            self.assertRaises(ValueError, _scrape.get_posts_by_names, names)
 
-    def test_returns_none_for_invalid_urls(self):
-        urls = [
-            'https://www.overcomingbias.com/2007/10/a-rational-argu.html',  # LessWrong URL
-            'https://www.overcomingbias.com/2012/08/not-a-real-post.html',  # Fake URL
-            r'https://www.overcomingbias.com/2007/01/the-procrastinator%e2%80%99s-clock.html',  # valid URL
+    def test_returns_none_for_nonexistent_names(self):
+        names = [
+            '/2007/10/a-rational-argu',  # LessWrong
+            '/2012/08/not-a-real-post',  # Fake
+            '/2012/02/why-retire',  # Valid
         ]
-        posts = _scrape.get_posts_by_urls(urls)
-        self.assertIsNone(posts[urls[0]])
-        self.assertIsNone(posts[urls[1]])
-        self.assert_is_valid_post(posts[urls[2]])
+        posts = _scrape.get_posts_by_names(names)
+        self.assertIsNone(posts[names[0]])
+        self.assertIsNone(posts[names[1]])
+        self.assert_is_valid_post(posts[names[2]])
 
     def assert_is_valid_post(self, p):
         self.assertIsInstance(p, _post.Post)
         self.assertGreaterEqual(p.word_count, 5)
         self.assertGreaterEqual(p.votes, 0)
         self.assertGreaterEqual(p.comments, 0)
+
+
+class TestGetPostsByURLs(unittest.TestCase):
+    def setUp(self):
+        fake_posts = {
+            '/2006/11/introduction': 1,
+            '/2021/10/what-makes-stuff-rot': 2,
+            '/2014/07/limits-on-generality': 3,
+        }
+        patch_grab_post = patch('obscraper._grab.grab_post_by_name',
+                                side_effect=lambda v: fake_posts.get(v, None))
+        patch_attach_dates = patch('obscraper._scrape.attach_edit_dates',
+                                   side_effect=lambda v: v)
+        self.mock_grab_post = patch_grab_post.start()
+        self.mock_attach_dates = patch_attach_dates.start()
+        self.addCleanup(patch.stopall)
+
+    def test_returns_empty_dict_for_empty_list(self):
+        urls = []
+        posts = _scrape.get_posts_by_urls(urls)
+        self.assertEqual(posts, {})
+
+    def test_raises_type_error_if_urls_are_wrong_type(self):
+        for urls in [
+            ['https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html', None],
+            [3514, 8293],
+        ]:
+            self.assertRaises(TypeError, _scrape.get_posts_by_urls, urls)
+
+    def test_raises_value_error_if_urls_in_wrong_format(self):
+        for urls in [
+            ['Not a url'],
+            ['https://www.overcomingbias.com/?p=12345'],
+            ['https://www.overcomingbias.com/abc/de/fg.html'],
+            ['https://www.overcomingbias.com/1234/56/ab'],
+            ['https://www.overcomingbias.com/page/20/'],
+            ['https://www.overcomingbias.com/archives'],
+        ]:
+            self.assertRaises(ValueError, _scrape.get_posts_by_urls, urls)
+
+    def test_returns_valid_posts_for_valid_urls(self):
+        urls = [
+            'https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html',
+            'https://www.overcomingbias.com/2015/08/not-a-real-post.html',
+        ]
+        posts = _scrape.get_posts_by_urls(urls)
+        self.assertIsInstance(posts, dict)
+        self.assertEqual(len(posts), 2)
+        self.assertEqual(posts[urls[0]], 2)
+        self.assertIsNone(posts[urls[1]])
 
 
 class TestGetPostsByEditDate(unittest.TestCase):
