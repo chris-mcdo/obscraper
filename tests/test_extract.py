@@ -299,6 +299,18 @@ class TestExtractFunctionsOnFakePost(unittest.TestCase):
             not_found, _extract_post.extract_disqus_id, fake_html)
 
 
+class TestIsOBPostName(unittest.TestCase):
+    def test_accepts_all_ob_post_names(self):
+        edit_dates = _grab.grab_edit_dates()
+        for name in edit_dates.keys():
+            self.assertTrue(_extract_post.is_valid_post_name(name))
+
+    def test_rejects_incorrectly_formatted_names(self):
+        is_name = _extract_post.is_valid_post_name
+        self.assertFalse(is_name('2022/20/without-first-slash'))
+        self.assertFalse(is_name('/1234/56/'))
+        self.assertFalse(is_name('/2020/02/named.html'))
+
 class TestIsOBPostURL(unittest.TestCase):
     # The two accepted formats look like this
     # https://www.overcomingbias.com/?p=32980
