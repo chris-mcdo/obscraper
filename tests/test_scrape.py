@@ -24,6 +24,81 @@ class TestGetAllPosts(unittest.TestCase):
             self.assertEqual(p.edit_date, edit_dates[name])
 
 
+class TestGetPostByURL(unittest.TestCase):
+    def setUp(self):
+        fake_posts = {
+            '/2006/11/introduction': 1,
+            '/2021/10/what-makes-stuff-rot': 2,
+            '/2014/07/limits-on-generality': 3,
+        }
+        patch_grab_post = patch('obscraper._grab.grab_post_by_name',
+                                side_effect=lambda v: fake_posts.get(v, None))
+        patch_attach_dates = patch('obscraper._scrape.attach_edit_dates',
+                                   side_effect=lambda v: v)
+        self.mock_grab_post = patch_grab_post.start()
+        self.mock_attach_dates = patch_attach_dates.start()
+        self.addCleanup(patch.stopall)
+
+    def test_raises_type_error_if_url_is_wrong_type(self):
+        for url in [None, 35]:
+            self.assertRaises(TypeError, _scrape.get_post_by_url, url)
+
+    def test_raises_value_error_if_url_in_wrong_format(self):
+        for url in [
+            'Not a url',
+            'https://www.overcomingbias.com/?p=12345',
+            'https://www.overcomingbias.com/abc/de/fg.html',
+            'https://www.overcomingbias.com/1234/56/ab',
+            'https://www.overcomingbias.com/archives',
+        ]:
+            self.assertRaises(ValueError, _scrape.get_post_by_url, url)
+
+    def test_raises_error_when_post_not_found(self):
+        url = 'https://www.overcomingbias.com/2021/10/not-a-real-post.html'
+        self.assertRaises(_exceptions.InvalidResponseError, _scrape.get_post_by_url, url)
+
+    def test_returns_valid_posts_for_valid_urls(self):
+        url = 'https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html'
+        p = _scrape.get_post_by_url(url)
+        self.assertEqual(p, 2)
+
+class TestGetPostByName(unittest.TestCase):
+    def setUp(self):
+        fake_posts = {
+            '/2006/11/introduction': 1,
+            '/2021/10/what-makes-stuff-rot': 2,
+            '/2014/07/limits-on-generality': 3,
+        }
+        patch_grab_post = patch('obscraper._grab.grab_post_by_name',
+                                side_effect=lambda v: fake_posts.get(v, None))
+        patch_attach_dates = patch('obscraper._scrape.attach_edit_dates',
+                                   side_effect=lambda v: v)
+        self.mock_grab_post = patch_grab_post.start()
+        self.mock_attach_dates = patch_attach_dates.start()
+        self.addCleanup(patch.stopall)
+
+    def test_raises_type_error_if_name_is_wrong_type(self):
+        for name in [None, 35]:
+            self.assertRaises(TypeError, _scrape.get_post_by_name, name)
+
+    def test_raises_value_error_if_name_in_wrong_format(self):
+        for name in [
+            'Not a name',
+            '/?p=12345',
+            '/abc/de/fg.html',
+            '/archives',
+        ]:
+            self.assertRaises(ValueError, _scrape.get_post_by_name, name)
+
+    def test_raises_error_when_post_not_found(self):
+        name = '/2021/10/not-a-real-post'
+        self.assertRaises(_exceptions.InvalidResponseError, _scrape.get_post_by_name, name)
+
+    def test_returns_valid_posts_for_valid_names(self):
+        name = '/2021/10/what-makes-stuff-rot'
+        p = _scrape.get_post_by_name(name)
+        self.assertEqual(p, 2)
+
 class TestGetPostsByNames(unittest.TestCase):
     def test_returns_valid_posts_for_valid_names(self):
         names = [

@@ -35,6 +35,33 @@ def get_all_posts(max_workers=32):
     return ob_posts
 
 
+def get_post_by_url(url):
+    """Get a single post by its URL.
+
+    Parameters
+    ---------
+    url : str
+        An overcomingbias post URL.
+
+    Returns
+    -------
+    obscraper.Post
+        A post with edit date attached.
+
+    Raises
+    ------
+    ValueError
+        If the input URL is not a valid overcomingbias post URL.
+    obscraper.InvalidResponseError
+        If the post could not be retrieved.
+    """
+    raise_exception_if_arg_is_not_type(url, str, 'url')
+    post = get_posts_by_urls([url])[url]
+    if post is None:
+        raise _exceptions.InvalidResponseError(f'No post found at URL {url}.')
+    return post
+
+
 def get_posts_by_urls(urls, max_workers=32):
     """Get list of posts identified by their URLs.
 
@@ -67,6 +94,33 @@ def get_posts_by_urls(urls, max_workers=32):
     posts_by_urls = {_extract_post.name_to_url(name): post
                      for name, post in posts_by_names.items()}
     return posts_by_urls
+
+
+def get_post_by_name(name):
+    """Get a single post by its name.
+
+    Parameters
+    ---------
+    name : str
+        An overcomingbias post name, e.g. '/2010/09/jobs-explain-lots'.
+
+    Returns
+    -------
+    obscraper.Post
+        A post with edit date attached.
+
+    Raises
+    ------
+    ValueError
+        If the input name is not a valid overcomingbias post name.
+    obscraper.InvalidResponseError
+        If the post could not be retrieved.
+    """
+    raise_exception_if_arg_is_not_type(name, str, 'name')
+    post = get_posts_by_names([name])[name]
+    if post is None:
+        raise _exceptions.InvalidResponseError(f'No post found at URL {name}.')
+    return post
 
 
 def get_posts_by_names(names, max_workers=32):
