@@ -1,4 +1,4 @@
-"""Get a list of posts by publish date or URL.
+"""Get a list of posts by publish date, name or URL.
 
 This interface is internal - implementation details may change.
 """

@@ -58,7 +58,7 @@ class TestGrabEditDates(unittest.TestCase):
         self.assertIsInstance(edit_dates, dict)
         for name in edit_dates.keys():
             self.assertIsInstance(name, str)
-            url = _extract_post.url_to_name(name)
+            url = _extract_post.name_to_url(name)
             self.assertTrue(is_url(url))
         for date in edit_dates.values():
             self.assertIsInstance(date, datetime.datetime)
