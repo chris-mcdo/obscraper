@@ -410,7 +410,16 @@ def name_to_url(post_name):
     -------
     url : str
         The URL of the post.
+
+    Raises
+    ------
+    ValueError
+        If the input name is not a valid overcomingbias post name.
     """
+    pattern = r'^/\d{4}/\d{2}/[a-z0-9-_%]+$'
+    match = re.search(pattern, post_name)
+    if match is None:
+        raise ValueError("Invalid post name.")
     return f'https://www.overcomingbias.com{post_name}.html'
 
 
@@ -458,8 +467,11 @@ def is_valid_post_name(name):
         True if the name is a valid overcomingbias post name, and False
         otherwise.
     """
-    pattern = r'^/\d{4}/\d{2}/[a-z0-9-_%]+$'
-    return re.search(pattern, name) is not None
+    try:
+        name_to_url(name)
+        return True
+    except ValueError:
+        return False
 
 
 def is_valid_post_url(url):
