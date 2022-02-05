@@ -11,6 +11,7 @@ import bs4
 START_DELAY = 0.04
 INCREASE_FACTOR = 4
 MAX_DELAY = 3
+MAX_REQUESTS = 5
 
 
 def retry_request(func):
@@ -18,11 +19,17 @@ def retry_request(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         delay = START_DELAY
-        while delay < MAX_DELAY:
+        for _ in range(MAX_REQUESTS):
             response = func(*args, **kwargs)
             if response.status_code != 429:
                 break
-            time.sleep(delay * (1 + random.random()) / 2)
+            try:
+                delay = int(response.headers['Retry-After'])
+            except (KeyError, TypeError):
+                delay = delay * (1 + random.random()) / 2
+            if delay > MAX_DELAY:
+                break
+            time.sleep(delay)
             delay = delay * INCREASE_FACTOR
         return response
     return wrapper

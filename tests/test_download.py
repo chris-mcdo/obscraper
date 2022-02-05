@@ -6,6 +6,8 @@ import math
 
 SUCCESS_RESPONSE = NonCallableMock(status_code=200)
 RETRY_RESPONSE = NonCallableMock(status_code=429)
+RETRY_RESPONSE_WITH_HEADER = NonCallableMock(
+    status_code=429, headers=MagicMock(headers={'Retry-After': '2'}))
 
 
 class TestHttpRequests(unittest.TestCase):
@@ -55,10 +57,11 @@ class TestHttpRequests(unittest.TestCase):
 
 class TestRetryRequest(unittest.TestCase):
 
-    def fail_n_times_then_succeed(self, n):
+    def fail_n_times_then_succeed(self, n, header=False):
         """Function which fails n times before succeeding."""
+        retry = RETRY_RESPONSE_WITH_HEADER if header else RETRY_RESPONSE
         mock_method = MagicMock(
-            side_effect=[RETRY_RESPONSE] * n + [SUCCESS_RESPONSE])
+            side_effect=[retry] * n + [SUCCESS_RESPONSE])
 
         @_download.retry_request
         def mock_responder():
@@ -89,6 +92,19 @@ class TestRetryRequest(unittest.TestCase):
         # Check duration of delay is roughly correct
         self.assertTrue(duration > 0.5 * _download.MAX_DELAY)
         (dmax, dincrease) = (_download.MAX_DELAY, _download.INCREASE_FACTOR)
-        max_total_delay = (3 / 2) * dmax * dincrease / \
-            (dincrease - 1)  # do the math
+        max_total_delay = (3 / 2) * dmax * dincrease / (dincrease - 1)
+        # ^ do the math
         self.assertTrue(duration < max_total_delay)
+
+    def test_uses_retry_after_header(self):
+        # Arrange
+        fail_once = self.fail_n_times_then_succeed(1, header=True)
+        retry_after = int(RETRY_RESPONSE_WITH_HEADER.headers['Retry-After'])
+        # Act
+        start_time = time.time()
+        response = fail_once()
+        duration = time.time() - start_time
+        # Assert
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(duration, retry_after)
+        self.assertLess(duration, retry_after * 1.5)
