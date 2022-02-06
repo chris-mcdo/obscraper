@@ -147,6 +147,17 @@ class TestGetPostsByNames(unittest.TestCase):
         self.assertIsNone(posts[names[1]])
         self.assert_is_valid_post(posts[names[2]])
 
+    def test_returns_none_for_post_which_raises_attribute_not_found(self):
+        # Post /2009/02/the-most-important-thing is broken, so needs to be
+        # handled as a special case
+        name = '/2009/02/the-most-important-thing'
+        try:
+            tricky_post = _scrape.get_posts_by_names([name])[name]
+        except _exceptions.AttributeNotFoundError:
+            self.fail()
+        self.assertIsNone(tricky_post)
+
+
     def assert_is_valid_post(self, p):
         self.assertIsInstance(p, _post.Post)
         self.assertGreaterEqual(p.word_count, 5)
