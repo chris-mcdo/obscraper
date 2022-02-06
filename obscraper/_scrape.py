@@ -59,7 +59,8 @@ def get_post_by_url(url):
     raise_exception_if_arg_is_not_type(url, str, 'url')
     post = get_posts_by_urls([url])[url]
     if post is None:
-        raise _exceptions.InvalidResponseError(f'No post found at URL {url}.')
+        raise _exceptions.InvalidResponseError('Could not retrieve post'
+                                               f' {url}.')
     return post
 
 
@@ -120,7 +121,8 @@ def get_post_by_name(name):
     raise_exception_if_arg_is_not_type(name, str, 'name')
     post = get_posts_by_names([name])[name]
     if post is None:
-        raise _exceptions.InvalidResponseError(f'No post found at URL {name}.')
+        raise _exceptions.InvalidResponseError('Could not retrieve'
+                                               f' post {name}.')
     return post
 
 
