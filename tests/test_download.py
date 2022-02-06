@@ -90,8 +90,8 @@ class TestRetryRequest(unittest.TestCase):
         duration = time.time() - start_time
         self.assertEqual(response.status_code, 429)
         # Check duration of delay is roughly correct
-        self.assertTrue(duration > 0.5 * _download.MAX_DELAY)
         (dmax, dincrease) = (_download.MAX_DELAY, _download.INCREASE_FACTOR)
+        self.assertTrue(duration > dmax / dincrease)
         max_total_delay = (3 / 2) * dmax * dincrease / (dincrease - 1)
         # ^ do the math
         self.assertTrue(duration < max_total_delay)
