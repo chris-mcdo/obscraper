@@ -3,8 +3,9 @@
 This interface is internal - implementation details may change.
 """
 
-from obscraper import _future
-from . import _exceptions, _extract_post, _grab, _utils
+import logging
+
+from . import _future, _exceptions, _extract_post, _grab, _utils
 
 
 def get_all_posts(max_workers=32):
@@ -159,10 +160,16 @@ def get_posts_by_names(names, max_workers=32):
 
     def get_post_or_none(name):
         """Get a post given its name, returning None if not found."""
+        logger = logging.getLogger(__name__)
         try:
-            return _grab.grab_post_by_name(name)
+            new_post = _grab.grab_post_by_name(name)
+            logger.info("Successfully grabbed post %(pn)s", {'pn': name})
+            return new_post
         except _exceptions.InvalidResponseError:
-            return None
+            logger.info("InvalidResponseError raised when grabbing post"
+                        " %(pn)s",
+                        {'pn': name})
+        return None
 
     posts = _future.map_with_delay(
         func=get_post_or_none,

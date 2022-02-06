@@ -1,4 +1,6 @@
 """obscraper: scrape posts from the overcomingbias blog."""
+import logging
+
 from ._post import Post
 from ._scrape import (get_all_posts,
                       get_post_by_url,
@@ -49,3 +51,6 @@ OB_POST_URL_PATTERN = (
 It consists of 3 capturing groups. The second group captures the post
 name.
 """
+
+# Logging config
+logging.getLogger('obscraper').addHandler(logging.NullHandler())
