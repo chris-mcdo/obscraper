@@ -169,6 +169,10 @@ def get_posts_by_names(names, max_workers=32):
             logger.info("InvalidResponseError raised when grabbing post"
                         " %(pn)s",
                         {'pn': name})
+        except _exceptions.AttributeNotFoundError:
+            logger.warning("AttributeNotFoundError raised when grabbing post"
+                           " %(pn)s",
+                           {'pn': name})
         return None
 
     posts = _future.map_with_delay(

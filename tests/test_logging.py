@@ -53,10 +53,9 @@ class TestLogging(unittest.TestCase):
         self.assertEqual(self.logs.getvalue(),
                          f'INFO InvalidResponseError raised when grabbing post {name}\n')
 
-#    def test_attribute_not_found_is_logged_as_expected(self):
-#        name = '/2020/01/raise-attribute-not-found'
-#        result = obscraper.get_posts_by_names([name])[name]
-#        self.assertIsNone(result)
-#        self.assertEqual(self.logs.getvalue(),
-#                         f'WARNING AttributeNotFoundError raised when grabbing post {name}\n')
-#
+    def test_attribute_not_found_is_logged_as_expected(self):
+        name = '/2020/01/raise-attribute-not-found'
+        result = obscraper.get_posts_by_names([name])[name]
+        self.assertIsNone(result)
+        self.assertEqual(self.logs.getvalue(),
+                         f'WARNING AttributeNotFoundError raised when grabbing post {name}\n')
