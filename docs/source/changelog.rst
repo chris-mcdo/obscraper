@@ -4,6 +4,23 @@ Changelog
 Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_
 standard.
 
+obscraper 0.4.0 (2022-02-06)
+****************************
+
+Features
+########
+
+- Added `logging <https://docs.python.org/3/library/logging.html>`_
+  functionality, and documentation in the
+  :doc:`Getting Started <getting-started>` guide.
+
+Bug fixes
+#########
+
+- :ref:`AttributeNotFoundError <attribute-not-found-error>` exceptions are now
+  caught when downloading multiple posts. This prevents crashes on "broken"
+  posts, e.g. /2009/02/the-most-important-thing.
+
 obscraper 0.3.0 (2022-02-03)
 ****************************
 

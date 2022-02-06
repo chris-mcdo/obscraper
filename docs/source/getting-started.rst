@@ -145,6 +145,29 @@ to the overcomingbias site, and download ~100MB-1GB of data.
 :ref:`grab_edit_dates <grab-edit-dates>` requires only 1 request to
 the overcomingbias site, so should probably be preferred where possible.
 
+
+Updating Vote and Comment Counts
+********************************
+
+Vote and comment counts are collected from separate APIs to the rest of
+the post data.
+
+They can be updated using :ref:`get_votes <get-votes>` and
+:ref:`get_comments <get-comments>`:
+
+.. code-block:: python
+
+    >>> obscraper.get_votes({'intro': intro.number})
+    {'intro': 4}
+    >>> obscraper.get_comments({'intro': intro.disqus_id})
+    {'intro': 20}
+
+.. note:: 
+
+    The vote count API appears to be broken for posts published after
+    2021-03-17.
+
+
 Representing Post Objects using JSON
 ************************************
 
@@ -227,6 +250,46 @@ directory:
 
 To see a full list of commands, use the -h / --help option.
 
+
+Logging
+*******
+
+.. What is logging roughly? What is its purpose in your case? How can you
+.. set it up? What does the output look like? 
+
+``obscraper`` uses python's inbuilt
+`logging <https://docs.python.org/3/library/logging.html>`_ library to monitor
+its activity.
+This is mainly useful for debugging, but if you want you can see these logs
+yourself by setting up a logger:
+
+.. code-block:: python
+
+    import logging
+    handler = logging.FileHandler('logs.txt', encoding='utf-8')
+    logger = logging.getLogger('obscraper')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(handler)
+
+    names = [
+        '/2010/08/new-hard-steps-results', 
+        '/2009/02/the-most-important-thing'
+    ]
+    posts = obscraper.get_posts_by_names(names)
+
+    # Close logging file when finished!
+    handler.close()
+    logger.removeHandler(handler)
+
+.. code-block:: text
+    :caption: logs.txt
+
+    AttributeNotFoundError raised when grabbing post /2009/02/the-most-important-thing
+    Successfully grabbed post /2010/08/new-hard-steps-results
+
+The ``urllib3`` library - which acts as the HTTP client - also uses logging.
+You can get its logs by the same method as above.
+
 Caching
 *******
 
@@ -236,26 +299,6 @@ This cache can be cleared using :ref:`clear_cache <clear-cache>`.
 You may want to do this if the site has recently been updated, or a post
 has been added.
 
-Updating Vote and Comment Counts
-********************************
-
-Vote and comment counts are collected from separate APIs to the rest of
-the post data.
-
-They can be updated using :ref:`get_votes <get-votes>` and
-:ref:`get_comments <get-comments>`:
-
-.. code-block:: python
-
-    >>> obscraper.get_votes({'intro': intro.number})
-    {'intro': 4}
-    >>> obscraper.get_comments({'intro': intro.disqus_id})
-    {'intro': 20}
-
-.. note:: 
-
-    The vote count API appears to be broken for posts published after
-    2021-03-17.
 
 Errors and Exceptions
 *********************
@@ -297,6 +340,7 @@ The behaviour is similar for :ref:`get_post_by_name <get-post-by-name>` and
 :ref:`get_posts_by_names <get-posts-by-names>`.
 This is useful when you intend to download many posts, some of which may
 not exist.
+
 
 Continue Reading
 ****************
