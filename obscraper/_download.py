@@ -1,26 +1,31 @@
-"""Perform general web scraping tasks.
+"""Download data from external APIs and return raw responses.
 
 This interface is internal - implementation details may change.
 """
 import functools
 import random
-import time
-import requests
-import bs4
+import asyncio
+
+from ._extract_post import name_to_url
 
 START_DELAY = 0.04
 INCREASE_FACTOR = 4
 MAX_DELAY = 3
 MAX_REQUESTS = 5
 
+VOTE_API_URL = ('https://www.overcomingbias.com/'
+                'wp-content/plugins/gd-star-rating/ajax.php')
+COMMENT_API_URL = 'https://overcoming-bias.disqus.com/count-data.js'
+EDIT_DATES_URL = 'https://www.overcomingbias.com/post.xml'
 
-def retry_request(func):
+
+def async_retry_request(func):
     """Retry HTTP request until 429 response is no longer received."""
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs):
         delay = START_DELAY
         for _ in range(MAX_REQUESTS):
-            response = func(*args, **kwargs)
+            response = await func(*args, **kwargs)
             if response.status_code != 429:
                 break
             try:
@@ -29,42 +34,55 @@ def retry_request(func):
                 delay = delay * (1 + random.random()) / 2
             if delay > MAX_DELAY:
                 break
-            time.sleep(delay)
+            await asyncio.sleep(delay)
             delay = delay * INCREASE_FACTOR
         return response
     return wrapper
 
 
-@retry_request
-def http_get_request(url, headers=None):
-    """Wrapper around requests.get."""
-    if headers is None:
-        headers = {}
-    headers.setdefault('user-agent', 'Mozilla/5.0',)
-    response = requests.get(url, headers=headers)
+@async_retry_request
+async def download_post(name, async_client):
+    """Download a post by its name."""
+    headers = get_default_headers()
+    url = name_to_url(name)
+    response = await async_client.get(url, headers=headers)
     return response
 
 
-@retry_request
-def http_post_request(url, params, headers=None):
-    """Wrapper around requests.post."""
-    if headers is None:
-        headers = {}
-    headers.setdefault('user-agent', 'Mozilla/5.0')
-    response = requests.post(url, params=params, headers=headers)
+@async_retry_request
+async def download_vote_count(vote_id, vote_auth, async_client):
+    """Download vote count for a post."""
+    headers = get_default_headers()
+    headers.update({'x-requested-with': 'XMLHttpRequest'})
+    params = {
+        '_ajax_nonce': vote_auth,
+        'vote_type': 'cache',
+        'vote_domain': 'a',
+        'votes': vote_id
+    }
+    response = await async_client.post(VOTE_API_URL, headers=headers,
+                                       params=params)
     return response
 
 
-def grab_xml_soup(url):
-    """Download an XML file and parse as a bs4.BeautifulSoup object."""
-    return bs4.BeautifulSoup(grab_page_raw(url), 'lxml-xml')
+@async_retry_request
+async def download_comment_count(comment_id, async_client):
+    """Download comment count for a post."""
+    headers = get_default_headers()
+    params = {'1': comment_id}
+    response = await async_client.post(COMMENT_API_URL, headers=headers,
+                                       params=params)
+    return response
 
 
-def grab_page_raw(url):
-    """Download the raw HTML of a webpage."""
-    return http_get_request(url).text
+@async_retry_request
+async def download_edit_dates(async_client):
+    """Download list of posts and edit dates."""
+    headers = get_default_headers()
+    response = await async_client.get(EDIT_DATES_URL, headers=headers)
+    return response
 
 
-def grab_html_soup(url):
-    """Download an HTML file and parse as a bs4.BeautifulSoup object."""
-    return bs4.BeautifulSoup(grab_page_raw(url), 'lxml')
+def get_default_headers():
+    """Get headers to be used with all requests."""
+    return {'user-agent': 'Mozilla/5.0'}
