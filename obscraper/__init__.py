@@ -2,16 +2,18 @@
 import logging
 
 from ._post import Post
-from ._scrape import (get_all_posts,
-                      get_post_by_url,
-                      get_posts_by_urls,
-                      get_post_by_name,
-                      get_posts_by_names,
-                      get_posts_by_edit_date,
-                      get_votes,
-                      get_comments,
-                      clear_cache,)
-from ._grab import grab_edit_dates
+from ._scrape import (
+    get_posts_by_names,
+    get_votes,
+    get_comments,
+    get_edit_dates,
+    get_all_posts,
+    get_post_by_name,
+    get_post_by_url,
+    get_posts_by_urls,
+    get_posts_by_edit_date,
+    clear_cache
+    )
 from ._extract_post import url_to_name, name_to_url
 from ._serialize import PostEncoder, PostDecoder
 from ._exceptions import (InvalidResponseError,
@@ -21,16 +23,16 @@ from ._exceptions import (InvalidResponseError,
 
 __all__ = [
     'Post',
-    'get_all_posts',
-    'get_post_by_url',
-    'get_posts_by_urls',
-    'get_post_by_name',
     'get_posts_by_names',
-    'get_posts_by_edit_date',
     'get_votes',
     'get_comments',
+    'get_edit_dates',
+    'get_all_posts',
+    'get_post_by_name',
+    'get_post_by_url',
+    'get_posts_by_urls',
+    'get_posts_by_edit_date',
     'clear_cache',
-    'grab_edit_dates',
     'url_to_name',
     'name_to_url',
     'PostEncoder',
