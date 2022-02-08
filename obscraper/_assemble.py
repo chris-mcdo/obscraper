@@ -30,25 +30,19 @@ def async_assembly_cache(maxsize, ttl, timer=time.monotonic, getsizeof=None):
                                     getsizeof=getsizeof)
         lock = threading.Lock()
 
-        # Define hash key generator
-        def assembly_hashkey(async_client, *args, **kwargs):
-            """Hash key for the ``assemble`` functions.
-
-            It ignores their ``async_client`` argument.
-            """
-            return cachetools.keys.hashkey(*args, **kwargs)
-
         # Define wrapper
         # Inpsired by https://github.com/tkem/cachetools/issues/92
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
-            key = assembly_hashkey(*args, **kwargs)
+        async def wrapper(async_client, *args, **kwargs):
+            # Hash key ignores ``async_client``, so that results are
+            # cached across sessions.
+            key = cachetools.keys.hashkey(*args, **kwargs)
             try:
                 with lock:
                     return cache[key]
             except KeyError:
                 pass
-            val = await func(*args, **kwargs)
+            val = await func(async_client, *args, **kwargs)
             # in case of a race, prefer the item already in the cache
             try:
                 with lock:
@@ -68,18 +62,33 @@ def async_assembly_cache(maxsize, ttl, timer=time.monotonic, getsizeof=None):
 
 
 @async_assembly_cache(maxsize=5000, ttl=3600)
-async def assemble_post(async_client, name):
+async def assemble_post(async_client, name, votes=True, comments=True,
+                        edit_dates=True):
     """Download and tidy a post."""
-    raw_response = await _download.download_post(name, async_client)
-    tidy_item = _tidy.tidy_post(raw_response)
-    return tidy_item
+    raw_response = await _download.download_post(async_client, name)
+    post = _tidy.tidy_post(raw_response)
+
+    if votes:
+        vote_auth = await assemble_vote_auth(async_client)
+        post.votes = await assemble_vote_count(async_client, post.number,
+                                               vote_auth)
+
+    if comments:
+        post.comments = await assemble_comment_count(async_client,
+                                                     post.disqus_id)
+
+    if edit_dates:
+        edit_dates = await assemble_edit_dates(async_client)
+        post.edit_date = edit_dates[post.name]
+
+    return post
 
 
 @async_assembly_cache(maxsize=5000, ttl=3600)
 async def assemble_vote_count(async_client, vote_id, vote_auth):
     """Download and tidy a vote count."""
-    raw_response = await _download.download_vote_count(vote_id, vote_auth,
-                                                       async_client)
+    raw_response = await _download.download_vote_count(async_client, vote_id,
+                                                       vote_auth)
     tidy_item = _tidy.tidy_vote_count(raw_response)
     return tidy_item
 
@@ -87,8 +96,8 @@ async def assemble_vote_count(async_client, vote_id, vote_auth):
 @async_assembly_cache(maxsize=5000, ttl=3600)
 async def assemble_comment_count(async_client, comment_id):
     """Download and tidy a comment count."""
-    raw_response = await _download.download_comment_count(comment_id,
-                                                          async_client)
+    raw_response = await _download.download_comment_count(async_client,
+                                                          comment_id)
     tidy_item = _tidy.tidy_comment_count(raw_response)
     return tidy_item
 
@@ -105,6 +114,6 @@ async def assemble_edit_dates(async_client):
 async def assemble_vote_auth(async_client):
     """Download and tidy the vote auth code."""
     raw_response = await _download.download_post(
-        _download.VOTE_AUTH_UPDATE_NAME, async_client)
+        async_client, _download.VOTE_AUTH_UPDATE_NAME)
     tidy_item = _tidy.tidy_vote_auth(raw_response)
     return tidy_item
