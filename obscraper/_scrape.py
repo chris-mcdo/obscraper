@@ -59,7 +59,7 @@ def get_votes(post_numbers):
 
     Parameters
     ---------
-    vote_ids_dict : Dict[str, int]
+    post_numbers : Dict[str, int]
         Dictionary whose keys are arbitrary labels (e.g. the post URLs)
         and whose values are post numbers to get votes for.
 
@@ -101,7 +101,7 @@ def get_comments(disqus_ids):
 
     Parameters
     ---------
-    comment_ids_dict : Dict[str, str]
+    disqus_ids : Dict[str, str]
         Dictionary whose keys are arbitrary labels (e.g. the post URLs)
         and whose values are the the corresponding Disqus ID strings.
 
