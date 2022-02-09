@@ -24,15 +24,14 @@ EDIT_DATES_URL = "https://www.overcomingbias.com/post.xml"
 VOTE_AUTH_UPDATE_NAME = "/2011/12/life-is-good"
 
 
-def async_retry_rate_limited(rate_limit):
-    """Retry HTTP request until 429 response is no longer received."""
+def async_retry(start_delay):
+    """Either return a 2xx response, try again, or raise an error."""
 
     def decorator(func):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
-            delay = rate_limit
+            delay = start_delay
             for _ in range(MAX_REQUESTS):
-                # Make sure this request is at least delay from prev one
                 response = await func(*args, **kwargs)
                 if response.status_code != 429:
                     break
@@ -55,7 +54,7 @@ def async_retry_rate_limited(rate_limit):
     return decorator
 
 
-@async_retry_rate_limited(rate_limit=0.04)
+@async_retry(start_delay=0.04)
 async def download_post(async_client, name):
     """Download a post by its name."""
     headers = get_default_headers()
@@ -64,7 +63,7 @@ async def download_post(async_client, name):
     return response
 
 
-@async_retry_rate_limited(rate_limit=0.04)
+@async_retry(start_delay=0.04)
 async def download_vote_count(async_client, vote_id, vote_auth):
     """Download vote count for a post."""
     headers = get_default_headers()
@@ -79,7 +78,7 @@ async def download_vote_count(async_client, vote_id, vote_auth):
     return response
 
 
-@async_retry_rate_limited(rate_limit=0.001)
+@async_retry(start_delay=0.001)
 async def download_comment_count(async_client, comment_id):
     """Download comment count for a post."""
     headers = get_default_headers()
@@ -88,7 +87,7 @@ async def download_comment_count(async_client, comment_id):
     return response
 
 
-@async_retry_rate_limited(rate_limit=0.001)
+@async_retry(start_delay=0.001)
 async def download_edit_dates(async_client):
     """Download list of posts and edit dates."""
     headers = get_default_headers()
