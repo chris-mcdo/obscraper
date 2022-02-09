@@ -4,6 +4,7 @@ This interface is internal - implementation details may change.
 """
 import functools
 
+import httpx
 import trio
 
 from . import _exceptions
@@ -40,8 +41,13 @@ def async_retry_rate_limited(rate_limit):
                 except (KeyError, TypeError):
                     delay = delay * INCREASE_FACTOR
                 if delay > MAX_DELAY:
-                    raise _exceptions.InvalidResponseError("Exceeded max" " timeout.")
+                    raise _exceptions.InvalidResponseError("Exceeded max timeout.")
                 await trio.sleep(delay)
+
+            try:
+                response.raise_for_status()
+            except httpx.HTTPStatusError as err:
+                raise _exceptions.InvalidResponseError("Invalid response.") from err
             return response
 
         return wrapper
