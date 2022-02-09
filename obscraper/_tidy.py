@@ -3,10 +3,10 @@
 import json
 import re
 
-import dateutil.parser
 import bs4
+import dateutil.parser
 
-from . import _extract_post, _exceptions, _post
+from . import _exceptions, _extract_post, _post
 
 
 def tidy_post(response):
@@ -30,10 +30,11 @@ def tidy_post(response):
         If an obscraper.Post attribute could not be extracted from the
         response text.
     """
-    raw_html = bs4.BeautifulSoup(response.text, 'lxml')
+    raw_html = bs4.BeautifulSoup(response.text, "lxml")
     if not _extract_post.is_ob_post_html(raw_html):
         raise _exceptions.InvalidResponseError(
-            'The downloaded page is not an overcomingbias post.')
+            "The downloaded page is not an overcomingbias post."
+        )
 
     new_post = _post.Post(
         # URL and title
@@ -84,13 +85,13 @@ def tidy_vote_count(response):
     obscraper.InvalidAuthCodeError
         If the response indicates an invalid vote auth code.
     """
-    if response.text == '-1':
-        raise _exceptions.InvalidAuthCodeError('Invalid Vote Auth Code.')
+    if response.text == "-1":
+        raise _exceptions.InvalidAuthCodeError("Invalid Vote Auth Code.")
 
     raw_json = json.loads(response.text)
-    html_soup = bs4.BeautifulSoup(raw_json['items'][0]['html'], 'lxml')
+    html_soup = bs4.BeautifulSoup(raw_json["items"][0]["html"], "lxml")
 
-    pattern = r'(Rating:\s*\+{0,1})(\d+)(\s*vote)'
+    pattern = r"(Rating:\s*\+{0,1})(\d+)(\s*vote)"
     match = re.search(pattern, html_soup.text).group(2)
 
     votes = int(match)
@@ -115,14 +116,14 @@ def tidy_comment_count(response):
     obscraper.InvalidResponseError
         If no comment count is found in the response.
     """
-    pattern = r'(?<=displayCount\()(.*)(?=\))'
+    pattern = r"(?<=displayCount\()(.*)(?=\))"
     match = re.search(pattern, response.text).group()
     raw_json = json.loads(match)
 
-    if raw_json['counts'] == []:
-        raise _exceptions.InvalidResponseError('Comment count not found.')
+    if raw_json["counts"] == []:
+        raise _exceptions.InvalidResponseError("Comment count not found.")
 
-    comments = raw_json['counts'][0]['comments']
+    comments = raw_json["counts"][0]["comments"]
     return comments
 
 
@@ -141,7 +142,7 @@ def tidy_edit_dates(response):
         Dictionary whose keys are post names and values are the last
         edit dates of each post as aware datetime.datetime objects.
     """
-    xml_soup = bs4.BeautifulSoup(response.text, 'lxml-xml')
+    xml_soup = bs4.BeautifulSoup(response.text, "lxml-xml")
 
     url_tags = xml_soup.find_all("loc")
     urls = [tag.string for tag in url_tags]
@@ -155,10 +156,11 @@ def tidy_edit_dates(response):
 
 def tidy_vote_auth(response):
     """Extract the vote auth code from a post page."""
-    raw_html = bs4.BeautifulSoup(response.text, 'lxml')
+    raw_html = bs4.BeautifulSoup(response.text, "lxml")
     if not _extract_post.is_ob_post_html(raw_html):
         raise _exceptions.InvalidResponseError(
-            'The downloaded page is not an overcomingbias post.')
+            "The downloaded page is not an overcomingbias post."
+        )
 
     vote_auth = _extract_post.extract_vote_auth_code(raw_html)
     return vote_auth

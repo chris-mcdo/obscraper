@@ -6,11 +6,10 @@ Also perform exception handling and logging.
 import logging
 from functools import partial
 
-import trio
 import httpx
+import trio
 
-from . import _exceptions, _assemble
-
+from . import _assemble, _exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -39,23 +38,27 @@ async def fetch(results, label, func, obj_type=None):
         The type of object returned by the function call. Used for
         logging.
     """
-    log_info = {'label': label, 'obj': obj_type}
+    log_info = {"label": label, "obj": obj_type}
 
     try:
         obj = await func()
         logger.info("Successfully grabbed %(obj)s %(label)s", log_info)
     except _exceptions.InvalidResponseError:
         obj = None
-        logger.info("InvalidResponseError raised when grabbing"
-                    " %(obj)s %(label)s", log_info)
+        logger.info(
+            "InvalidResponseError raised when grabbing" " %(obj)s %(label)s", log_info
+        )
     except _exceptions.AttributeNotFoundError:
         obj = None
-        logger.warning("AttributeNotFoundError raised when grabbing"
-                       " %(obj)s %(label)s", log_info)
+        logger.warning(
+            "AttributeNotFoundError raised when grabbing" " %(obj)s %(label)s", log_info
+        )
 
     if label in results.keys():
-        logger.warning('Results container already contains an entry'
-                       'for post %(obj)s %(label)s', log_info)
+        logger.warning(
+            "Results container already contains an entry" "for post %(obj)s %(label)s",
+            log_info,
+        )
 
     results[label] = obj
 
@@ -66,8 +69,7 @@ async def fetch_posts(names_dict):
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
             for label, name in names_dict.items():
-                assembler = partial(_assemble.assemble_post, async_client,
-                                    name)
+                assembler = partial(_assemble.assemble_post, async_client, name)
                 fetcher = partial(fetch, results, label, assembler, "post")
                 nursery.start_soon(fetcher)
     return results
@@ -79,10 +81,10 @@ async def fetch_vote_counts(vote_ids_dict, vote_auth):
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
             for label, vote_id in vote_ids_dict.items():
-                assembler = partial(_assemble.assemble_vote_count,
-                                    async_client, vote_id, vote_auth)
-                fetcher = partial(fetch, results, label, assembler,
-                                  "vote count")
+                assembler = partial(
+                    _assemble.assemble_vote_count, async_client, vote_id, vote_auth
+                )
+                fetcher = partial(fetch, results, label, assembler, "vote count")
                 nursery.start_soon(fetcher)
     return results
 
@@ -93,10 +95,10 @@ async def fetch_comment_counts(comment_ids_dict):
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
             for label, comment_id in comment_ids_dict.items():
-                assembler = partial(_assemble.assemble_comment_count,
-                                    async_client, comment_id)
-                fetcher = partial(fetch, results, label, assembler,
-                                  "comment count")
+                assembler = partial(
+                    _assemble.assemble_comment_count, async_client, comment_id
+                )
+                fetcher = partial(fetch, results, label, assembler, "comment count")
                 nursery.start_soon(fetcher)
     return results
 
@@ -107,10 +109,9 @@ async def fetch_edit_dates():
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
             assembler = partial(_assemble.assemble_edit_dates, async_client)
-            fetcher = partial(fetch, results, 'edit-dates', assembler,
-                              "edit dates")
+            fetcher = partial(fetch, results, "edit-dates", assembler, "edit dates")
             nursery.start_soon(fetcher)
-    return results['edit-dates']
+    return results["edit-dates"]
 
 
 async def fetch_vote_auth():
@@ -119,7 +120,6 @@ async def fetch_vote_auth():
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
             assembler = partial(_assemble.assemble_vote_auth, async_client)
-            fetcher = partial(fetch, results, 'vote-auth', assembler,
-                              "vote auth")
+            fetcher = partial(fetch, results, "vote-auth", assembler, "vote auth")
             nursery.start_soon(fetcher)
-    return results['vote-auth']
+    return results["vote-auth"]

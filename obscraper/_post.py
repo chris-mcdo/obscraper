@@ -1,8 +1,9 @@
 """Store information from a single overcomingbias post."""
 
-import datetime
 import dataclasses
+import datetime
 from typing import Dict, List
+
 from . import _extract_post
 
 
@@ -58,6 +59,7 @@ class Post:
         The (aware) datetime when the post was last edited, according to
         the sitemap.
     """
+
     # pylint: disable=too-many-instance-attributes
     name: str
     number: int

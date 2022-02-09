@@ -6,12 +6,12 @@ This interface is internal - implementation details may change.
 """
 
 import functools
-import time
 import threading
+import time
 
 import cachetools
-import cachetools.keys
 import cachetools.func
+import cachetools.keys
 
 from . import _download, _tidy
 
@@ -24,10 +24,12 @@ def async_assembly_cache(maxsize, ttl, timer=time.monotonic, getsizeof=None):
     ``async_client`` argument. This lets it store results across
     sessions.
     """
+
     def custom_cache(func):
         # Define cache
-        cache = cachetools.TTLCache(maxsize=maxsize, ttl=ttl, timer=timer,
-                                    getsizeof=getsizeof)
+        cache = cachetools.TTLCache(
+            maxsize=maxsize, ttl=ttl, timer=timer, getsizeof=getsizeof
+        )
         lock = threading.Lock()
 
         # Define wrapper
@@ -55,27 +57,26 @@ def async_assembly_cache(maxsize, ttl, timer=time.monotonic, getsizeof=None):
         def cache_clear():
             with lock:
                 cache.clear()
+
         wrapper.cache_clear = cache_clear
 
         return wrapper
+
     return custom_cache
 
 
 @async_assembly_cache(maxsize=5000, ttl=3600)
-async def assemble_post(async_client, name, votes=True, comments=True,
-                        edit_dates=True):
+async def assemble_post(async_client, name, votes=True, comments=True, edit_dates=True):
     """Download and tidy a post."""
     raw_response = await _download.download_post(async_client, name)
     post = _tidy.tidy_post(raw_response)
 
     if votes:
         vote_auth = await assemble_vote_auth(async_client)
-        post.votes = await assemble_vote_count(async_client, post.number,
-                                               vote_auth)
+        post.votes = await assemble_vote_count(async_client, post.number, vote_auth)
 
     if comments:
-        post.comments = await assemble_comment_count(async_client,
-                                                     post.disqus_id)
+        post.comments = await assemble_comment_count(async_client, post.disqus_id)
 
     if edit_dates:
         edit_dates = await assemble_edit_dates(async_client)
@@ -87,8 +88,7 @@ async def assemble_post(async_client, name, votes=True, comments=True,
 @async_assembly_cache(maxsize=5000, ttl=3600)
 async def assemble_vote_count(async_client, vote_id, vote_auth):
     """Download and tidy a vote count."""
-    raw_response = await _download.download_vote_count(async_client, vote_id,
-                                                       vote_auth)
+    raw_response = await _download.download_vote_count(async_client, vote_id, vote_auth)
     tidy_item = _tidy.tidy_vote_count(raw_response)
     return tidy_item
 
@@ -96,8 +96,7 @@ async def assemble_vote_count(async_client, vote_id, vote_auth):
 @async_assembly_cache(maxsize=5000, ttl=3600)
 async def assemble_comment_count(async_client, comment_id):
     """Download and tidy a comment count."""
-    raw_response = await _download.download_comment_count(async_client,
-                                                          comment_id)
+    raw_response = await _download.download_comment_count(async_client, comment_id)
     tidy_item = _tidy.tidy_comment_count(raw_response)
     return tidy_item
 
@@ -114,6 +113,7 @@ async def assemble_edit_dates(async_client):
 async def assemble_vote_auth(async_client):
     """Download and tidy the vote auth code."""
     raw_response = await _download.download_post(
-        async_client, _download.VOTE_AUTH_UPDATE_NAME)
+        async_client, _download.VOTE_AUTH_UPDATE_NAME
+    )
     tidy_item = _tidy.tidy_vote_auth(raw_response)
     return tidy_item

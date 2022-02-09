@@ -3,14 +3,15 @@
 This interface is internal - implementation details may change.
 """
 
-import re
 import datetime
+import re
+
 import pytz
 
 
 def tidy_date(messy_date, timezone):
     """Convert verbose date string to aware datetime.datetime object."""
-    naive_date = datetime.datetime.strptime(messy_date, '%B %d, %Y %I:%M %p')
+    naive_date = datetime.datetime.strptime(messy_date, "%B %d, %Y %I:%M %p")
     return date_to_utc(naive_date, timezone)
 
 
@@ -24,11 +25,10 @@ def count_words(text, ignore=None):
     """Count the number of words in a string, ignoring some."""
     if ignore is None:
         ignore = []
-    text_without_punctuation = re.sub(r'[^a-zA-Z0-9\s]+', '', text)
-    text_without_special_chars = re.sub(r'\s+', ' ', text_without_punctuation)
+    text_without_punctuation = re.sub(r"[^a-zA-Z0-9\s]+", "", text)
+    text_without_special_chars = re.sub(r"\s+", " ", text_without_punctuation)
     words = len(
-        [word for word in str.split(
-            text_without_special_chars) if word not in ignore]
+        [word for word in str.split(text_without_special_chars) if word not in ignore]
     )
     return words
 
@@ -53,5 +53,4 @@ def property_names(cls):
     List[str]
         A list of the properties defined by the input class.
     """
-    return [name for name in dir(cls)
-            if isinstance(getattr(cls, name), property)]
+    return [name for name in dir(cls) if isinstance(getattr(cls, name), property)]

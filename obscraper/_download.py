@@ -3,6 +3,7 @@
 This interface is internal - implementation details may change.
 """
 import functools
+
 import trio
 
 from . import _exceptions
@@ -12,17 +13,19 @@ INCREASE_FACTOR = 2
 MAX_DELAY = 5
 MAX_REQUESTS = 10
 
-VOTE_API_URL = ('https://www.overcomingbias.com/'
-                'wp-content/plugins/gd-star-rating/ajax.php')
-COMMENT_API_URL = 'https://overcoming-bias.disqus.com/count-data.js'
-EDIT_DATES_URL = 'https://www.overcomingbias.com/post.xml'
+VOTE_API_URL = (
+    "https://www.overcomingbias.com/" "wp-content/plugins/gd-star-rating/ajax.php"
+)
+COMMENT_API_URL = "https://overcoming-bias.disqus.com/count-data.js"
+EDIT_DATES_URL = "https://www.overcomingbias.com/post.xml"
 
 # Name used to update the vote auth code
-VOTE_AUTH_UPDATE_NAME = '/2011/12/life-is-good'
+VOTE_AUTH_UPDATE_NAME = "/2011/12/life-is-good"
 
 
 def async_retry_rate_limited(rate_limit):
     """Retry HTTP request until 429 response is no longer received."""
+
     def decorator(func):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
@@ -33,15 +36,16 @@ def async_retry_rate_limited(rate_limit):
                 if response.status_code != 429:
                     break
                 try:
-                    delay = int(response.headers['Retry-After'])
+                    delay = int(response.headers["Retry-After"])
                 except (KeyError, TypeError):
                     delay = delay * INCREASE_FACTOR
                 if delay > MAX_DELAY:
-                    raise _exceptions.InvalidResponseError('Exceeded max'
-                                                           ' timeout.')
+                    raise _exceptions.InvalidResponseError("Exceeded max" " timeout.")
                 await trio.sleep(delay)
             return response
+
         return wrapper
+
     return decorator
 
 
@@ -58,15 +62,14 @@ async def download_post(async_client, name):
 async def download_vote_count(async_client, vote_id, vote_auth):
     """Download vote count for a post."""
     headers = get_default_headers()
-    headers.update({'x-requested-with': 'XMLHttpRequest'})
+    headers.update({"x-requested-with": "XMLHttpRequest"})
     params = {
-        '_ajax_nonce': vote_auth,
-        'vote_type': 'cache',
-        'vote_domain': 'a',
-        'votes': f'atr.{vote_id}'
+        "_ajax_nonce": vote_auth,
+        "vote_type": "cache",
+        "vote_domain": "a",
+        "votes": f"atr.{vote_id}",
     }
-    response = await async_client.post(VOTE_API_URL, headers=headers,
-                                       params=params)
+    response = await async_client.post(VOTE_API_URL, headers=headers, params=params)
     return response
 
 
@@ -74,9 +77,8 @@ async def download_vote_count(async_client, vote_id, vote_auth):
 async def download_comment_count(async_client, comment_id):
     """Download comment count for a post."""
     headers = get_default_headers()
-    params = {'1': comment_id}
-    response = await async_client.post(COMMENT_API_URL, headers=headers,
-                                       params=params)
+    params = {"1": comment_id}
+    response = await async_client.post(COMMENT_API_URL, headers=headers, params=params)
     return response
 
 
@@ -90,4 +92,4 @@ async def download_edit_dates(async_client):
 
 def get_default_headers():
     """Get headers to be used with all requests."""
-    return {'user-agent': 'Mozilla/5.0'}
+    return {"user-agent": "Mozilla/5.0"}

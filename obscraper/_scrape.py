@@ -5,7 +5,7 @@ This interface is internal - implementation details may change.
 
 import trio
 
-from . import _exceptions, _extract_post, _utils, _fetch, _assemble
+from . import _assemble, _exceptions, _extract_post, _fetch, _utils
 
 
 def get_posts_by_names(names):
@@ -32,7 +32,7 @@ def get_posts_by_names(names):
         names.
     """
     # Argument validation
-    raise_exception_if_arg_is_not_type(names, list, 'names')
+    raise_exception_if_arg_is_not_type(names, list, "names")
     for name in names:
         raise_exception_if_name_is_not_valid_post_name(name)
 
@@ -76,9 +76,9 @@ def get_votes(post_numbers):
         If any of the input post numbers are not valid.
     """
     # Argument validation
-    raise_exception_if_arg_is_not_type(post_numbers, dict, 'post_numbers')
+    raise_exception_if_arg_is_not_type(post_numbers, dict, "post_numbers")
     for url, number in post_numbers.items():
-        raise_exception_if_arg_is_not_type(url, str, 'post_numbers label')
+        raise_exception_if_arg_is_not_type(url, str, "post_numbers label")
         raise_exception_if_number_has_incorrect_format(number)
 
     # Short-circuit if dict is empty
@@ -118,9 +118,9 @@ def get_comments(disqus_ids):
         If any of the input Disqus IDs are not valid.
     """
     # Argument validation
-    raise_exception_if_arg_is_not_type(disqus_ids, dict, 'disqus_ids')
+    raise_exception_if_arg_is_not_type(disqus_ids, dict, "disqus_ids")
     for url, number in disqus_ids.items():
-        raise_exception_if_arg_is_not_type(url, str, 'disqus_ids label')
+        raise_exception_if_arg_is_not_type(url, str, "disqus_ids label")
         raise_exception_if_disqus_id_has_incorrect_format(number)
 
     # Short-circuit if dict is empty
@@ -162,10 +162,8 @@ def get_all_posts():
         corresponding posts. "Last edit" dates are attached.
     """
     edit_dates = get_edit_dates()
-    all_posts = get_posts_by_names(
-        list(edit_dates.keys()))
-    ob_posts = {name: post
-                for name, post in all_posts.items() if post is not None}
+    all_posts = get_posts_by_names(list(edit_dates.keys()))
+    ob_posts = {name: post for name, post in all_posts.items() if post is not None}
     return ob_posts
 
 
@@ -189,11 +187,10 @@ def get_post_by_name(name):
     obscraper.InvalidResponseError
         If the post could not be retrieved.
     """
-    raise_exception_if_arg_is_not_type(name, str, 'name')
+    raise_exception_if_arg_is_not_type(name, str, "name")
     post = get_posts_by_names([name])[name]
     if post is None:
-        raise _exceptions.InvalidResponseError('Could not retrieve'
-                                               f' post {name}.')
+        raise _exceptions.InvalidResponseError("Could not retrieve" f" post {name}.")
     return post
 
 
@@ -219,12 +216,13 @@ def get_posts_by_urls(urls):
     ValueError
         If any of the input URLs are not valid overcomingbias post URLs.
     """
-    raise_exception_if_arg_is_not_type(urls, list, 'urls')
+    raise_exception_if_arg_is_not_type(urls, list, "urls")
 
     names = [_extract_post.url_to_name(url) for url in urls]
     posts_by_names = get_posts_by_names(names)
-    posts_by_urls = {_extract_post.name_to_url(name): post
-                     for name, post in posts_by_names.items()}
+    posts_by_urls = {
+        _extract_post.name_to_url(name): post for name, post in posts_by_names.items()
+    }
     return posts_by_urls
 
 
@@ -248,11 +246,10 @@ def get_post_by_url(url):
     obscraper.InvalidResponseError
         If the post could not be retrieved.
     """
-    raise_exception_if_arg_is_not_type(url, str, 'url')
+    raise_exception_if_arg_is_not_type(url, str, "url")
     post = get_posts_by_urls([url])[url]
     if post is None:
-        raise _exceptions.InvalidResponseError('Could not retrieve post'
-                                               f' {url}.')
+        raise _exceptions.InvalidResponseError("Could not retrieve post" f" {url}.")
     return post
 
 
@@ -276,14 +273,17 @@ def get_posts_by_edit_date(start_date, end_date):
     ValueError
         If start date is after end date.
     """
-    raise_exception_if_date_has_incorrect_format(start_date, 'start_date')
-    raise_exception_if_date_has_incorrect_format(end_date, 'end_date')
+    raise_exception_if_date_has_incorrect_format(start_date, "start_date")
+    raise_exception_if_date_has_incorrect_format(end_date, "end_date")
     if start_date > end_date:
-        raise ValueError('end date is before start date')
+        raise ValueError("end date is before start date")
 
     edit_dates = get_edit_dates()
-    selected_names = [name for name, edit_date in edit_dates.items()
-                      if start_date < edit_date < end_date]
+    selected_names = [
+        name
+        for name, edit_date in edit_dates.items()
+        if start_date < edit_date < end_date
+    ]
     posts = get_posts_by_names(selected_names)
     return posts
 
@@ -300,37 +300,37 @@ def clear_cache():
 def raise_exception_if_name_is_not_valid_post_name(name):
     """Raise an exception if a post name is not valid."""
     if not isinstance(name, str):
-        raise TypeError(f'expected name to be type str, got {type(name)}')
+        raise TypeError(f"expected name to be type str, got {type(name)}")
     if not _extract_post.is_valid_post_name(name):
-        raise ValueError(
-            f'expected name to be overcomingbias post name, got {name}')
+        raise ValueError(f"expected name to be overcomingbias post name, got {name}")
 
 
 def raise_exception_if_number_has_incorrect_format(number):
     """Raise an exception if a number has the wrong format."""
     if not isinstance(number, int):
-        raise TypeError(
-            f'expected number to be type int, got type {type(number)}')
+        raise TypeError(f"expected number to be type int, got type {type(number)}")
     if not 9999 < number < 100000:
-        raise ValueError(
-            f'expected number to be 5-digit integer, got {number}')
+        raise ValueError(f"expected number to be 5-digit integer, got {number}")
 
 
 def raise_exception_if_disqus_id_has_incorrect_format(disqus_id):
     """Raise an exception if a Diqus ID has the wrong format"""
     if not isinstance(disqus_id, str):
         raise TypeError(
-            f'expected Disqus ID to be type str, got type {type(disqus_id)}')
+            f"expected Disqus ID to be type str, got type {type(disqus_id)}"
+        )
     if not _extract_post.is_valid_disqus_id(disqus_id):
-        raise ValueError(f'Disqus ID {disqus_id} is not valid')
+        raise ValueError(f"Disqus ID {disqus_id} is not valid")
 
 
 def raise_exception_if_date_has_incorrect_format(date, variable_name):
     """Raise an exception if a datetime has the wrong format."""
     if not _utils.is_aware_datetime(date):
         raise TypeError(
-            (f'expected {variable_name} to be type aware datetime.datetime, '
-             f'got type {type(date)}')
+            (
+                f"expected {variable_name} to be type aware datetime.datetime, "
+                f"got type {type(date)}"
+            )
         )
 
 
@@ -338,6 +338,8 @@ def raise_exception_if_arg_is_not_type(arg, expected_type, variable_name):
     """Raise an exception if an argument has the wrong type."""
     if not isinstance(arg, expected_type):
         raise TypeError(
-            (f'expected {variable_name} to be type {expected_type}, '
-             f'got {type(arg)}')
+            (
+                f"expected {variable_name} to be type {expected_type}, "
+                f"got {type(arg)}"
+            )
         )
