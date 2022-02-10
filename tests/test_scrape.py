@@ -219,7 +219,8 @@ def test_get_all_posts_works_for_fake_edit_list():
         posts = _scrape.get_all_posts()
 
     assert mock_fetch_edit_dates.call_count >= 1
-    assert len(posts) == 2
+    assert len(posts) == 3
+    assert posts.pop("/2007/10/a-rational-argu") is None
     for name, p in posts.items():
         assert p.edit_date == edit_dates[name]
 

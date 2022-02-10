@@ -141,21 +141,19 @@ def get_edit_dates():
 def get_all_posts():
     """Get all posts hosted on the overcomingbias site.
 
-    This includes vote and comment counts for each post.
+    This includes vote and comment counts for each post, and their last edit dates.
 
-    Posts which are no longer hosted on the overcomingbias site are not
-    included (i.e. posts by Eliezer Yudkowsky).
+    Posts which are no longer hosted on the overcomingbias site are returned as "None".
 
     Returns
     -------
     Dict[str, obscraper.Post]
         A dictionary whose keys are post names and whose values are the
-        corresponding posts. "Last edit" dates are attached.
+        corresponding posts.
     """
     edit_dates = get_edit_dates()
-    all_posts = get_posts_by_names(list(edit_dates.keys()))
-    ob_posts = {name: post for name, post in all_posts.items() if post is not None}
-    return ob_posts
+    posts = get_posts_by_names(list(edit_dates.keys()))
+    return posts
 
 
 def get_post_by_name(name):
