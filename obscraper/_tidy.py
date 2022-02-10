@@ -85,8 +85,7 @@ def tidy_vote_count(response):
     obscraper.InvalidAuthCodeError
         If the response indicates an invalid vote auth code.
     """
-    if response.text == "-1":
-        raise _exceptions.InvalidAuthCodeError("Invalid Vote Auth Code.")
+    assert response.text != "-1", "Invalid Vote Auth Code."
 
     raw_json = json.loads(response.text)
     html_soup = bs4.BeautifulSoup(raw_json["items"][0]["html"], "lxml")

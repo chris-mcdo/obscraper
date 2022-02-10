@@ -1,11 +1,7 @@
 """obscraper: scrape posts from the overcomingbias blog."""
 import logging
 
-from ._exceptions import (
-    AttributeNotFoundError,
-    InvalidAuthCodeError,
-    InvalidResponseError,
-)
+from ._exceptions import AttributeNotFoundError, InvalidResponseError
 from ._extract_post import name_to_url, url_to_name
 from ._post import Post
 from ._scrape import (
@@ -39,7 +35,6 @@ __all__ = [
     "PostEncoder",
     "PostDecoder",
     "InvalidResponseError",
-    "InvalidAuthCodeError",
     "AttributeNotFoundError",
     "OB_POST_URL_PATTERN",
 ]
