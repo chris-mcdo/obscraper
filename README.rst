@@ -28,6 +28,10 @@ obscraper: scrape posts from the overcomingbias blog
   :target: https://codecov.io/gh/chris-mcdo/obscraper
   :alt: Unit Test Coverage
   
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+  :target: https://github.com/psf/black
+  :alt: Code Style: Black
+
 .. image:: https://img.shields.io/badge/license-MIT-purple
   :target: https://github.com/chris-mcdo/obscraper/blob/main/LICENSE
   :alt: MIT License
