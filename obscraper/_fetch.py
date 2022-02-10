@@ -46,12 +46,12 @@ async def fetch(results, label, func, obj_type=None):
     except _exceptions.InvalidResponseError:
         obj = None
         logger.info(
-            "InvalidResponseError raised when grabbing" " %(obj)s %(label)s", log_info
+            "InvalidResponseError raised when grabbing %(obj)s %(label)s", log_info
         )
     except _exceptions.AttributeNotFoundError:
         obj = None
         logger.warning(
-            "AttributeNotFoundError raised when grabbing" " %(obj)s %(label)s", log_info
+            "AttributeNotFoundError raised when grabbing %(obj)s %(label)s", log_info
         )
 
     if label in results.keys():

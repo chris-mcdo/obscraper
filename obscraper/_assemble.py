@@ -22,10 +22,12 @@ VOTE_AUTH_UPDATE_NAME = "/2011/12/life-is-good"
 def async_assembly_cache(maxsize, ttl, timer=time.monotonic, getsizeof=None):
     """Custom TTL cache for the ``assemble`` functions.
 
-    Differs from the ``cachetools`` default by implementing (1) a
-    (thread-safe) ``cache_clear`` method, and (2) ignoring the
+    Differs from the ``cachetools`` default by implementing a
+    (thread-safe) ``cache_clear`` method, and ignoring the
     ``async_client`` argument. This lets it store results across
     sessions.
+
+    And it's asynchronous.
     """
 
     def custom_cache(func):
