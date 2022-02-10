@@ -64,3 +64,5 @@ def test_clears_grab_post_cache():
             p3 = _scrape.get_vote_counts(fake_post_numbers)
             assert p3 == {"/2020/06/fake-post": 321}
             assert mock_download.call_count == 2
+
+            _scrape.clear_cache()
