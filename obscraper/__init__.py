@@ -7,7 +7,7 @@ from ._post import Post
 from ._scrape import (
     clear_cache,
     get_all_posts,
-    get_comments,
+    get_comment_counts,
     get_edit_dates,
     get_post_by_name,
     get_post_by_url,
@@ -22,7 +22,7 @@ __all__ = [
     "Post",
     "get_posts_by_names",
     "get_votes",
-    "get_comments",
+    "get_comment_counts",
     "get_edit_dates",
     "get_all_posts",
     "get_post_by_name",

@@ -91,7 +91,7 @@ def get_votes(post_numbers):
     return votes
 
 
-def get_comments(disqus_ids):
+def get_comment_counts(disqus_ids):
     """Get comment counts for some posts.
 
     Takes a dictionary of Disqus ID strings. If the Disqus

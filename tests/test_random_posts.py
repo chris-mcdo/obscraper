@@ -29,7 +29,7 @@ def test_core_api_produces_valid_posts_votes_and_comments(edit_dates):
         assert is_valid_vote_or_comment_count(v)
 
     sample_disqus_ids = {name: post.disqus_id for name, post in existing_posts.items()}
-    sample_comments = _scrape.get_comments(sample_disqus_ids)
+    sample_comments = _scrape.get_comment_counts(sample_disqus_ids)
     for c in sample_comments.values():
         assert is_valid_vote_or_comment_count(c)
 

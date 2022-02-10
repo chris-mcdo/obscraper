@@ -258,10 +258,10 @@ class TestGetVotes:
                 _scrape.get_votes(post_numbers)
 
 
-class TestGetComments:
+class TestGetCommentCounts:
     def test_returns_empty_dict_for_empty_dict(self):
         urls = {}
-        posts = _scrape.get_comments(urls)
+        posts = _scrape.get_comment_counts(urls)
         assert posts == {}
 
     def test_raises_type_error_if_arguments_are_wrong_type(self):
@@ -281,7 +281,7 @@ class TestGetComments:
             },
         ]:
             with pytest.raises(TypeError):
-                _scrape.get_comments(disqus_ids)
+                _scrape.get_comment_counts(disqus_ids)
 
     def test_raises_value_error_if_arguments_have_wrong_value(self):
         for disqus_ids in [
@@ -296,7 +296,7 @@ class TestGetComments:
             {name_to_url("/2006/11/introduction"): ""},
         ]:
             with pytest.raises(ValueError):
-                _scrape.get_comments(disqus_ids)
+                _scrape.get_comment_counts(disqus_ids)
 
     def test_returns_none_for_invalid_numbers(self):
         disqus_ids = {
@@ -305,7 +305,7 @@ class TestGetComments:
             name_to_url("/2021/04/shoulda-listened-futures"): "65432"
             " http://www.overcomingbias.com/?p=65432",
         }
-        comments = _scrape.get_comments(disqus_ids)
+        comments = _scrape.get_comment_counts(disqus_ids)
         for url in disqus_ids.keys():
             assert comments[url] is None
 

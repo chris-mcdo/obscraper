@@ -153,13 +153,13 @@ Vote and comment counts are collected from separate APIs to the rest of
 the post data.
 
 They can be updated using :ref:`get_votes <get-votes>` and
-:ref:`get_comments <get-comments>`:
+:ref:`get_comment_counts <get-comment-counts>`:
 
 .. code-block:: python
 
     >>> obscraper.get_votes({'intro': intro.number})
     {'intro': 4}
-    >>> obscraper.get_comments({'intro': intro.disqus_id})
+    >>> obscraper.get_comment_counts({'intro': intro.disqus_id})
     {'intro': 20}
 
 .. note:: 

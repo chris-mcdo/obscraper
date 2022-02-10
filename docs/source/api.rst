@@ -70,12 +70,12 @@ get_votes
 
 .. autofunction:: obscraper.get_votes
 
-.. _get-comments:
+.. _get-comment-counts:
 
-get_comments
-############
+get_comment_counts
+###################
 
-.. autofunction:: obscraper.get_comments
+.. autofunction:: obscraper.get_comment_counts
 
 .. _clear-cache:
 
