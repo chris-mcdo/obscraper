@@ -112,14 +112,3 @@ async def fetch_edit_dates():
             fetcher = partial(fetch, results, "edit-dates", assembler, "edit dates")
             nursery.start_soon(fetcher)
     return results["edit-dates"]
-
-
-async def fetch_vote_auth():
-    """Get vote auth code."""
-    results = {}
-    async with httpx.AsyncClient() as async_client:
-        async with trio.open_nursery() as nursery:
-            assembler = partial(_assemble.assemble_vote_auth, async_client)
-            fetcher = partial(fetch, results, "vote-auth", assembler, "vote auth")
-            nursery.start_soon(fetcher)
-    return results["vote-auth"]

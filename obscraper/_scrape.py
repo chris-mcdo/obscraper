@@ -138,14 +138,6 @@ def get_edit_dates():
     return edit_dates
 
 
-def attach_extra_data(posts, extra_data, attr_name):
-    """Attach data to a list of posts."""
-    for label, post in posts.items():
-        if post is not None:
-            setattr(post, attr_name, extra_data[label])
-    return posts
-
-
 def get_all_posts():
     """Get all posts hosted on the overcomingbias site.
 
