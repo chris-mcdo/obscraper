@@ -14,8 +14,8 @@ class Post:
     Attributes
     ----------
     name : str
-        The original year, month and abbreviated name of the post, as
-        found in its url. E.g. '/2010/09/jobs-explain-lots'.
+        The original year, month and abbreviated name of the post, as found in its url.
+        E.g. '/2010/09/jobs-explain-lots'.
     number : int
         The unique integer identifier of the post.
     page_type : str
@@ -25,13 +25,12 @@ class Post:
     page_format : str
         Page format, normally 'standard'. I don't know its definition.
     title : str
-        The title of the post, as seen on the page. E.g. 'Jobs Explain
-        Lots'.
+        The title of the post, as seen on the page. E.g. 'Jobs Explain Lots'.
     author : str
         The name of the author of the post. E.g. 'Robin Hanson'
     publish_date : datetime.datetime
-        The (aware) datetime when the post was first published,
-        according to the post page.
+        The (aware) datetime when the post was first published, according to the post
+        page.
     tags : List[str]
         A list of tags associated with the post.
     categories : List[str]
@@ -41,23 +40,19 @@ class Post:
     word_count : int
         The number of words in the body of the post.
     internal_links : Dict[str, int]
-        Dictionary whose keys are the hyperlinks to other posts found in
-        the body of the post (str), and whose values are the number of
-        times these links are repeated (int).
+        Dictionary whose keys are the hyperlinks to other posts found in the body of the
+        post, and whose values are the number of times these links are repeated.
     external_links : Dict[str, int]
-        Dictionary whose keys are the hyperlinks to non-post webpages
-        found in the body of the post (str), and whose values are
-        the number of times these links are repeated (int).
+        Dictionary whose keys are the hyperlinks to non-post webpages found in the body
+        of the post, and whose values are the number of times these links are repeated.
     disqus_id : str
-        A string which uniquely identifies the post to the Disqus
-        comment count API.
+        A string which uniquely identifies the post to the Disqus comment count API.
     votes : int, optional
         The number of votes the post has received.
     comments : int, optional
         The number of comments on the post.
     edit_date : datetime.datetime, optional
-        The (aware) datetime when the post was last edited, according to
-        the sitemap.
+        The (aware) datetime when the post was last edited, according to the sitemap.
     """
 
     # pylint: disable=too-many-instance-attributes

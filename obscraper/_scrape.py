@@ -9,27 +9,26 @@ from . import _assemble, _exceptions, _extract_post, _fetch, _utils
 
 
 def get_posts_by_names(names):
-    """Get list of posts identified by their names.
+    """Get dict of posts identified by their names.
 
-    No exceptions are raised if a post or post attribute is not found -
-    instead "None" is returned for that post.
+    No exceptions are raised if a post or post attribute is not found - instead "None"
+    is returned for that post.
 
     Parameters
-    ---------
+    ----------
     names : List[str]
         A list of overcomingbias post names to scrape data for.
 
     Returns
     -------
     Dict[str, obscraper.Post]
-        A dictionary whose keys are the inputted names and whose values
-        are the corresponding posts. "Last edit" dates are attached.
+        A dictionary whose keys are the inputted names and whose values are the
+        corresponding posts.
 
     Raises
     ------
     ValueError
-        If any of the input names are not valid overcomingbias post
-        names.
+        If any of the input names are not valid overcomingbias post names.
     """
     # Argument validation
     raise_exception_if_arg_is_not_type(names, list, "names")
@@ -50,25 +49,22 @@ def get_posts_by_names(names):
 def get_vote_counts(numbers_dict):
     """Get vote counts for some posts.
 
-    If one of the numbers is in an incorrect format, an exception is
-    raised. Unlike other functions, ``get_vote_counts`` returns 0 (rather than
-    None) when a post is not found. This is because the vote count API
-    returns a vote count of 0 for posts that do not exist - it is
-    not possible to tell whether a post doesn't exist or if it just has
-    zero votes.
+    Unlike other functions, `get_vote_counts` returns 0 (rather than None) when a post
+    is not found. This is because the vote count API returns a vote count of 0 for posts
+    that do not exist - it is impossible to tell whether a post doesn't exist or if it
+    just has zero votes.
 
     Parameters
     ---------
     numbers_dict : Dict[str, int]
-        Dictionary whose keys are arbitrary labels (e.g. the post URLs)
-        and whose values are post numbers to get votes for.
+        Dictionary whose keys are arbitrary labels (e.g. the post URLs) and whose values
+        are post numbers to get votes for.
 
     Returns
     -------
     Dict[str, int]
-        A dictionary whose keys are the inputted labels and whose
-        values are the corresponding vote counts (int). The vote count
-        is 0 if the post is not found.
+        A dictionary whose keys are the inputted labels and whose values are the
+        corresponding vote counts (int). The vote count is 0 if the post is not found.
 
     Raises
     ------
@@ -94,9 +90,7 @@ def get_vote_counts(numbers_dict):
 def get_comment_counts(disqus_ids_dict):
     """Get comment counts for some posts.
 
-    Takes a dictionary of Disqus ID strings. If the Disqus
-    ID is in an incorrect format, an exception is raised.
-    If no post is found, None is returned for that particular post.
+    If no comment count is found, "None" is returned.
 
     Parameters
     ---------
@@ -108,7 +102,7 @@ def get_comment_counts(disqus_ids_dict):
     -------
     Dict[str, int]
         A dictionary whose keys are the inputted labels and whose values
-        are the corresponding comment counts. The comment count is None
+        are the corresponding comment counts. The comment count is "None"
         if the post is not found.
 
     Raises
@@ -133,7 +127,14 @@ def get_comment_counts(disqus_ids_dict):
 
 
 def get_edit_dates():
-    """Get a list of post edit dates."""
+    """Get a dict of post edit dates.
+
+    Returns
+    -------
+    Dict[str, datetime.datetime]
+        Dictionary whose keys are post names and values are the last edit dates of each
+        post as "aware" datetime.datetime objects.
+    """
     edit_dates = trio.run(_fetch.fetch_edit_dates)
     return edit_dates
 
@@ -167,7 +168,7 @@ def get_post_by_name(name):
     Returns
     -------
     obscraper.Post
-        A post with edit date attached.
+        The Post corresponding to the input name.
 
     Raises
     ------
@@ -186,8 +187,7 @@ def get_post_by_name(name):
 def get_posts_by_urls(urls):
     """Get list of posts identified by their URLs.
 
-    No exceptions are raised if a post or post attribute is not found -
-    instead "None" is returned for that post.
+    "None" is returned if a post could not be retrieved.
 
     Parameters
     ---------
@@ -226,7 +226,7 @@ def get_post_by_url(url):
     Returns
     -------
     obscraper.Post
-        A post with edit date attached.
+        The Post corresponding to the input URL.
 
     Raises
     ------
@@ -248,19 +248,18 @@ def get_posts_by_edit_date(start_date, end_date):
     Parameters
     ----------
     start_date, end_date : datetime.datetime
-        The start and end dates of the date range, as aware datetimes.
+        The start and end dates of the date range, as "aware" datetimes.
 
     Returns
     -------
     Dict[str, obscraper.Post]
-        A dictionary whose keys are the URLs of posts edited within the
-        date range, and whose values are the corresponding posts. "Last
-        edit" dates are attached.
+        A dictionary whose keys are the URLs of posts edited within the date range, and
+        whose values are the corresponding posts.
 
     Raises
     ------
     ValueError
-        If start date is after end date.
+        If `start_date` is after `end_date`.
     """
     raise_exception_if_date_has_incorrect_format(start_date, "start_date")
     raise_exception_if_date_has_incorrect_format(end_date, "end_date")
@@ -303,7 +302,7 @@ def raise_exception_if_number_has_incorrect_format(number):
 
 
 def raise_exception_if_disqus_id_has_incorrect_format(disqus_id):
-    """Raise an exception if a Diqus ID has the wrong format"""
+    """Raise an exception if a Diqus ID has the wrong format."""
     if not isinstance(disqus_id, str):
         raise TypeError(
             f"expected Disqus ID to be type str, got type {type(disqus_id)}"

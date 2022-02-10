@@ -36,6 +36,7 @@ obscraper: scrape posts from the overcomingbias blog
   :target: https://github.com/chris-mcdo/obscraper/blob/main/LICENSE
   :alt: MIT License
 
+
 ``obscraper`` lets you scrape blog posts and associated metadata from the
 `overcomingbias <https://www.overcomingbias.com/>`_ blog.
 
@@ -57,7 +58,7 @@ It's easy to get a single post::
 Or a full list of post URLs and edit dates::
 
     >>> import obscraper
-    >>> edit_dates = obscraper.grab_edit_dates()
+    >>> edit_dates = obscraper.get_edit_dates()
     ...
     >>> len(edit_dates)
     4352
@@ -85,7 +86,7 @@ Features
 - Provides summary of post content including full post text as HTML or
   plaintext, and a list of hyperlinks to other overcomingbias posts
 
-- Multithreading and caching for fast downloads
+- Asynchronous execution and caching for fast downloads
 
 - Use via ``import obscraper`` or the simple command line interface
 
@@ -119,6 +120,7 @@ License
 
 Copyright (c) 2022 Christopher McDonald
 
-Distributed under the terms of the `MIT <https://github.com/chris-mcdo/obscraper/blob/main/LICENSE>`_ license.
+Distributed under the terms of the
+`MIT <https://github.com/chris-mcdo/obscraper/blob/main/LICENSE>`_ license.
 
 All overcomingbias posts are copyright the original authors.

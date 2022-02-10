@@ -10,14 +10,14 @@ This page explains how to install obscraper and run some basic commands.
 Install ``obscraper``
 *********************
 
-Install from PyPI:
+Install from `PyPI <https://pypi.org/project/obscraper/>`_:
 
 .. code-block:: console
 
     $ python -m pip install obscraper
     $ python -m pip show obscraper
 
-Alternatively, get the source code:
+Alternatively, get the `source code <https://github.com/chris-mcdo/obscraper>`_:
 
 .. code-block:: console
 
@@ -26,7 +26,8 @@ Alternatively, get the source code:
 Get a Single Post
 *****************
 
-Scrape data from a single post:
+Scrape data from a single
+`post <https://www.overcomingbias.com/2006/11/introduction.html>`_:
 
 .. code-block:: python
 
@@ -57,8 +58,8 @@ Get Multiple Posts
 
 :ref:`get_posts_by_urls <get-posts-by-urls>` and
 :ref:`get_posts_by_names <get-posts-by-names>` let you get multiple posts by
-their URLs or names.
-The name of a post is its URL with the same-y parts chopped off:
+their URLs / names.
+The "name" of a post is its URL with the same-y parts chopped off:
 
 .. code-block:: python
 
@@ -106,11 +107,11 @@ Get All Posts
 
 To get a list of URLs and "last edited" dates for all posts (including
 some no longer hosted on the overcomingbias site), you can use
-:ref:`grab_edit_dates <grab-edit-dates>`:
+:ref:`get_edit_dates <get-edit-dates>`:
 
 .. code-block:: python
 
-    >>> urls_and_dates = obscraper.grab_edit_dates()
+    >>> urls_and_dates = obscraper.get_edit_dates()
     >>> len(urls_and_dates)
     4353
     >>> {url: str(urls_and_dates[url]) for url in list(urls_and_dates)[:5]}
@@ -142,7 +143,7 @@ This may take a few (<10) minutes.
 
 :ref:`get_all_posts <get-all-posts>` will send more than 4000 requests
 to the overcomingbias site, and download ~100MB-1GB of data.
-:ref:`grab_edit_dates <grab-edit-dates>` requires only 1 request to
+:ref:`get_edit_dates <get-edit-dates>` requires only 1 request to
 the overcomingbias site, so should probably be preferred where possible.
 
 
@@ -253,9 +254,6 @@ To see a full list of commands, use the -h / --help option.
 
 Logging
 *******
-
-.. What is logging roughly? What is its purpose in your case? How can you
-.. set it up? What does the output look like? 
 
 ``obscraper`` uses python's inbuilt
 `logging <https://docs.python.org/3/library/logging.html>`_ library to monitor

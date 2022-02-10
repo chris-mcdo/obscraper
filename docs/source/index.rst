@@ -21,10 +21,10 @@ It's easy to get a single post:
     >>> intro.comments
     20
 
-Or a full list of post URLs and edit dates::
+Or a full list of post names and edit dates::
 
     >>> import obscraper
-    >>> edit_dates = obscraper.grab_edit_dates()
+    >>> edit_dates = obscraper.get_edit_dates()
     ...
     >>> len(edit_dates)
     4352
@@ -54,9 +54,9 @@ Features
 - Provides summary of post content including full post text as HTML or
   plaintext, and a list of hyperlinks to other overcomingbias posts
 
-- Multithreading and caching for fast downloads
+- Asynchronous execution and caching for fast downloads
 
-- Use in scripts or the command line interface
+- Use via ``import obscraper`` or the simple command line interface
 
 - Comprehensively tested
 
@@ -67,9 +67,11 @@ Documentation
 
 See :doc:`Getting Started <getting-started>` for an introduction to the package. 
 
-A full reference to the obscraper public API can be found at :doc:`Public API Reference <api>`.
+A full reference to the obscraper public API can be found at
+:doc:`Public API Reference <api>`.
 
-For the full details, check out the well-documented `code <https://github.com/chris-mcdo/obscraper>`_.
+For the full details, check out the well-documented
+`code <https://github.com/chris-mcdo/obscraper>`_.
 
 Bugs/Requests
 *************
@@ -80,13 +82,15 @@ to submit bugs or request features.
 Changelog
 *********
 
-See the :doc:`Changelog <changelog>` for a list of fixes and enhancements of each version.
+See the :doc:`Changelog <changelog>` for a list of fixes and enhancements of each
+version.
 
 License
 *******
 
 Copyright (c) 2022 Christopher McDonald
 
-Distributed under the terms of the `MIT <https://github.com/chris-mcdo/obscraper/blob/main/LICENSE>`_ license.
+Distributed under the terms of the
+`MIT <https://github.com/chris-mcdo/obscraper/blob/main/LICENSE>`_ license.
 
 All overcomingbias posts are copyright the original authors.

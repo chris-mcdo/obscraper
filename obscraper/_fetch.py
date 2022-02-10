@@ -1,4 +1,4 @@
-"""Fetch multiple objects and place them in containers.
+"""Fetch multiple objects and place them in a container.
 
 Also perform exception handling and logging.
 """
@@ -15,15 +15,13 @@ logger = logging.getLogger(__name__)
 
 
 async def fetch(results, label, func, obj_type=None):
-    """Fetch result and place in container.
+    """Fetch result and place them in a container.
 
-    The return value of ``func`` is placed in the ``results`` dict,
-    under the dict key ``label``. ``obj_name`` (optional) gives the type
-    of the object (e.g. post) returned by ``func`` (this is used for
-    logging only).
+    The return value of `func` is placed in the `results` dict, under the dict key
+    `label`. `obj_name` (optional) gives the type of the object (e.g. post) returned by
+    `func` (this is used for logging only).
 
-    If you want to pass arguments to ``func``, use a functools.partial
-    object.
+    If you want to pass arguments to `func`, use a `functools.partial` object.
 
     Parameters
     ----------
@@ -60,7 +58,7 @@ async def fetch(results, label, func, obj_type=None):
 
 
 async def fetch_posts(names_dict):
-    """Get list of posts."""
+    """Fetch dict of posts."""
     results = {}
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
@@ -72,7 +70,7 @@ async def fetch_posts(names_dict):
 
 
 async def fetch_vote_counts(numbers_dict):
-    """Get list of vote counts."""
+    """Fetch dict of vote counts."""
     results = {}
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
@@ -84,7 +82,7 @@ async def fetch_vote_counts(numbers_dict):
 
 
 async def fetch_comment_counts(disqus_ids_dict):
-    """Get list of comment counts."""
+    """Fetch dict of comment counts."""
     results = {}
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
@@ -98,7 +96,7 @@ async def fetch_comment_counts(disqus_ids_dict):
 
 
 async def fetch_edit_dates():
-    """Get list of edit dates."""
+    """Fetch dict of edit dates."""
     results = {}
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:

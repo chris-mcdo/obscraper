@@ -1,4 +1,4 @@
-"""Assemble the results of downloading and tidying data.
+"""Assemble downloaded data into a tidy format.
 
 This module exists mainly to cache results of responses.
 
@@ -20,12 +20,11 @@ VOTE_AUTH_UPDATE_NAME = "/2011/12/life-is-good"
 
 
 def async_assembly_cache(maxsize, ttl, timer=time.monotonic, getsizeof=None):
-    """Custom TTL cache for the ``assemble`` functions.
+    """Custom TTL cache for the `assemble` functions.
 
-    Differs from the ``cachetools`` default by implementing a
-    (thread-safe) ``cache_clear`` method, and ignoring the
-    ``async_client`` argument. This lets it store results across
-    sessions.
+    Differs from the `cachetools` default by implementing a thread-safe
+    `cache_clear` method, and ignoring the `async_client` argument. This lets it
+    store results across sessions.
 
     And it's asynchronous.
     """
@@ -41,7 +40,7 @@ def async_assembly_cache(maxsize, ttl, timer=time.monotonic, getsizeof=None):
         # Inpsired by https://github.com/tkem/cachetools/issues/92
         @functools.wraps(func)
         async def wrapper(async_client, *args, **kwargs):
-            # Hash key ignores ``async_client``, so that results are
+            # Hash key ignores `async_client`, so that results are
             # cached across sessions.
             key = cachetools.keys.hashkey(*args, **kwargs)
             try:
