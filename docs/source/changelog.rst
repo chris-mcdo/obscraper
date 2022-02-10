@@ -4,6 +4,47 @@ Changelog
 Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_
 standard.
 
+obscraper 0.5.0 (2022-02-10)
+****************************
+
+Major update.
+
+Improvements
+############
+
+- Asynchronous execution: internals now execute requests and postprocessing
+  asynchronously using `trio <https://github.com/python-trio/trio>`_. This is at least
+  10% faster than the previous multithreaded version.
+
+- Improved tests: migrated all tests to pytest. Added more systematic testing of random
+  posts.
+
+- Sessions: internals now use (asynchronous) sessions, reducing the load on the
+  overcomingbias server and increasing download speed.
+
+
+Breaking changes
+################
+
+- Updated interface for consistency and clarity:
+
+  - ``grab_edit_dates`` is now :ref:`get_edit_dates <get-edit-dates>`
+
+  - ``get_votes`` and ``get_comments`` are now :ref:`get_vote_counts <get-vote-counts>`
+    and :ref:`get_comment_counts <get-comment-counts>`
+
+- Updated behaviour of :ref:`get_all_posts <get-all-posts>` to return None when the post
+  could not be retrieved.
+
+- Removed outdated ``max_workers`` argument from public API functions.
+
+
+Trivial / internal changes
+##########################
+
+- Source code now follows the `black <https://github.com/psf/black>`_ format.
+
+
 obscraper 0.4.0 (2022-02-06)
 ****************************
 
