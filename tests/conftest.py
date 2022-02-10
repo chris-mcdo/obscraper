@@ -32,9 +32,8 @@ def http_client():
 
 @pytest.fixture
 async def async_http_client():
-    client = httpx.AsyncClient(headers={"user-agent": "Mozilla/5.0"})
-    yield client
-    await client.aclose()
+    with httpx.AsyncClient(headers={"user-agent": "Mozilla/5.0"}) as async_client:
+        yield async_client
 
 
 @pytest.fixture
