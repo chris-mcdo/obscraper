@@ -20,9 +20,6 @@ VOTE_API_URL = (
 COMMENT_API_URL = "https://overcoming-bias.disqus.com/count-data.js"
 EDIT_DATES_URL = "https://www.overcomingbias.com/post.xml"
 
-# Name used to update the vote auth code
-VOTE_AUTH_UPDATE_NAME = "/2011/12/life-is-good"
-
 
 def async_retry(start_delay):
     """Either return a 2xx response, try again, or raise an error."""

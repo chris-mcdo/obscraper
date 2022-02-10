@@ -15,6 +15,9 @@ import cachetools.keys
 
 from . import _download, _tidy
 
+# Name used to update the vote auth code
+VOTE_AUTH_UPDATE_NAME = "/2011/12/life-is-good"
+
 
 def async_assembly_cache(maxsize, ttl, timer=time.monotonic, getsizeof=None):
     """Custom TTL cache for the ``assemble`` functions.
@@ -112,8 +115,6 @@ async def assemble_edit_dates(async_client):
 @async_assembly_cache(maxsize=1, ttl=43200)
 async def assemble_vote_auth(async_client):
     """Download and tidy the vote auth code."""
-    raw_response = await _download.download_post(
-        async_client, _download.VOTE_AUTH_UPDATE_NAME
-    )
+    raw_response = await _download.download_post(async_client, VOTE_AUTH_UPDATE_NAME)
     tidy_item = _tidy.tidy_vote_auth(raw_response)
     return tidy_item
