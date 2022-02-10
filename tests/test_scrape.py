@@ -1,453 +1,330 @@
-
-import unittest
-from unittest.mock import MagicMock, patch
-
 import datetime
+from unittest.mock import AsyncMock, patch
 
-from obscraper import _exceptions, _extract_post, _grab, _post, _scrape, _utils
+import pytest
+from utils import tidy_us_date
 
-
-class TestGetAllPosts(unittest.TestCase):
-    @patch('obscraper._grab.grab_edit_dates')
-    def test_returns_correct_result_for_fake_edit_list(self, mock_grab_edit_dates):
-        def tidy(d):
-            return _utils.tidy_date(d, 'US/Eastern')
-        edit_dates = {
-            '/2006/11/introduction': tidy('November 22, 2006 6:17 am'),
-            '/2007/10/a-rational-argu': tidy('October 5, 2007 2:31 pm'),
-            '/2021/04/shoulda-listened-futures': tidy('July 2, 2021 9:15 am')
-        }
-        mock_grab_edit_dates.return_value = edit_dates
-        posts = _scrape.get_all_posts()
-        self.assertEqual(len(posts), 2)
-        for name, p in posts.items():
-            self.assertEqual(p.edit_date, edit_dates[name])
+from obscraper import _exceptions, _scrape
+from obscraper._extract_post import name_to_url
 
 
-class TestGetPostByURL(unittest.TestCase):
-    def setUp(self):
-        fake_posts = {
-            '/2006/11/introduction': 1,
-            '/2021/10/what-makes-stuff-rot': 2,
-            '/2014/07/limits-on-generality': 3,
-        }
-        patch_grab_post = patch('obscraper._grab.grab_post_by_name',
-                                side_effect=lambda v: fake_posts.get(v, None))
-        patch_attach_dates = patch('obscraper._scrape.attach_edit_dates',
-                                   side_effect=lambda v: v)
-        self.mock_grab_post = patch_grab_post.start()
-        self.mock_attach_dates = patch_attach_dates.start()
-        self.addCleanup(patch.stopall)
+def now():
+    return datetime.datetime.now(datetime.timezone.utc)
 
-    def test_raises_type_error_if_url_is_wrong_type(self):
-        for url in [None, 35]:
-            self.assertRaises(TypeError, _scrape.get_post_by_url, url)
 
-    def test_raises_value_error_if_url_in_wrong_format(self):
-        for url in [
-            'Not a url',
-            'https://www.overcomingbias.com/?p=12345',
-            'https://www.overcomingbias.com/abc/de/fg.html',
-            'https://www.overcomingbias.com/1234/56/ab',
-            'https://www.overcomingbias.com/archives',
-        ]:
-            self.assertRaises(ValueError, _scrape.get_post_by_url, url)
+def days_from_now(n):
+    return now() + n * datetime.timedelta(days=1)
 
-    def test_raises_error_when_post_not_found(self):
-        url = 'https://www.overcomingbias.com/2021/10/not-a-real-post.html'
-        self.assertRaises(_exceptions.InvalidResponseError, _scrape.get_post_by_url, url)
 
-    def test_returns_valid_posts_for_valid_urls(self):
-        url = 'https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html'
-        p = _scrape.get_post_by_url(url)
-        self.assertEqual(p, 2)
+@pytest.fixture
+def mock_fetch_posts():
+    """Return mock posts for 3 examples, and None otherwise."""
+    fake_posts = {
+        "/2006/11/introduction": "intro",
+        "/2021/10/what-makes-stuff-rot": "rot",
+        "/2014/07/limits-on-generality": "generality",
+    }
 
-class TestGetPostByName(unittest.TestCase):
-    def setUp(self):
-        fake_posts = {
-            '/2006/11/introduction': 1,
-            '/2021/10/what-makes-stuff-rot': 2,
-            '/2014/07/limits-on-generality': 3,
-        }
-        patch_grab_post = patch('obscraper._grab.grab_post_by_name',
-                                side_effect=lambda v: fake_posts.get(v, None))
-        patch_attach_dates = patch('obscraper._scrape.attach_edit_dates',
-                                   side_effect=lambda v: v)
-        self.mock_grab_post = patch_grab_post.start()
-        self.mock_attach_dates = patch_attach_dates.start()
-        self.addCleanup(patch.stopall)
+    async def fetch_posts(names_dict):
+        results = {}
+        for label, name in names_dict.items():
+            results[label] = fake_posts.get(name, None)
 
-    def test_raises_type_error_if_name_is_wrong_type(self):
-        for name in [None, 35]:
-            self.assertRaises(TypeError, _scrape.get_post_by_name, name)
+        return results
 
-    def test_raises_value_error_if_name_in_wrong_format(self):
-        for name in [
-            'Not a name',
-            '/?p=12345',
-            '/abc/de/fg.html',
-            '/archives',
-        ]:
-            self.assertRaises(ValueError, _scrape.get_post_by_name, name)
+    return AsyncMock(side_effect=fetch_posts)
 
-    def test_raises_error_when_post_not_found(self):
-        name = '/2021/10/not-a-real-post'
-        self.assertRaises(_exceptions.InvalidResponseError, _scrape.get_post_by_name, name)
 
-    def test_returns_valid_posts_for_valid_names(self):
-        name = '/2021/10/what-makes-stuff-rot'
-        p = _scrape.get_post_by_name(name)
-        self.assertEqual(p, 2)
-
-class TestGetPostsByNames(unittest.TestCase):
-    def test_returns_valid_posts_for_valid_names(self):
-        names = [
-            '/2021/10/what-makes-stuff-rot',
-            '/2014/07/limits-on-generality',
-            r'/2007/01/the-procrastinator%e2%80%99s-clock',  # valid
-        ]
-        posts = _scrape.get_posts_by_names(names)
-        self.assertIsInstance(posts, dict)
-        self.assertTrue(len(posts), len(names))
-        for p in posts.values():
-            self.assert_is_valid_post(p)
-            self.assertIn(p.name, names)
-
+class TestGetPostsByNames:
     def test_returns_empty_dict_for_empty_list(self):
         names = []
         posts = _scrape.get_posts_by_names(names)
-        self.assertEqual(posts, {})
+        assert posts == {}
 
     def test_raises_type_error_if_names_are_wrong_type(self):
         for names in [
-            ['/2007/10/a-rational-argu', None],
+            ["/2007/10/a-rational-argu", None],
             [3514, 8293],
         ]:
-            self.assertRaises(TypeError, _scrape.get_posts_by_names, names)
+            with pytest.raises(TypeError):
+                _scrape.get_posts_by_names(names)
 
     def test_raises_value_error_if_names_in_wrong_format(self):
         for names in [
-            ['Not a name'],
-            ['/'],
-            ['/123/456/ok'],
-            ['/post'],
-            ['/page/20/post'],
-            ['/archives'],
+            ["Not a name"],
+            ["/"],
+            ["/123/456/ok"],
+            ["/post"],
+            ["/page/20/post"],
+            ["/archives"],
         ]:
-            self.assertRaises(ValueError, _scrape.get_posts_by_names, names)
-
-    def test_returns_none_for_nonexistent_names(self):
-        names = [
-            '/2007/10/a-rational-argu',  # LessWrong
-            '/2012/08/not-a-real-post',  # Fake
-            '/2012/02/why-retire',  # Valid
-        ]
-        posts = _scrape.get_posts_by_names(names)
-        self.assertIsNone(posts[names[0]])
-        self.assertIsNone(posts[names[1]])
-        self.assert_is_valid_post(posts[names[2]])
-
-    def test_returns_none_for_post_which_raises_attribute_not_found(self):
-        # Post /2009/02/the-most-important-thing is broken, so needs to be
-        # handled as a special case
-        name = '/2009/02/the-most-important-thing'
-        try:
-            tricky_post = _scrape.get_posts_by_names([name])[name]
-        except _exceptions.AttributeNotFoundError:
-            self.fail()
-        self.assertIsNone(tricky_post)
+            with pytest.raises(ValueError):
+                _scrape.get_posts_by_names(names)
 
 
-    def assert_is_valid_post(self, p):
-        self.assertIsInstance(p, _post.Post)
-        self.assertGreaterEqual(p.word_count, 5)
-        self.assertGreaterEqual(p.votes, 0)
-        self.assertGreaterEqual(p.comments, 0)
+class TestGetPostByName:
+    def test_raises_type_error_if_name_is_wrong_type(self):
+        for name in [None, 35]:
+            with pytest.raises(TypeError):
+                _scrape.get_post_by_name(name)
+
+    def test_raises_value_error_if_name_in_wrong_format(self):
+        for name in [
+            "Not a name",
+            "/?p=12345",
+            "/abc/de/fg.html",
+            "/archives",
+        ]:
+            with pytest.raises(ValueError):
+                _scrape.get_post_by_name(name)
+
+    def test_raises_error_when_post_not_found(self, mock_fetch_posts):
+        name = "/2021/10/not-a-real-post"
+        with patch("obscraper._fetch.fetch_posts", mock_fetch_posts):
+            with pytest.raises(_exceptions.InvalidResponseError):
+                _scrape.get_post_by_name(name)
+        assert mock_fetch_posts.call_count == 1
+
+    def test_returns_valid_posts_for_valid_names(self, mock_fetch_posts):
+        name = "/2021/10/what-makes-stuff-rot"
+        with patch("obscraper._fetch.fetch_posts", mock_fetch_posts):
+            fake_post = _scrape.get_post_by_name(name)
+        assert mock_fetch_posts.call_count == 1
+        assert fake_post == "rot"
 
 
-class TestGetPostsByURLs(unittest.TestCase):
-    def setUp(self):
-        fake_posts = {
-            '/2006/11/introduction': 1,
-            '/2021/10/what-makes-stuff-rot': 2,
-            '/2014/07/limits-on-generality': 3,
-        }
-        patch_grab_post = patch('obscraper._grab.grab_post_by_name',
-                                side_effect=lambda v: fake_posts.get(v, None))
-        patch_attach_dates = patch('obscraper._scrape.attach_edit_dates',
-                                   side_effect=lambda v: v)
-        self.mock_grab_post = patch_grab_post.start()
-        self.mock_attach_dates = patch_attach_dates.start()
-        self.addCleanup(patch.stopall)
-
+class TestGetPostsByURLs:
     def test_returns_empty_dict_for_empty_list(self):
         urls = []
         posts = _scrape.get_posts_by_urls(urls)
-        self.assertEqual(posts, {})
+        assert posts == {}
 
     def test_raises_type_error_if_urls_are_wrong_type(self):
         for urls in [
-            ['https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html', None],
+            ["https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html", None],
             [3514, 8293],
         ]:
-            self.assertRaises(TypeError, _scrape.get_posts_by_urls, urls)
+            with pytest.raises(TypeError):
+                _scrape.get_posts_by_urls(urls)
 
     def test_raises_value_error_if_urls_in_wrong_format(self):
         for urls in [
-            ['Not a url'],
-            ['https://www.overcomingbias.com/?p=12345'],
-            ['https://www.overcomingbias.com/abc/de/fg.html'],
-            ['https://www.overcomingbias.com/1234/56/ab'],
-            ['https://www.overcomingbias.com/page/20/'],
-            ['https://www.overcomingbias.com/archives'],
+            ["Not a url"],
+            ["https://www.overcomingbias.com/?p=12345"],
+            ["https://www.overcomingbias.com/abc/de/fg.html"],
+            ["https://www.overcomingbias.com/1234/56/ab"],
+            ["https://www.overcomingbias.com/page/20/"],
+            ["https://www.overcomingbias.com/archives"],
         ]:
-            self.assertRaises(ValueError, _scrape.get_posts_by_urls, urls)
+            with pytest.raises(ValueError):
+                _scrape.get_posts_by_urls(urls)
 
-    def test_returns_valid_posts_for_valid_urls(self):
+    def test_returns_valid_posts_for_valid_urls(self, mock_fetch_posts):
         urls = [
-            'https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html',
-            'https://www.overcomingbias.com/2015/08/not-a-real-post.html',
+            "https://www.overcomingbias.com/2021/10/what-makes-stuff-rot.html",
+            "https://www.overcomingbias.com/2015/08/not-a-real-post.html",
         ]
-        posts = _scrape.get_posts_by_urls(urls)
-        self.assertIsInstance(posts, dict)
-        self.assertEqual(len(posts), 2)
-        self.assertEqual(posts[urls[0]], 2)
-        self.assertIsNone(posts[urls[1]])
+        with patch("obscraper._fetch.fetch_posts", mock_fetch_posts):
+            posts = _scrape.get_posts_by_urls(urls)
+        assert isinstance(posts, dict)
+        assert len(posts) == 2
+        assert posts[urls[0]] == "rot"
+        assert posts[urls[1]] is None
 
 
-class TestGetPostsByEditDate(unittest.TestCase):
-    def test_returns_valid_results_for_valid_arguments(self):
-        with patch('obscraper._grab.grab_edit_dates', return_value=_grab.grab_edit_dates()) as mock_grab_edit_dates:
-            now = datetime.datetime.now(datetime.timezone.utc)
-            dday = datetime.timedelta(days=1)
-            self.assertEqual(_scrape.get_posts_by_edit_date(
-                now+dday, now+5*dday), {})
-            last_week = _scrape.get_posts_by_edit_date(now-7*dday, now)
-            self.assertIsInstance(last_week, dict)
-            [self.assertTrue(_extract_post.is_valid_post_name(name))
-             for name in last_week.keys()]
-            [self.assertIsInstance(p, _post.Post) for p in last_week.values()]
+class TestGetPostByURL:
+    def test_raises_type_error_if_url_is_wrong_type(self):
+        for url in [None, 35]:
+            with pytest.raises(TypeError):
+                _scrape.get_post_by_url(url)
 
+    def test_raises_value_error_if_url_in_wrong_format(self):
+        for url in [
+            "Not a url",
+            "https://www.overcomingbias.com/?p=12345",
+            "https://www.overcomingbias.com/abc/de/fg.html",
+            "https://www.overcomingbias.com/1234/56/ab",
+            "https://www.overcomingbias.com/archives",
+        ]:
+            with pytest.raises(ValueError):
+                _scrape.get_post_by_url(url)
+
+    def test_raises_error_when_post_not_found(self):
+        url = "https://www.overcomingbias.com/2021/10/not-a-real-post.html"
+        with pytest.raises(_exceptions.InvalidResponseError):
+            _scrape.get_post_by_url(url)
+
+    def test_returns_valid_posts_for_valid_urls(self, mock_fetch_posts):
+        url = "https://www.overcomingbias.com/2006/11/introduction.html"
+        with patch("obscraper._fetch.fetch_posts", mock_fetch_posts):
+            fake_post = _scrape.get_post_by_url(url)
+        assert fake_post == "intro"
+
+
+class TestGetPostsByEditDate:
     def test_raises_type_error_if_dates_are_wrong_type(self):
-        now = datetime.datetime.now(datetime.timezone.utc)
-        dday = datetime.timedelta(days=1)
-        self.assertRaises(TypeError, _scrape.get_posts_by_edit_date,
-                          start_date=now, end_date=datetime.datetime.now())
-        self.assertRaises(TypeError, _scrape.get_posts_by_edit_date,
-                          start_date=now - 3 * dday, end_date='hi')
-        self.assertRaises(TypeError, _scrape.get_posts_by_edit_date,
-                          start_date=12345, end_date=now)
+        # Naive datetime
+        with pytest.raises(TypeError):
+            _scrape.get_posts_by_edit_date(
+                start_date=now(), end_date=datetime.datetime.now()
+            )
+
+        # String
+        with pytest.raises(TypeError):
+            _scrape.get_posts_by_edit_date(
+                start_date=days_from_now(-5),
+                end_date="hi",
+            )
+
+        # Int
+        with pytest.raises(TypeError):
+            _scrape.get_posts_by_edit_date(start_date=1, end_date=now())
 
     def test_raises_value_error_if_end_date_before_start_date(self):
-        now = datetime.datetime.now(datetime.timezone.utc)
-        dday = datetime.timedelta(days=1)
-        self.assertRaises(ValueError, _scrape.get_posts_by_edit_date,
-                          start_date=now+dday, end_date=now-dday)
+        with pytest.raises(ValueError):
+            _scrape.get_posts_by_edit_date(start_date=now(), end_date=days_from_now(-1))
+
+    def test_returns_valid_results_for_valid_arguments(
+        self, edit_dates, mock_fetch_posts
+    ):
+        with patch("obscraper._scrape.get_edit_dates", return_value=edit_dates):
+            with patch("obscraper._fetch.fetch_posts", mock_fetch_posts):
+                # Future dates return empty dict
+                assert _scrape.get_posts_by_edit_date(now(), days_from_now(5)) == {}
+
+                # Past dates
+                start_date = days_from_now(-1200)
+                end_date = days_from_now(-800)
+                posts = _scrape.get_posts_by_edit_date(start_date, end_date)
+
+                # Check all names in results are in valid range
+                for name in posts.keys():
+                    assert start_date < edit_dates[name] < end_date
+
+                # Check all names in the date range are in results
+                for name, date in edit_dates.items():
+                    if start_date < date < end_date:
+                        assert name in posts.keys()
 
 
-class TestGetVotes(unittest.TestCase):
-    def test_returns_valid_vote_counts_for_valid_post_numbers(self):
-        post_numbers = {
-            'https://www.overcomingbias.com/2006/11/introduction.html': 18402,
-            'https://www.overcomingbias.com/2007/03/the_very_worst_.html': 18141,
-            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 18423,
-            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': 32811,
-            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html': 33023,
-        }
-        votes = _scrape.get_votes(post_numbers)
-        for label, vote in votes.items():
-            self.assertIn(label, post_numbers.keys())
-            self.assertIsInstance(vote, int)
-            self.assertGreaterEqual(vote, 0)
+def test_get_all_posts_works_for_fake_edit_list():
+    edit_dates = {
+        "/2006/11/introduction": tidy_us_date("November 22, 2006 6:17 am"),
+        "/2007/10/a-rational-argu": tidy_us_date("October 5, 2007 2:31 pm"),
+        "/2021/04/shoulda-listened-futures": tidy_us_date("July 2, 2021 9:15 am"),
+    }
+    with patch(
+        "obscraper._assemble.assemble_edit_dates", AsyncMock(return_value=edit_dates)
+    ) as mock_fetch_edit_dates:
+        posts = _scrape.get_all_posts()
+
+    assert mock_fetch_edit_dates.call_count >= 1
+    assert len(posts) == 2
+    for name, p in posts.items():
+        assert p.edit_date == edit_dates[name]
+
+
+class TestGetVotes:
+    def test_returns_empty_dict_for_empty_dict(self):
+        urls = {}
+        posts = _scrape.get_votes(urls)
+        assert posts == {}
 
     def test_raises_type_error_if_arguments_are_wrong_type(self):
         for post_numbers in [
             18402,
             {
-                'https://www.overcomingbias.com/2006/11/introduction.html': 18402,
-                12345: 45678
+                name_to_url("/2006/11/introduction"): 18402,
+                12345: 45678,
             },
             {
-                'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 18423,
-                'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': 'Rogue string',
+                name_to_url("/2009/05/we-only-need-a-handshake"): 18423,
+                name_to_url("/2021/04/shoulda-listened-futures"): "Rogue string",
             },
         ]:
-            self.assertRaises(TypeError, _scrape.get_votes, post_numbers)
+            with pytest.raises(TypeError):
+                _scrape.get_votes(post_numbers)
 
     def test_raises_value_error_if_arguments_have_wrong_value(self):
         for post_numbers in [
+            {"intro": 18402, "new": 4567},
             {
-                'intro': 18402,
-                'new': 4567
-            },
-            {
-                'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html': 18423,
-                'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html': 123456,
+                name_to_url("/2009/05/we-only-need-a-handshake"): 18423,
+                name_to_url("/2021/04/shoulda-listened-futures"): 123456,
             },
         ]:
-            self.assertRaises(ValueError, _scrape.get_votes, post_numbers)
-
-    def test_calls_map_with_delay_with_correct_arguments(self):
-        with patch('obscraper._future.map_with_delay') as mock_map_with_delay:
-            intro_number = {'intro': 18402}
-            mock_map_with_delay.return_value = 5
-            fake_votes = _scrape.get_votes(intro_number, max_workers=3)
-        mock_map_with_delay.assert_called_once()
-        self.assertEqual(mock_map_with_delay.call_args.args[1], intro_number)
-        self.assertEqual(
-            mock_map_with_delay.call_args.kwargs['max_workers'], 3)
-        self.assertEqual(fake_votes, 5)
-
-    def test_exception_raised_when_invalid_max_workers_passed(self):
-        get_votes = _scrape.get_votes
-        intro_numbers = {'intro': 18402}
-        self.assertRaises(TypeError, get_votes,
-                          intro_numbers, max_workers='string')
-        self.assertRaises(ValueError, get_votes,
-                          intro_numbers, max_workers=-0.5)
+            with pytest.raises(ValueError):
+                _scrape.get_votes(post_numbers)
 
 
-class TestGetComments(unittest.TestCase):
-    def test_returns_valid_comment_counts_for_valid_disqus_ids(self):
-        disqus_ids = {
-            'https://www.overcomingbias.com/2006/11/introduction.html':
-            '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
-            'https://www.overcomingbias.com/2007/03/the_very_worst_.html':
-            '18141 http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html',
-            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html':
-            '18423 http://www.overcomingbias.com/?p=18423',
-            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html':
-            '32811 http://www.overcomingbias.com/?p=32811',
-            'https://www.overcomingbias.com/2021/12/innovation-liability-nightmare.html':
-            '33023 https://www.overcomingbias.com/?p=33023',
-        }
-        comments = _scrape.get_comments(disqus_ids)
-        for label, comment in comments.items():
-            self.assertIn(label, disqus_ids.keys())
-            self.assertIsInstance(comment, int)
-            self.assertGreater(comment, 1)
+class TestGetComments:
+    def test_returns_empty_dict_for_empty_dict(self):
+        urls = {}
+        posts = _scrape.get_comments(urls)
+        assert posts == {}
 
     def test_raises_type_error_if_arguments_are_wrong_type(self):
         for disqus_ids in [
-            '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
+            "18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html",
             {
-                'https://www.overcomingbias.com/2006/11/introduction.html':
-                '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
-                'https://www.overcomingbias.com/2007/03/the_very_worst_.html':
-                18481,
+                name_to_url(
+                    "/2006/11/introduction"
+                ): "18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html",
+                name_to_url("/2007/03/the_very_worst_"): 18481,
             },
             {
-                'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html':
-                '18423 http://www.overcomingbias.com/?p=18423',
-                35618:
-                '32811 http://www.overcomingbias.com/?p=32811',
-            }
+                name_to_url(
+                    "/2009/05/we-only-need-a-handshake"
+                ): "18423 http://www.overcomingbias.com/?p=18423",
+                35618: "32811 http://www.overcomingbias.com/?p=32811",
+            },
         ]:
-            self.assertRaises(TypeError, _scrape.get_comments, disqus_ids)
+            with pytest.raises(TypeError):
+                _scrape.get_comments(disqus_ids)
 
     def test_raises_value_error_if_arguments_have_wrong_value(self):
-        dt = _utils.tidy_date('October 15, 2013 6:10 pm', 'US/Eastern')
         for disqus_ids in [
             {
-                'https://www.overcomingbias.com/2006/11/introduction.html':
-                '18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html',
-                'https://www.overcomingbias.com/2007/03/the_very_worst_.html':
-                '18141 http://prod.ob.trike.com.au/?p=18141',
+                name_to_url(
+                    "/2006/11/introduction"
+                ): "18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html",
+                name_to_url(
+                    "/2007/03/the_very_worst_"
+                ): "18141 http://prod.ob.trike.com.au/?p=18141",
             },
-            {'https://www.overcomingbias.com/2006/11/introduction.html': ''},
+            {name_to_url("/2006/11/introduction"): ""},
         ]:
-            self.assertRaises(ValueError, _scrape.get_comments, disqus_ids)
+            with pytest.raises(ValueError):
+                _scrape.get_comments(disqus_ids)
 
     def test_returns_none_for_invalid_numbers(self):
-        none_urls = [
-            'https://www.overcomingbias.com/2007/03/the_very_worst_.html',
-            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html',
-        ]
-        real_urls = [
-            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html']
         disqus_ids = {
-            'https://www.overcomingbias.com/2007/03/the_very_worst_.html':
-            '12345 http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html',
-            'https://www.overcomingbias.com/2009/05/we-only-need-a-handshake.html':
-            '18423 http://www.overcomingbias.com/?p=18423',
-            'https://www.overcomingbias.com/2021/04/shoulda-listened-futures.html':
-            '65432 http://www.overcomingbias.com/?p=65432',
+            name_to_url("/2007/03/the_very_worst_"): "12345"
+            " http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html",
+            name_to_url("/2021/04/shoulda-listened-futures"): "65432"
+            " http://www.overcomingbias.com/?p=65432",
         }
         comments = _scrape.get_comments(disqus_ids)
-        for url in none_urls:
-            self.assertIsNone(comments[url])
-        for url in real_urls:
-            self.assertIsInstance(comments[url], int)
-            self.assertGreater(comments[url], 1)
+        for url in disqus_ids.keys():
+            assert comments[url] is None
 
 
-class TestAttachEditDates(unittest.TestCase):
-    def test_returns_post_with_date_attached_for_fake_posts_and_dates(self):
-        # Expect more edit dates than posts
-        edit_dates = {f'name {i+1}': f'edit date {i+1}' for i in range(10)}
-        posts = {}
-        for i in range(5):
-            # name attribute is special for mocks - it must be set after init
-            mock = MagicMock()
-            mock.name=f'name {2*i+2}'
-            posts[f"name {2*i+2}"] = mock
-        with patch('obscraper._grab.grab_edit_dates', return_value=edit_dates) as mock_edit_dates:
-            posts = _scrape.attach_edit_dates(posts)
-        mock_edit_dates.assert_called_once()
-        for i, p in enumerate(posts.values()):
-            self.assertEqual(p.edit_date, f'edit date {2*i+2}')
-
-    def test_returns_none_for_invalid_post(self):
-        # Posts which could not be found are returned as None
-        edit_dates = {'fake name': 'fake edit date'}
-        with patch('obscraper._grab.grab_edit_dates', return_value=edit_dates) as mock_edit_dates:
-            invalid_post = _scrape.attach_edit_dates({'fake name': None})
-        mock_edit_dates.assert_called_once()
-        self.assertIsNone(invalid_post['fake name'])
-
-
-class TestRaiseExceptionIfNumberHasIncorrectFormat(unittest.TestCase):
-    def test_no_exception_raised_if_number_has_correct_format(self):
-        check_number = _scrape.raise_exception_if_number_has_incorrect_format
+class TestRaiseExceptionIfNumberHasIncorrectFormat:
+    @pytest.mark.parametrize("number", [12345, 54321, 10000, 99999])
+    def test_no_exception_raised_if_number_has_correct_format(self, number):
         try:
-            check_number(12345)
-            check_number(54321)
-            check_number(10000)
-            check_number(99999)
+            _scrape.raise_exception_if_number_has_incorrect_format(number)
         except ValueError:
-            self.fail('ValueError raised')
+            pytest.fail("ValueError raised")
         except TypeError:
-            self.fail('TypeError raised')
+            pytest.fail("TypeError raised")
 
-    def test_type_error_raised_if_number_has_wrong_type(self):
-        check_number = _scrape.raise_exception_if_number_has_incorrect_format
-        self.assertRaises(TypeError, check_number, 'Hello')
-        self.assertRaises(TypeError, check_number, ['A', 'List'])
-        self.assertRaises(TypeError, check_number, 32.591)
-        self.assertRaises(TypeError, check_number, [12345])
+    @pytest.mark.parametrize("number", ["Hello", ["A", "List"], 32.591, [12345]])
+    def test_type_error_raised_if_number_has_wrong_type(self, number):
+        with pytest.raises(TypeError):
+            _scrape.raise_exception_if_number_has_incorrect_format(number)
 
-    def test_value_error_raised_if_number_is_not_5_digits(self):
-        check_number = _scrape.raise_exception_if_number_has_incorrect_format
-        self.assertRaises(ValueError, check_number, 1)
-        self.assertRaises(ValueError, check_number, 9999)
-        self.assertRaises(ValueError, check_number, 100000)
-        self.assertRaises(ValueError, check_number, -12594)
-
-
-class TestClearCache(unittest.TestCase):
-    @patch('obscraper._extract_post.is_ob_post_html', return_value=True)
-    def test_clears_grab_post_cache(self, mock_is_ob_post):
-        _scrape.clear_cache()
-
-        p1 = _grab.grab_post_by_name('/2021/12/innovation-liability-nightmare')
-        self.assertIsInstance(p1, _post.Post)
-        mock_is_ob_post.assert_called_once()
-
-        p2 = _grab.grab_post_by_name('/2021/12/innovation-liability-nightmare')
-        self.assertEqual(p1, p2)
-        mock_is_ob_post.assert_called_once()
-
-        _scrape.clear_cache()
-
-        p3 = _grab.grab_post_by_name('/2021/12/innovation-liability-nightmare')
-        self.assertEqual(mock_is_ob_post.call_count, 2)
+    @pytest.mark.parametrize("number", [1, 9999, 100000, -12345])
+    def test_value_error_raised_if_number_is_not_5_digits(self, number):
+        with pytest.raises(ValueError):
+            _scrape.raise_exception_if_number_has_incorrect_format(number)
