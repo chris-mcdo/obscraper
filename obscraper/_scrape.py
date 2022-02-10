@@ -86,8 +86,7 @@ def get_votes(post_numbers):
         return {}
 
     # Run
-    vote_auth = trio.run(_fetch.fetch_vote_auth)
-    votes = trio.run(_fetch.fetch_vote_counts, post_numbers, vote_auth)
+    votes = trio.run(_fetch.fetch_vote_counts, post_numbers)
 
     return votes
 

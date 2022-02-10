@@ -75,8 +75,7 @@ async def assemble_post(async_client, name, votes=True, comments=True, edit_date
     post = _tidy.tidy_post(raw_response)
 
     if votes:
-        vote_auth = await assemble_vote_auth(async_client)
-        post.votes = await assemble_vote_count(async_client, post.number, vote_auth)
+        post.votes = await assemble_vote_count(async_client, post.number)
 
     if comments:
         post.comments = await assemble_comment_count(async_client, post.disqus_id)
@@ -89,8 +88,9 @@ async def assemble_post(async_client, name, votes=True, comments=True, edit_date
 
 
 @async_assembly_cache(maxsize=5000, ttl=3600)
-async def assemble_vote_count(async_client, vote_id, vote_auth):
+async def assemble_vote_count(async_client, vote_id):
     """Download and tidy a vote count."""
+    vote_auth = await assemble_vote_auth(async_client)
     raw_response = await _download.download_vote_count(async_client, vote_id, vote_auth)
     tidy_item = _tidy.tidy_vote_count(raw_response)
     return tidy_item

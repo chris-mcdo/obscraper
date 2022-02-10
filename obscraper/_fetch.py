@@ -75,14 +75,14 @@ async def fetch_posts(names_dict):
     return results
 
 
-async def fetch_vote_counts(vote_ids_dict, vote_auth):
+async def fetch_vote_counts(vote_ids_dict):
     """Get list of vote counts."""
     results = {}
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
             for label, vote_id in vote_ids_dict.items():
                 assembler = partial(
-                    _assemble.assemble_vote_count, async_client, vote_id, vote_auth
+                    _assemble.assemble_vote_count, async_client, vote_id
                 )
                 fetcher = partial(fetch, results, label, assembler, "vote count")
                 nursery.start_soon(fetcher)
