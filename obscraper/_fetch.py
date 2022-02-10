@@ -54,11 +54,7 @@ async def fetch(results, label, func, obj_type=None):
             "AttributeNotFoundError raised when grabbing %(obj)s %(label)s", log_info
         )
 
-    if label in results.keys():
-        logger.warning(
-            "Results container already contains an entry" "for post %(obj)s %(label)s",
-            log_info,
-        )
+    assert label not in results.keys()
 
     results[label] = obj
 

@@ -6,7 +6,7 @@ import re
 import bs4
 import dateutil.parser
 
-from . import _exceptions, _extract_post, _post
+from . import _extract_post, _post
 
 
 def tidy_post(response):
@@ -31,10 +31,7 @@ def tidy_post(response):
         response text.
     """
     raw_html = bs4.BeautifulSoup(response.text, "lxml")
-    if not _extract_post.is_ob_post_html(raw_html):
-        raise _exceptions.InvalidResponseError(
-            "The downloaded page is not an overcomingbias post."
-        )
+    assert _extract_post.is_ob_post_html(raw_html), "HTML is not overcomingbias post."
 
     new_post = _post.Post(
         # URL and title
@@ -119,8 +116,7 @@ def tidy_comment_count(response):
     match = re.search(pattern, response.text).group()
     raw_json = json.loads(match)
 
-    if raw_json["counts"] == []:
-        raise _exceptions.InvalidResponseError("Comment count not found.")
+    assert raw_json["counts"] != [], "Comment count not found."
 
     comments = raw_json["counts"][0]["comments"]
     return comments
@@ -156,10 +152,7 @@ def tidy_edit_dates(response):
 def tidy_vote_auth(response):
     """Extract the vote auth code from a post page."""
     raw_html = bs4.BeautifulSoup(response.text, "lxml")
-    if not _extract_post.is_ob_post_html(raw_html):
-        raise _exceptions.InvalidResponseError(
-            "The downloaded page is not an overcomingbias post."
-        )
+    assert _extract_post.is_ob_post_html(raw_html), "HTML is not overcomingbias post."
 
     vote_auth = _extract_post.extract_vote_auth_code(raw_html)
     return vote_auth
