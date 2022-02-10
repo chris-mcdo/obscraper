@@ -47,11 +47,11 @@ def get_posts_by_names(names):
     return posts
 
 
-def get_votes(post_numbers):
+def get_vote_counts(post_numbers):
     """Get vote counts for some posts.
 
     If one of the numbers is in an incorrect format, an exception is
-    raised. Unlike other functions, ``get_votes`` returns 0 (rather than
+    raised. Unlike other functions, ``get_vote_counts`` returns 0 (rather than
     None) when a post is not found. This is because the vote count API
     returns a vote count of 0 for posts that do not exist - it is
     not possible to tell whether a post doesn't exist or if it just has

@@ -24,7 +24,7 @@ def test_core_api_produces_valid_posts_votes_and_comments(edit_dates):
         assert_is_valid_post(p)
 
     sample_numbers = {name: post.number for name, post in existing_posts.items()}
-    sample_votes = _scrape.get_votes(sample_numbers)
+    sample_votes = _scrape.get_vote_counts(sample_numbers)
     for v in sample_votes.values():
         assert is_valid_vote_or_comment_count(v)
 
@@ -52,15 +52,15 @@ def test_clears_grab_post_cache():
         with patch("obscraper._tidy.tidy_vote_count", Mock(side_effect=lambda v: v)):
             _scrape.clear_cache()
 
-            p1 = _scrape.get_votes(fake_post_numbers)
+            p1 = _scrape.get_vote_counts(fake_post_numbers)
             assert p1 == {"/2020/06/fake-post": 123}
             assert mock_download.call_count == 1
 
-            p2 = _scrape.get_votes(fake_post_numbers)
+            p2 = _scrape.get_vote_counts(fake_post_numbers)
             assert p2 == {"/2020/06/fake-post": 123}
             assert mock_download.call_count == 1
 
             _scrape.clear_cache()
-            p3 = _scrape.get_votes(fake_post_numbers)
+            p3 = _scrape.get_vote_counts(fake_post_numbers)
             assert p3 == {"/2020/06/fake-post": 321}
             assert mock_download.call_count == 2

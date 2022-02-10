@@ -225,10 +225,10 @@ def test_get_all_posts_works_for_fake_edit_list():
         assert p.edit_date == edit_dates[name]
 
 
-class TestGetVotes:
+class TestGetVoteCounts:
     def test_returns_empty_dict_for_empty_dict(self):
         urls = {}
-        posts = _scrape.get_votes(urls)
+        posts = _scrape.get_vote_counts(urls)
         assert posts == {}
 
     def test_raises_type_error_if_arguments_are_wrong_type(self):
@@ -244,7 +244,7 @@ class TestGetVotes:
             },
         ]:
             with pytest.raises(TypeError):
-                _scrape.get_votes(post_numbers)
+                _scrape.get_vote_counts(post_numbers)
 
     def test_raises_value_error_if_arguments_have_wrong_value(self):
         for post_numbers in [
@@ -255,7 +255,7 @@ class TestGetVotes:
             },
         ]:
             with pytest.raises(ValueError):
-                _scrape.get_votes(post_numbers)
+                _scrape.get_vote_counts(post_numbers)
 
 
 class TestGetCommentCounts:

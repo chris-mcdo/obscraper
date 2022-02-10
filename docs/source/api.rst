@@ -63,12 +63,12 @@ get_posts_by_edit_date
 
 .. autofunction:: obscraper.get_posts_by_edit_date
 
-.. _get-votes:
+.. _get-vote-counts:
 
-get_votes
-#########
+get_vote_counts
+###############
 
-.. autofunction:: obscraper.get_votes
+.. autofunction:: obscraper.get_vote_counts
 
 .. _get-comment-counts:
 

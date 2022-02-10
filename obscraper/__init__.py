@@ -14,14 +14,14 @@ from ._scrape import (
     get_posts_by_edit_date,
     get_posts_by_names,
     get_posts_by_urls,
-    get_votes,
+    get_vote_counts,
 )
 from ._serialize import PostDecoder, PostEncoder
 
 __all__ = [
     "Post",
     "get_posts_by_names",
-    "get_votes",
+    "get_vote_counts",
     "get_comment_counts",
     "get_edit_dates",
     "get_all_posts",
