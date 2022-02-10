@@ -257,6 +257,12 @@ class TestGetVoteCounts:
             with pytest.raises(ValueError):
                 _scrape.get_vote_counts(post_numbers)
 
+    def test_returns_zero_for_invalid_numbers(self):
+        numbers = {"not-a-real-post": 12345}
+        votes = _scrape.get_vote_counts(numbers)
+        for name in numbers.keys():
+            assert votes[name] == 0
+
 
 class TestGetCommentCounts:
     def test_returns_empty_dict_for_empty_dict(self):

@@ -6,7 +6,7 @@ import re
 import bs4
 import dateutil.parser
 
-from . import _extract_post, _post
+from . import _exceptions, _extract_post, _post
 
 
 def tidy_post(response):
@@ -76,11 +76,6 @@ def tidy_vote_count(response):
     -------
     int
         The vote count stated in the response.
-
-    Raises
-    ------
-    obscraper.InvalidAuthCodeError
-        If the response indicates an invalid vote auth code.
     """
     assert response.text != "-1", "Invalid Vote Auth Code."
 
@@ -116,7 +111,8 @@ def tidy_comment_count(response):
     match = re.search(pattern, response.text).group()
     raw_json = json.loads(match)
 
-    assert raw_json["counts"] != [], "Comment count not found."
+    if raw_json["counts"] == []:
+        raise _exceptions.InvalidResponseError("Comment count not found.")
 
     comments = raw_json["counts"][0]["comments"]
     return comments
