@@ -90,18 +90,18 @@ async def assemble_post(async_client, name, votes=True, comments=True, edit_date
 
 
 @async_assembly_cache(maxsize=5000, ttl=3600)
-async def assemble_vote_count(async_client, vote_id):
+async def assemble_vote_count(async_client, number):
     """Download and tidy a vote count."""
     vote_auth = await assemble_vote_auth(async_client)
-    raw_response = await _download.download_vote_count(async_client, vote_id, vote_auth)
+    raw_response = await _download.download_vote_count(async_client, number, vote_auth)
     tidy_item = _tidy.tidy_vote_count(raw_response)
     return tidy_item
 
 
 @async_assembly_cache(maxsize=5000, ttl=3600)
-async def assemble_comment_count(async_client, comment_id):
+async def assemble_comment_count(async_client, disqus_id):
     """Download and tidy a comment count."""
-    raw_response = await _download.download_comment_count(async_client, comment_id)
+    raw_response = await _download.download_comment_count(async_client, disqus_id)
     tidy_item = _tidy.tidy_comment_count(raw_response)
     return tidy_item
 

@@ -61,7 +61,7 @@ async def download_post(async_client, name):
 
 
 @async_retry(start_delay=0.04)
-async def download_vote_count(async_client, vote_id, vote_auth):
+async def download_vote_count(async_client, number, vote_auth):
     """Download vote count for a post."""
     headers = get_default_headers()
     headers.update({"x-requested-with": "XMLHttpRequest"})
@@ -69,17 +69,17 @@ async def download_vote_count(async_client, vote_id, vote_auth):
         "_ajax_nonce": vote_auth,
         "vote_type": "cache",
         "vote_domain": "a",
-        "votes": f"atr.{vote_id}",
+        "votes": f"atr.{number}",
     }
     response = await async_client.post(VOTE_API_URL, headers=headers, params=params)
     return response
 
 
 @async_retry(start_delay=0.001)
-async def download_comment_count(async_client, comment_id):
+async def download_comment_count(async_client, disqus_id):
     """Download comment count for a post."""
     headers = get_default_headers()
-    params = {"1": comment_id}
+    params = {"1": disqus_id}
     response = await async_client.post(COMMENT_API_URL, headers=headers, params=params)
     return response
 

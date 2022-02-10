@@ -71,28 +71,26 @@ async def fetch_posts(names_dict):
     return results
 
 
-async def fetch_vote_counts(vote_ids_dict):
+async def fetch_vote_counts(numbers_dict):
     """Get list of vote counts."""
     results = {}
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
-            for label, vote_id in vote_ids_dict.items():
-                assembler = partial(
-                    _assemble.assemble_vote_count, async_client, vote_id
-                )
+            for label, number in numbers_dict.items():
+                assembler = partial(_assemble.assemble_vote_count, async_client, number)
                 fetcher = partial(fetch, results, label, assembler, "vote count")
                 nursery.start_soon(fetcher)
     return results
 
 
-async def fetch_comment_counts(comment_ids_dict):
+async def fetch_comment_counts(disqus_ids_dict):
     """Get list of comment counts."""
     results = {}
     async with httpx.AsyncClient() as async_client:
         async with trio.open_nursery() as nursery:
-            for label, comment_id in comment_ids_dict.items():
+            for label, disqus_id in disqus_ids_dict.items():
                 assembler = partial(
-                    _assemble.assemble_comment_count, async_client, comment_id
+                    _assemble.assemble_comment_count, async_client, disqus_id
                 )
                 fetcher = partial(fetch, results, label, assembler, "comment count")
                 nursery.start_soon(fetcher)

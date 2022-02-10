@@ -47,7 +47,7 @@ def get_posts_by_names(names):
     return posts
 
 
-def get_vote_counts(post_numbers):
+def get_vote_counts(numbers_dict):
     """Get vote counts for some posts.
 
     If one of the numbers is in an incorrect format, an exception is
@@ -59,7 +59,7 @@ def get_vote_counts(post_numbers):
 
     Parameters
     ---------
-    post_numbers : Dict[str, int]
+    numbers_dict : Dict[str, int]
         Dictionary whose keys are arbitrary labels (e.g. the post URLs)
         and whose values are post numbers to get votes for.
 
@@ -76,22 +76,22 @@ def get_vote_counts(post_numbers):
         If any of the input post numbers are not valid.
     """
     # Argument validation
-    raise_exception_if_arg_is_not_type(post_numbers, dict, "post_numbers")
-    for url, number in post_numbers.items():
-        raise_exception_if_arg_is_not_type(url, str, "post_numbers label")
+    raise_exception_if_arg_is_not_type(numbers_dict, dict, "numbers_dict")
+    for url, number in numbers_dict.items():
+        raise_exception_if_arg_is_not_type(url, str, "numbers_dict label")
         raise_exception_if_number_has_incorrect_format(number)
 
     # Short-circuit if dict is empty
-    if post_numbers == {}:
+    if numbers_dict == {}:
         return {}
 
     # Run
-    votes = trio.run(_fetch.fetch_vote_counts, post_numbers)
+    votes = trio.run(_fetch.fetch_vote_counts, numbers_dict)
 
     return votes
 
 
-def get_comment_counts(disqus_ids):
+def get_comment_counts(disqus_ids_dict):
     """Get comment counts for some posts.
 
     Takes a dictionary of Disqus ID strings. If the Disqus
@@ -100,7 +100,7 @@ def get_comment_counts(disqus_ids):
 
     Parameters
     ---------
-    disqus_ids : Dict[str, str]
+    disqus_ids_dict : Dict[str, str]
         Dictionary whose keys are arbitrary labels (e.g. the post URLs)
         and whose values are the the corresponding Disqus ID strings.
 
@@ -117,17 +117,17 @@ def get_comment_counts(disqus_ids):
         If any of the input Disqus IDs are not valid.
     """
     # Argument validation
-    raise_exception_if_arg_is_not_type(disqus_ids, dict, "disqus_ids")
-    for url, number in disqus_ids.items():
-        raise_exception_if_arg_is_not_type(url, str, "disqus_ids label")
+    raise_exception_if_arg_is_not_type(disqus_ids_dict, dict, "disqus_ids_dict")
+    for url, number in disqus_ids_dict.items():
+        raise_exception_if_arg_is_not_type(url, str, "disqus_ids_dict label")
         raise_exception_if_disqus_id_has_incorrect_format(number)
 
     # Short-circuit if dict is empty
-    if disqus_ids == {}:
+    if disqus_ids_dict == {}:
         return {}
 
     # Run
-    comments = trio.run(_fetch.fetch_comment_counts, disqus_ids)
+    comments = trio.run(_fetch.fetch_comment_counts, disqus_ids_dict)
 
     return comments
 
