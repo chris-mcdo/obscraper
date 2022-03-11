@@ -280,19 +280,14 @@ def extract_internal_links(post_html):
 
     Returns
     -------
-    internal_links : Dict[str, int]
-        A dictionary whose keys record links to OB webpages within the
-        post, and whose values record how many times each link is
-        repeated (usually 1).
+    internal_links : List[str]
+        List of hyperlinks to other posts found in the body of the page. May contain
+        duplicates.
     """
     all_links = extract_all_links(post_html)
     int_links = [link for link in all_links if is_valid_post_url(link)]
 
-    int_link_dict = {}
-    for link in int_links:
-        int_link_dict[link] = int_link_dict.get(link, 0) + 1
-
-    return int_link_dict
+    return int_links
 
 
 def extract_external_links(post_html):
@@ -305,19 +300,14 @@ def extract_external_links(post_html):
 
     Returns
     -------
-    internal_links : Dict[str, int]
-        A dictionary whose keys record links to other webpages within
-        the post, and whose values record how many times each link is
-        repeated (usually 1).
+    internal_links : List[str]
+        List of hyperlinks to external webpages found in the body of the page. May
+        contain duplicates.
     """
     all_links = extract_all_links(post_html)
     ext_links = [link for link in all_links if not is_valid_post_url(link)]
 
-    ext_link_dict = {}
-    for link in ext_links:
-        ext_link_dict[link] = ext_link_dict.get(link, 0) + 1
-
-    return ext_link_dict
+    return ext_links
 
 
 def extract_vote_auth_code(post_html):

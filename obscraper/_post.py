@@ -2,7 +2,7 @@
 
 import dataclasses
 import datetime
-from typing import Dict, List
+from typing import List
 
 from . import _extract_post
 
@@ -39,12 +39,10 @@ class Post:
         The full text of the post in HTML format.
     word_count : int
         The number of words in the body of the post.
-    internal_links : Dict[str, int]
-        Dictionary whose keys are the hyperlinks to other posts found in the body of the
-        post, and whose values are the number of times these links are repeated.
-    external_links : Dict[str, int]
-        Dictionary whose keys are the hyperlinks to non-post webpages found in the body
-        of the post, and whose values are the number of times these links are repeated.
+    internal_links : List[str]
+        List of hyperlinks to other posts. May contain duplicates.
+    external_links : List[str]
+        List of hyperlinks to external webpages. May contain duplicates.
     disqus_id : str
         A string which uniquely identifies the post to the Disqus comment count API.
     votes : int, optional
@@ -68,8 +66,8 @@ class Post:
     categories: List[str]
     text_html: str
     word_count: int
-    internal_links: Dict[str, int]
-    external_links: Dict[str, int]
+    internal_links: List[str]
+    external_links: List[str]
     disqus_id: str
     votes: int = None
     comments: int = None
