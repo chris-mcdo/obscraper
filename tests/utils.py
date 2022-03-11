@@ -109,7 +109,7 @@ def assert_post_standard_attributes_have_valid_values(test_post):
     assert is_valid_edit_or_publish_date(test_post.publish_date)
     # Word count and links
     assert test_post.plaintext != ""
-    assert test_post.word_count > 5
+    assert test_post.word_count > 2  # /2008/12/cryonics-is-cool, found via random test
     for url in test_post.internal_links:
         assert is_valid_post_url(url)
     for url in test_post.external_links:
