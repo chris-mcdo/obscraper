@@ -16,8 +16,10 @@ It's easy to get a single post:
     >>> intro.plaintext
     'How can we better believe what is true? ...'
     >>> intro.internal_links
-    {'http://www.overcomingbias.com/2007/02/moderate_modera.html': 1, 
-    'http://www.overcomingbias.com/2006/12/contributors_be.html': 1}
+    [
+      'http://www.overcomingbias.com/2007/02/moderate_modera.html': 1,
+      'http://www.overcomingbias.com/2006/12/contributors_be.html': 1
+    ]
     >>> intro.comments
     20
 

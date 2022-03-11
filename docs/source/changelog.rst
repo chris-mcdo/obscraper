@@ -4,6 +4,19 @@ Changelog
 Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_
 standard.
 
+
+obscraper 0.6.0 (2022-03-11)
+****************************
+
+Breaking changes
+################
+
+- Updated API: the ``internal_links`` and ``external_links`` attributes of
+  :ref:`Post <post>` are now lists (possibly containing duplicates) rather than
+  dictionaries.
+
+
+
 obscraper 0.5.0 (2022-02-10)
 ****************************
 
