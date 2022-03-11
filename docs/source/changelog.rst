@@ -70,7 +70,7 @@ Breaking Changes
 
 - :ref:`get_all_posts <get-all-posts>`,
   :ref:`get_posts_by_edit_date <get-posts-by-edit-date>` and
-  :ref:`grab_edit_dates <grab-edit-dates>` now return post names rather than
+  *grab_edit_dates* now return post names rather than
   post URLs in their keys.
 
 - "Short" URLs - the form overcomingbias.com/?p=12345 - are no longer accepted.
