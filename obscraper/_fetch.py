@@ -13,6 +13,10 @@ from . import _assemble, _exceptions
 
 logger = logging.getLogger(__name__)
 
+# Default timeout for requests (in seconds)
+# See https://www.python-httpx.org/advanced/#timeout-configuration
+DEFAULT_TIMEOUT = 20.0
+
 
 async def fetch(results, label, func, obj_type=None):
     """Fetch result and place them in a container.
@@ -60,7 +64,7 @@ async def fetch(results, label, func, obj_type=None):
 async def fetch_posts(names_dict):
     """Fetch dict of posts."""
     results = {}
-    async with httpx.AsyncClient() as async_client:
+    async with httpx.AsyncClient(timeout=DEFAULT_TIMEOUT) as async_client:
         async with trio.open_nursery() as nursery:
             for label, name in names_dict.items():
                 assembler = partial(_assemble.assemble_post, async_client, name)
@@ -72,7 +76,7 @@ async def fetch_posts(names_dict):
 async def fetch_vote_counts(numbers_dict):
     """Fetch dict of vote counts."""
     results = {}
-    async with httpx.AsyncClient() as async_client:
+    async with httpx.AsyncClient(timeout=DEFAULT_TIMEOUT) as async_client:
         async with trio.open_nursery() as nursery:
             for label, number in numbers_dict.items():
                 assembler = partial(_assemble.assemble_vote_count, async_client, number)
@@ -84,7 +88,7 @@ async def fetch_vote_counts(numbers_dict):
 async def fetch_comment_counts(disqus_ids_dict):
     """Fetch dict of comment counts."""
     results = {}
-    async with httpx.AsyncClient() as async_client:
+    async with httpx.AsyncClient(timeout=DEFAULT_TIMEOUT) as async_client:
         async with trio.open_nursery() as nursery:
             for label, disqus_id in disqus_ids_dict.items():
                 assembler = partial(
@@ -98,7 +102,7 @@ async def fetch_comment_counts(disqus_ids_dict):
 async def fetch_edit_dates():
     """Fetch dict of edit dates."""
     results = {}
-    async with httpx.AsyncClient() as async_client:
+    async with httpx.AsyncClient(timeout=DEFAULT_TIMEOUT) as async_client:
         async with trio.open_nursery() as nursery:
             assembler = partial(_assemble.assemble_edit_dates, async_client)
             fetcher = partial(fetch, results, "edit-dates", assembler, "edit dates")
