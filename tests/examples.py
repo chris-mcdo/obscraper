@@ -12,13 +12,11 @@ STANDARD_EXAMPLES = {  # first post
         "categories": ["meta"],
         "endswith": "Copyright is retained by each author.",
         "word_count": 263,
-        "internal_links": {
-            "http://www.overcomingbias.com/2006/12/contributors_be.html": 1,
-            "http://www.overcomingbias.com/2007/02/moderate_modera.html": 1,
-        },
-        "external_links": {
-            "http://www.fhi.ox.ac.uk/": 1,
-        },
+        "internal_links": [
+            "http://www.overcomingbias.com/2006/12/contributors_be.html",
+            "http://www.overcomingbias.com/2007/02/moderate_modera.html",
+        ],
+        "external_links": ["http://www.fhi.ox.ac.uk/"],
         "disqus_id": "18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html",
     },
     # early post by another author
@@ -31,11 +29,11 @@ STANDARD_EXAMPLES = {  # first post
         "categories": ["morality", "psychology"],
         "endswith": "unlikely to correspond to truth.",
         "word_count": 315,
-        "internal_links": {},
-        "external_links": {
-            "http://www.solstice.us/russell/religionciv.html": 1,
-            "http://www.davidbrin.com/addiction.html": 1,
-        },
+        "internal_links": [],
+        "external_links": [
+            "http://www.solstice.us/russell/religionciv.html",
+            "http://www.davidbrin.com/addiction.html",
+        ],
         "disqus_id": "18141"
         " http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html",
     },
@@ -49,10 +47,10 @@ STANDARD_EXAMPLES = {  # first post
         "categories": ["standard-biases"],
         "endswith": "but definitely worth living.",
         "word_count": 155,
-        "internal_links": {},
-        "external_links": {
-            "/wp-content/uploads/2007/04/asgoodasitgets_2.jpg": 1,
-        },
+        "internal_links": [],
+        "external_links": [
+            "/wp-content/uploads/2007/04/asgoodasitgets_2.jpg",
+        ],
         "disqus_id": "18115"
         " http://prod.ob.trike.com.au/2007/04/as-good-as-it-gets.html",
     },
@@ -66,10 +64,10 @@ STANDARD_EXAMPLES = {  # first post
         "categories": ["signaling", "social-science"],
         "endswith": "even when backed by such publications.",
         "word_count": 247,
-        "internal_links": {},
-        "external_links": {
-            "http://dx.doi.org/10.1016/j.geb.2009.05.001": 1,
-        },
+        "internal_links": [],
+        "external_links": [
+            "http://dx.doi.org/10.1016/j.geb.2009.05.001",
+        ],
         "disqus_id": "18423 http://www.overcomingbias.com/?p=18423",
     },
     # old post with embedded video
@@ -82,10 +80,10 @@ STANDARD_EXAMPLES = {  # first post
         "categories": ["uncategorized"],
         "endswith": "here is the 5 minute video:",
         "word_count": 28,
-        "internal_links": {},
-        "external_links": {
-            "http://rt.com/on-air/rt-america-air/": 1,
-        },
+        "internal_links": [],
+        "external_links": [
+            "http://rt.com/on-air/rt-america-air/",
+        ],
         "disqus_id": "30613 http://www.overcomingbias.com/?p=30613",
     },
     # before Disqus API changes (2nd time)
@@ -98,8 +96,8 @@ STANDARD_EXAMPLES = {  # first post
         "categories": ["uncategorized"],
         "endswith": "will never be directly evaluated.",
         "word_count": 1205,
-        "internal_links": {},
-        "external_links": {},
+        "internal_links": [],
+        "external_links": [],
         "disqus_id": "32811 http://www.overcomingbias.com/?p=32811",
     },
     # post with embedded tweet
@@ -112,13 +110,14 @@ STANDARD_EXAMPLES = {  # first post
         "categories": ["uncategorized"],
         "endswith": "pretty minor issue here.",
         "word_count": 1336,  # likely to change
-        "internal_links": {
-            name_to_url("/2012/06/frozen-or-plastic-brain"): 1,
-            name_to_url("/2010/07/modern-male-sati"): 1,
-            name_to_url("/2010/07/space-ashes-vs-cryonics"): 1,
-            name_to_url("/2020/01/how-to-not-die-soon"): 2,
-            name_to_url("/2008/12/tyler-on-cryonics"): 1,
-        },
+        "internal_links": [
+            name_to_url("/2012/06/frozen-or-plastic-brain"),
+            name_to_url("/2010/07/modern-male-sati"),
+            name_to_url("/2010/07/space-ashes-vs-cryonics"),
+            name_to_url("/2020/01/how-to-not-die-soon"),
+            name_to_url("/2020/01/how-to-not-die-soon"),
+            name_to_url("/2008/12/tyler-on-cryonics"),
+        ],
         "external_links": None,
         "disqus_id": "33014 https://www.overcomingbias.com/?p=33014",
     },

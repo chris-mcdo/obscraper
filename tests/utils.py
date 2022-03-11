@@ -76,21 +76,17 @@ def assert_post_standard_attributes_have_correct_types(test_post):
     # list
     assert isinstance(test_post.tags, list)
     assert isinstance(test_post.categories, list)
+    assert isinstance(test_post.internal_links, list)
+    assert isinstance(test_post.external_links, list)
     # list elements
     for tag in test_post.tags:
         assert isinstance(tag, str)
     for cat in test_post.categories:
         assert isinstance(cat, str)
-    # dict
-    assert isinstance(test_post.internal_links, dict)
-    assert isinstance(test_post.external_links, dict)
-    # dict elements
-    for url, number in test_post.internal_links.items():
+    for url in test_post.internal_links:
         assert isinstance(url, str)
-        assert isinstance(number, int)
-    for url, number in test_post.external_links.items():
+    for url in test_post.external_links:
         assert isinstance(url, str)
-        assert isinstance(number, int)
 
 
 def assert_post_standard_attributes_have_valid_values(test_post):
@@ -114,12 +110,10 @@ def assert_post_standard_attributes_have_valid_values(test_post):
     # Word count and links
     assert test_post.plaintext != ""
     assert test_post.word_count > 5
-    for url, number in test_post.internal_links.items():
+    for url in test_post.internal_links:
         assert is_valid_post_url(url)
-        assert 1 <= number < 20
-    for url, number in test_post.external_links.items():
+    for url in test_post.external_links:
         assert not is_valid_post_url(url)
-        assert 1 <= number < 20
     # Disqus ID string
     assert is_valid_disqus_id(test_post.disqus_id)
 

@@ -22,11 +22,9 @@ def test_standard_examples_have_expected_attributes(standard_examples, name):
     assert test_input.page_format == "standard"
     assert test_input.plaintext.endswith(expected["endswith"])
     assert test_input.word_count == expected["word_count"]
-    assert (
-        test_input.external_links == expected["external_links"]
-        or expected["external_links"] is None
-    )
-    assert test_input.internal_links == expected["internal_links"]
+    if expected["external_links"] is not None:
+        assert sorted(test_input.external_links) == sorted(expected["external_links"])
+    assert sorted(test_input.internal_links) == sorted(expected["internal_links"])
     assert test_input.disqus_id == expected["disqus_id"]
 
 
