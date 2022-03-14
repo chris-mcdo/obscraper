@@ -64,9 +64,9 @@ The "name" of a post is its URL with the same-y parts chopped off:
 .. code-block:: python
 
     >>> names = [
-    ... '/2006/11/quiz_fox_or_hed',
-    ... '/2011/04/the-seti-game',
-    ... '/2013/10/stories-change-goals',
+    ... '2006/11/quiz_fox_or_hed',
+    ... '2011/04/the-seti-game',
+    ... '2013/10/stories-change-goals',
     ... ]
     >>> posts = obscraper.get_posts_by_names(names)
 
@@ -115,15 +115,15 @@ some no longer hosted on the overcomingbias site), you can use
     >>> len(urls_and_dates)
     4353
     >>> {url: str(urls_and_dates[url]) for url in list(urls_and_dates)[:5]}
-    {'/2022/01/best-case-contrarians': 
+    {'2022/01/best-case-contrarians': 
     '2022-01-16 21:55:04+00:00', 
-    '/2022/01/much-talk-is-sales-patter': 
+    '2022/01/much-talk-is-sales-patter': 
     '2022-01-14 20:46:35+00:00', 
-    '/2022/01/old-man-rant': 
+    '2022/01/old-man-rant': 
     '2022-01-13 15:21:33+00:00', 
-    '/2022/01/my-11-bets-at-10-1-odds-on-10m-covid-deaths-by-2022': 
+    '2022/01/my-11-bets-at-10-1-odds-on-10m-covid-deaths-by-2022': 
     '2022-01-12 19:15:10+00:00', 
-    '/2022/01/to-innovate-unify-or-fragment': 
+    '2022/01/to-innovate-unify-or-fragment': 
     '2022-01-11 01:03:44+00:00'}
 
 You can download all posts indirectly by using :ref:`get_posts_by_edit_date
@@ -181,7 +181,7 @@ to the `JSON <https://www.json.org/>`_ format, use the
     >>> import json
     >>> intro_json = json.dumps(intro, cls=obscraper.PostEncoder)
     >>> intro_json
-    '{"name": "/2006/11/introduction", "number": 18402, ...}'
+    '{"name": "2006/11/introduction", "number": 18402, ...}'
 
 This is useful when storing posts for later:
 
@@ -197,7 +197,7 @@ Also, the attributes of the post can be examined more easily in a file:
     :caption: 2006-11-introduction.json
 
     {
-        "name": "/2006/11/introduction",
+        "name": "2006/11/introduction",
         "number": 18402,
         "page_type": "post",
         ...
@@ -209,7 +209,7 @@ the :ref:`PostDecoder <post-decoder>` class:
 .. code-block:: python
 
     >>> intro_json
-    '{"name": "/2006/11/introduction", "number": 18402, ...}'
+    '{"name": "2006/11/introduction", "number": 18402, ...}'
     >>> intro_decoded = json.loads(intro_json, cls=obscraper.PostDecoder)
     >>> type(intro_decoded)
     <class 'obscraper._post.Post'>
@@ -240,7 +240,7 @@ directory:
         {
             "url": "https://www.overcomingbias.com/2016/11/myplay.html",
             "post": {
-                "name": "/2016/11/myplay",
+                "name": "2016/11/myplay",
                 "number": 31449,
                 "page_type": "post",
                 ...
@@ -270,8 +270,8 @@ yourself by setting up a logger:
     logger.addHandler(handler)
 
     names = [
-        '/2010/08/new-hard-steps-results', 
-        '/2009/02/the-most-important-thing'
+        '2010/08/new-hard-steps-results', 
+        '2009/02/the-most-important-thing'
     ]
     posts = obscraper.get_posts_by_names(names)
 
@@ -282,8 +282,8 @@ yourself by setting up a logger:
 .. code-block:: text
     :caption: logs.txt
 
-    AttributeNotFoundError raised when grabbing post /2009/02/the-most-important-thing
-    Successfully grabbed post /2010/08/new-hard-steps-results
+    AttributeNotFoundError raised when grabbing post 2009/02/the-most-important-thing
+    Successfully grabbed post 2010/08/new-hard-steps-results
 
 The ``urllib3`` library - which acts as the HTTP client - also uses logging.
 You can get its logs by the same method as above.

@@ -5,6 +5,23 @@ Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_
 standard.
 
 
+obscraper 0.7.0 (2022-03-14)
+****************************
+
+Breaking changes
+################
+
+- Post ``name``s are now formatted without the leading slash. E.g.:
+
+    - Before: /2009/02/the-most-important-thing
+    - After: 2009/02/the-most-important-thing
+
+Bug fixes
+#########
+
+- Fixed small bug matching URLs in regular expressions.
+
+
 obscraper 0.6.0 (2022-03-11)
 ****************************
 
@@ -73,7 +90,7 @@ Bug fixes
 
 - :ref:`AttributeNotFoundError <attribute-not-found-error>` exceptions are now
   caught when downloading multiple posts. This prevents crashes on "broken"
-  posts, e.g. /2009/02/the-most-important-thing.
+  posts, e.g. 2009/02/the-most-important-thing.
 
 obscraper 0.3.0 (2022-02-03)
 ****************************
@@ -124,7 +141,7 @@ Breaking Changes
 
 - The :ref:`Post <post>` name attribute now contains the year and month of
   publication, as in URLs. E.g. 'jobs-explain-lots' becomes
-  '/2010/09/jobs-explain-lots'. This ensures the post URL can be reconstructed
+  '2010/09/jobs-explain-lots'. This ensures the post URL can be reconstructed
   from the post name.
 
 Improvements
