@@ -20,9 +20,9 @@ def days_from_now(n):
 def mock_fetch_posts():
     """Return mock posts for 3 examples, and None otherwise."""
     fake_posts = {
-        "/2006/11/introduction": "intro",
-        "/2021/10/what-makes-stuff-rot": "rot",
-        "/2014/07/limits-on-generality": "generality",
+        "2006/11/introduction": "intro",
+        "2021/10/what-makes-stuff-rot": "rot",
+        "2014/07/limits-on-generality": "generality",
     }
 
     async def fetch_posts(names_dict):
@@ -43,7 +43,7 @@ class TestGetPostsByNames:
 
     def test_raises_type_error_if_names_are_wrong_type(self):
         for names in [
-            ["/2007/10/a-rational-argu", None],
+            ["2007/10/a-rational-argu", None],
             [3514, 8293],
         ]:
             with pytest.raises(TypeError):
@@ -53,7 +53,7 @@ class TestGetPostsByNames:
         for names in [
             ["Not a name"],
             ["/"],
-            ["/123/456/ok"],
+            ["123/456/ok"],
             ["/post"],
             ["/page/20/post"],
             ["/archives"],
@@ -79,14 +79,14 @@ class TestGetPostByName:
                 _scrape.get_post_by_name(name)
 
     def test_raises_error_when_post_not_found(self, mock_fetch_posts):
-        name = "/2021/10/not-a-real-post"
+        name = "2021/10/not-a-real-post"
         with patch("obscraper._fetch.fetch_posts", mock_fetch_posts):
             with pytest.raises(_exceptions.InvalidResponseError):
                 _scrape.get_post_by_name(name)
         assert mock_fetch_posts.call_count == 1
 
     def test_returns_valid_posts_for_valid_names(self, mock_fetch_posts):
-        name = "/2021/10/what-makes-stuff-rot"
+        name = "2021/10/what-makes-stuff-rot"
         with patch("obscraper._fetch.fetch_posts", mock_fetch_posts):
             fake_post = _scrape.get_post_by_name(name)
         assert mock_fetch_posts.call_count == 1
@@ -209,9 +209,9 @@ class TestGetPostsByEditDate:
 
 def test_get_all_posts_works_for_fake_edit_list():
     edit_dates = {
-        "/2006/11/introduction": tidy_us_date("November 22, 2006 6:17 am"),
-        "/2007/10/a-rational-argu": tidy_us_date("October 5, 2007 2:31 pm"),
-        "/2021/04/shoulda-listened-futures": tidy_us_date("July 2, 2021 9:15 am"),
+        "2006/11/introduction": tidy_us_date("November 22, 2006 6:17 am"),
+        "2007/10/a-rational-argu": tidy_us_date("October 5, 2007 2:31 pm"),
+        "2021/04/shoulda-listened-futures": tidy_us_date("July 2, 2021 9:15 am"),
     }
     with patch(
         "obscraper._assemble.assemble_edit_dates", AsyncMock(return_value=edit_dates)
@@ -220,7 +220,7 @@ def test_get_all_posts_works_for_fake_edit_list():
 
     assert mock_fetch_edit_dates.call_count >= 1
     assert len(posts) == 3
-    assert posts.pop("/2007/10/a-rational-argu") is None
+    assert posts.pop("2007/10/a-rational-argu") is None
     for name, p in posts.items():
         assert p.edit_date == edit_dates[name]
 
@@ -235,12 +235,12 @@ class TestGetVoteCounts:
         for post_numbers in [
             18402,
             {
-                name_to_url("/2006/11/introduction"): 18402,
+                name_to_url("2006/11/introduction"): 18402,
                 12345: 45678,
             },
             {
-                name_to_url("/2009/05/we-only-need-a-handshake"): 18423,
-                name_to_url("/2021/04/shoulda-listened-futures"): "Rogue string",
+                name_to_url("2009/05/we-only-need-a-handshake"): 18423,
+                name_to_url("2021/04/shoulda-listened-futures"): "Rogue string",
             },
         ]:
             with pytest.raises(TypeError):
@@ -250,8 +250,8 @@ class TestGetVoteCounts:
         for post_numbers in [
             {"intro": 18402, "new": 4567},
             {
-                name_to_url("/2009/05/we-only-need-a-handshake"): 18423,
-                name_to_url("/2021/04/shoulda-listened-futures"): 123456,
+                name_to_url("2009/05/we-only-need-a-handshake"): 18423,
+                name_to_url("2021/04/shoulda-listened-futures"): 123456,
             },
         ]:
             with pytest.raises(ValueError):
@@ -275,13 +275,13 @@ class TestGetCommentCounts:
             "18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html",
             {
                 name_to_url(
-                    "/2006/11/introduction"
+                    "2006/11/introduction"
                 ): "18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html",
-                name_to_url("/2007/03/the_very_worst_"): 18481,
+                name_to_url("2007/03/the_very_worst_"): 18481,
             },
             {
                 name_to_url(
-                    "/2009/05/we-only-need-a-handshake"
+                    "2009/05/we-only-need-a-handshake"
                 ): "18423 http://www.overcomingbias.com/?p=18423",
                 35618: "32811 http://www.overcomingbias.com/?p=32811",
             },
@@ -293,22 +293,22 @@ class TestGetCommentCounts:
         for disqus_ids in [
             {
                 name_to_url(
-                    "/2006/11/introduction"
+                    "2006/11/introduction"
                 ): "18402 http://prod.ob.trike.com.au/2006/11/how-to-join.html",
                 name_to_url(
-                    "/2007/03/the_very_worst_"
+                    "2007/03/the_very_worst_"
                 ): "18141 http://prod.ob.trike.com.au/?p=18141",
             },
-            {name_to_url("/2006/11/introduction"): ""},
+            {name_to_url("2006/11/introduction"): ""},
         ]:
             with pytest.raises(ValueError):
                 _scrape.get_comment_counts(disqus_ids)
 
     def test_returns_none_for_invalid_numbers(self):
         disqus_ids = {
-            name_to_url("/2007/03/the_very_worst_"): "12345"
+            name_to_url("2007/03/the_very_worst_"): "12345"
             " http://prod.ob.trike.com.au/2007/03/the-very-worst-kind-of-bias.html",
-            name_to_url("/2021/04/shoulda-listened-futures"): "65432"
+            name_to_url("2021/04/shoulda-listened-futures"): "65432"
             " http://www.overcomingbias.com/?p=65432",
         }
         comments = _scrape.get_comment_counts(disqus_ids)

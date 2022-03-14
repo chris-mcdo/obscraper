@@ -49,7 +49,7 @@ def extract_name(post_html):  # pylint: disable=inconsistent-return-statements
     Returns
     -------
     name : str
-        Name of the post, e.g. '/2006/11/introduction'.
+        Name of the post, e.g. '2006/11/introduction'.
     """
     url = extract_url(post_html)
     try:
@@ -373,7 +373,7 @@ def url_to_name(post_url):
     Returns
     -------
     name : str
-        Name of the post, e.g. '/2006/11/introduction'.
+        Name of the post, e.g. '2006/11/introduction'.
 
     Raises
     ------
@@ -381,14 +381,16 @@ def url_to_name(post_url):
         If the input URL is not a valid overcomingbias post URL.
     """
     pattern = (
-        r"(^https?://www\.overcomingbias\.com)"
-        r"(/\d{4}/\d{2}/[a-z0-9-_%]+)"
+        r"(^https?://www\.overcomingbias\.com/)"
+        r"(\d{4}/\d{2}/[a-z0-9-_%]+)"
         r"(\.html$)"
     )
     match = re.search(pattern, post_url)
     if match is None:
         raise ValueError("Invalid post URL.")
-    return match.group(2)
+
+    name = match.group(2)
+    return name
 
 
 def name_to_url(post_name):
@@ -397,7 +399,7 @@ def name_to_url(post_name):
     Parameters
     ----------
     post_name : str
-        The name of the post. E.g. '/2010/09/jobs-explain-lots'.
+        The name of the post. E.g. '2010/09/jobs-explain-lots'.
 
     Returns
     -------
@@ -409,11 +411,13 @@ def name_to_url(post_name):
     ValueError
         If the input name is not a valid overcomingbias post name.
     """
-    pattern = r"^/\d{4}/\d{2}/[a-z0-9-_%]+$"
+    pattern = r"^\d{4}/\d{2}/[a-z0-9-_%]+$"
     match = re.search(pattern, post_name)
     if match is None:
         raise ValueError("Invalid post name.")
-    return f"https://www.overcomingbias.com{post_name}.html"
+
+    url = f"https://www.overcomingbias.com/{post_name}.html"
+    return url
 
 
 def convert_to_plaintext(text_html):

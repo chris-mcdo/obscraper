@@ -33,9 +33,9 @@ class TestIsOBPostName:
 
     def test_rejects_incorrectly_formatted_names(self):
         is_name = _extract_post.is_valid_post_name
-        assert not is_name("2022/20/without-first-slash")
-        assert not is_name("/1234/56/")
-        assert not is_name("/2020/02/named.html")
+        assert not is_name("/2022/20/with-leading-slash")
+        assert not is_name("1234/56/")
+        assert not is_name("2020/02/named.html")
 
 
 class TestIsOBPostURL:

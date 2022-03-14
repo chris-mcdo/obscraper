@@ -43,7 +43,7 @@ def test_get_edit_dates_returns_expected_result(edit_dates):
 
 
 def test_clears_grab_post_cache():
-    fake_post_numbers = {"/2020/06/fake-post": 12345}
+    fake_post_numbers = {"2020/06/fake-post": 12345}
     # Ideally I could mock the wrapped function inside _assemble.assemble_vote_count
     # but there is no nice way to do it
     with patch(
@@ -53,16 +53,16 @@ def test_clears_grab_post_cache():
             _scrape.clear_cache()
 
             p1 = _scrape.get_vote_counts(fake_post_numbers)
-            assert p1 == {"/2020/06/fake-post": 123}
+            assert p1 == {"2020/06/fake-post": 123}
             assert mock_download.call_count == 1
 
             p2 = _scrape.get_vote_counts(fake_post_numbers)
-            assert p2 == {"/2020/06/fake-post": 123}
+            assert p2 == {"2020/06/fake-post": 123}
             assert mock_download.call_count == 1
 
             _scrape.clear_cache()
             p3 = _scrape.get_vote_counts(fake_post_numbers)
-            assert p3 == {"/2020/06/fake-post": 321}
+            assert p3 == {"2020/06/fake-post": 321}
             assert mock_download.call_count == 2
 
             _scrape.clear_cache()

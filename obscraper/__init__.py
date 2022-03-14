@@ -41,7 +41,7 @@ __all__ = [
 
 # taken from _extract_post.url_to_name
 OB_POST_URL_PATTERN = (
-    r"(^https?://www\.overcomingbias\.com)(/\d{4}/\d{2}/[a-z0-9-_%]+)(\.html$)"
+    r"(^https?://www\.overcomingbias\.com/)(\d{4}/\d{2}/[a-z0-9-_%]+)(\.html$)"
 )
 """str : Regex pattern for "long" format overcomingbias URLs.
 

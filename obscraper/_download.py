@@ -15,7 +15,7 @@ MAX_DELAY = 5
 MAX_REQUESTS = 10
 
 VOTE_API_URL = (
-    "https://www.overcomingbias.com/" "wp-content/plugins/gd-star-rating/ajax.php"
+    "https://www.overcomingbias.com/wp-content/plugins/gd-star-rating/ajax.php"
 )
 COMMENT_API_URL = "https://overcoming-bias.disqus.com/count-data.js"
 EDIT_DATES_URL = "https://www.overcomingbias.com/post.xml"

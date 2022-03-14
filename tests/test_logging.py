@@ -8,9 +8,9 @@ import obscraper
 @pytest.fixture
 def mock_assemble_post():
     async def fake_assemble_post(async_client, name):
-        if name == "/2020/01/raise-invalid-response":
+        if name == "2020/01/raise-invalid-response":
             raise obscraper.InvalidResponseError
-        elif name == "/2020/01/raise-attribute-not-found":
+        elif name == "2020/01/raise-attribute-not-found":
             raise obscraper.AttributeNotFoundError
         else:
             return "Fake Post"
@@ -19,7 +19,7 @@ def mock_assemble_post():
 
 
 def test_successful_grab_is_logged_as_expected(mock_assemble_post, logs):
-    name = "/2020/01/fake-post"
+    name = "2020/01/fake-post"
     with patch("obscraper._assemble.assemble_post", mock_assemble_post):
         result = obscraper.get_post_by_name(name)
     assert result == "Fake Post"
@@ -27,7 +27,7 @@ def test_successful_grab_is_logged_as_expected(mock_assemble_post, logs):
 
 
 def test_invalid_response_is_logged_as_expected(mock_assemble_post, logs):
-    name = "/2020/01/raise-invalid-response"
+    name = "2020/01/raise-invalid-response"
     with patch("obscraper._assemble.assemble_post", mock_assemble_post):
         with pytest.raises(obscraper.InvalidResponseError):
             obscraper.get_post_by_name(name)
@@ -38,7 +38,7 @@ def test_invalid_response_is_logged_as_expected(mock_assemble_post, logs):
 
 
 def test_attribute_not_found_is_logged_as_expected(mock_assemble_post, logs):
-    name = "/2020/01/raise-attribute-not-found"
+    name = "2020/01/raise-attribute-not-found"
     with patch("obscraper._assemble.assemble_post", mock_assemble_post):
         with pytest.raises(obscraper.InvalidResponseError):
             obscraper.get_post_by_name(name)

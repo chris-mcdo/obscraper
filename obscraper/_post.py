@@ -15,7 +15,7 @@ class Post:
     ----------
     name : str
         The original year, month and abbreviated name of the post, as found in its url.
-        E.g. '/2010/09/jobs-explain-lots'.
+        E.g. '2010/09/jobs-explain-lots'.
     number : int
         The unique integer identifier of the post.
     page_type : str

@@ -16,7 +16,7 @@ import cachetools.keys
 from . import _download, _tidy
 
 # Name used to update the vote auth code
-VOTE_AUTH_UPDATE_NAME = "/2011/12/life-is-good"
+VOTE_AUTH_UPDATE_NAME = "2011/12/life-is-good"
 
 
 def async_assembly_cache(maxsize, ttl, timer=time.monotonic, getsizeof=None):

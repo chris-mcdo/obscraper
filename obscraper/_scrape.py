@@ -163,7 +163,7 @@ def get_post_by_name(name):
     Parameters
     ---------
     name : str
-        An overcomingbias post name, e.g. '/2010/09/jobs-explain-lots'.
+        An overcomingbias post name, e.g. '2010/09/jobs-explain-lots'.
 
     Returns
     -------
