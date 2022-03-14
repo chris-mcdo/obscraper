@@ -13,11 +13,17 @@ from . import _exceptions, _utils
 OB_SERVER_TZ = "US/Eastern"
 # timezone of server generating post timestamps
 
-DISQUS_URL_PATTERN = (
+POST_NAME_PATTERN_RAW = r"\d{4}/\d{2}/[a-z0-9-_%]+"
+POST_NAME_PATTERN = re.compile(f"^{POST_NAME_PATTERN_RAW}$")
+DISQUS_URL_PATTERN = re.compile(
     r"^(\d{5})\ "
     r"(http://prod\.ob\.trike\.com\.au/\d{4}/\d{2}/\S+\.html$|"
     r"https?://www\.overcomingbias\.com/\?p=\1)$"
 )
+POST_LONG_URL_PATTERN = re.compile(
+    f"(^https?://www\\.overcomingbias\\.com/)({POST_NAME_PATTERN_RAW})(\\.html$)"
+)
+POST_SHORT_URL_PATTERN = re.compile(r"^https?://www\.overcomingbias\.com/\?p=\d{5}$")
 
 
 def extract_url(post_html):
@@ -380,12 +386,7 @@ def url_to_name(post_url):
     ValueError
         If the input URL is not a valid overcomingbias post URL.
     """
-    pattern = (
-        r"(^https?://www\.overcomingbias\.com/)"
-        r"(\d{4}/\d{2}/[a-z0-9-_%]+)"
-        r"(\.html$)"
-    )
-    match = re.search(pattern, post_url)
+    match = POST_LONG_URL_PATTERN.search(post_url)
     if match is None:
         raise ValueError("Invalid post URL.")
 
@@ -411,8 +412,7 @@ def name_to_url(post_name):
     ValueError
         If the input name is not a valid overcomingbias post name.
     """
-    pattern = r"^\d{4}/\d{2}/[a-z0-9-_%]+$"
-    match = re.search(pattern, post_name)
+    match = POST_NAME_PATTERN.search(post_name)
     if match is None:
         raise ValueError("Invalid post name.")
 
@@ -529,8 +529,7 @@ def is_valid_post_short_url(url):
         True if the URL is a valid overcomingbias post short URL, and
         False otherwise.
     """
-    pattern = r"^https?://www\.overcomingbias\.com/\?p=\d{5}$"
-    return re.search(pattern, url) is not None
+    return POST_SHORT_URL_PATTERN.search(url) is not None
 
 
 def is_ob_site_html(html):
@@ -588,7 +587,7 @@ def is_valid_disqus_id(disqus_id):
     """
     if not isinstance(disqus_id, str):
         return False
-    return re.compile(DISQUS_URL_PATTERN).search(disqus_id) is not None
+    return DISQUS_URL_PATTERN.search(disqus_id) is not None
 
 
 def raise_attribute_not_found_error_if_none(obj, attribute_name):

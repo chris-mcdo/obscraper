@@ -3,6 +3,7 @@ import re
 
 from obscraper import _post, _utils
 from obscraper._extract_post import (
+    POST_NAME_PATTERN,
     is_valid_disqus_id,
     is_valid_post_long_url,
     is_valid_post_url,
@@ -92,7 +93,7 @@ def assert_post_standard_attributes_have_correct_types(test_post):
 def assert_post_standard_attributes_have_valid_values(test_post):
     # URL and title
     assert is_valid_post_long_url(test_post.url)
-    assert re.search(r"^\d{4}/\d{2}/[a-z0-9-_%]+$", test_post.name) is not None
+    assert POST_NAME_PATTERN.search(test_post.name) is not None
     # Metadata
     assert 9999 < test_post.number < 100000
     assert test_post.page_type == "post"

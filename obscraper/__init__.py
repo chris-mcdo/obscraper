@@ -2,7 +2,7 @@
 import logging
 
 from ._exceptions import AttributeNotFoundError, InvalidResponseError
-from ._extract_post import name_to_url, url_to_name
+from ._extract_post import POST_LONG_URL_PATTERN, name_to_url, url_to_name
 from ._post import Post
 from ._scrape import (
     clear_cache,
@@ -40,9 +40,7 @@ __all__ = [
 ]
 
 # taken from _extract_post.url_to_name
-OB_POST_URL_PATTERN = (
-    r"(^https?://www\.overcomingbias\.com/)(\d{4}/\d{2}/[a-z0-9-_%]+)(\.html$)"
-)
+OB_POST_URL_PATTERN = POST_LONG_URL_PATTERN.pattern
 """str : Regex pattern for "long" format overcomingbias URLs.
 
 It consists of 3 capturing groups. The second group captures the post
