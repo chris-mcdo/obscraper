@@ -48,6 +48,12 @@ class TestIsOBPostURL:
             url = _extract_post.name_to_url(name)
             assert is_url(url)
 
+    def test_accepts_short_ob_post_urls(self):
+        is_url = _extract_post.is_valid_post_url
+        assert is_url("https://www.overcomingbias.com/?p=10000")
+        assert is_url("https://www.overcomingbias.com/?p=99999")
+        assert is_url("http://www.overcomingbias.com/?p=32980")
+
     def test_rejects_incorrectly_formatted_urls(self):
         is_url = _extract_post.is_valid_post_url
         assert not is_url("https://www.example.com/")
@@ -59,6 +65,8 @@ class TestIsOBPostURL:
         )
         assert not is_url("https://www.overcomingbias.com/2021/10/what-makes-stuff-rot")
         assert not is_url("www.overcomingbias.com/2021/10/what-makes-stuff-rot")
+        assert not is_url("https://wwwzovercomingbiasvcom/2006/11/introduction.html")
+        assert not is_url("https://wwwzovercomingbias.com/?p=12345")
 
 
 class TestDetermineOriginOfHTMLFiles:

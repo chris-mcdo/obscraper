@@ -15,9 +15,8 @@ OB_SERVER_TZ = "US/Eastern"
 
 DISQUS_URL_PATTERN = (
     r"^(\d{5})\ "
-    r"(?:http://prod.ob.trike.com.au/\d{4}/\d{2}/\S+\.html$|"
-    r"http://www.overcomingbias.com/\?p=\1|"
-    r"https://www.overcomingbias.com/\?p=\1)$"
+    r"(http://prod\.ob\.trike\.com\.au/\d{4}/\d{2}/\S+\.html$|"
+    r"https?://www\.overcomingbias\.com/\?p=\1)$"
 )
 
 
@@ -382,7 +381,7 @@ def url_to_name(post_url):
         If the input URL is not a valid overcomingbias post URL.
     """
     pattern = (
-        r"(^https{0,1}://www.overcomingbias.com)"
+        r"(^https?://www\.overcomingbias\.com)"
         r"(/\d{4}/\d{2}/[a-z0-9-_%]+)"
         r"(\.html$)"
     )
@@ -526,7 +525,7 @@ def is_valid_post_short_url(url):
         True if the URL is a valid overcomingbias post short URL, and
         False otherwise.
     """
-    pattern = r"^https{0,1}://www.overcomingbias.com/\?p=\d+$"
+    pattern = r"^https?://www\.overcomingbias\.com/\?p=\d{5}$"
     return re.search(pattern, url) is not None
 
 

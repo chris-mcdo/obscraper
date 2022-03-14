@@ -82,7 +82,7 @@ def tidy_vote_count(response):
     raw_json = json.loads(response.text)
     html_soup = bs4.BeautifulSoup(raw_json["items"][0]["html"], "lxml")
 
-    pattern = r"(Rating:\s*\+{0,1})(\d+)(\s*vote)"
+    pattern = r"(Rating:\s*\+?)(\d+)(\s*vote)"
     match = re.search(pattern, html_soup.text).group(2)
 
     votes = int(match)
