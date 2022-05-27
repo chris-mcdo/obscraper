@@ -94,13 +94,13 @@ def get_comment_counts(disqus_ids_dict):
 
     Parameters
     ---------
-    disqus_ids_dict : Dict[str, str]
+    disqus_ids_dict : Dict[str, str | None]
         Dictionary whose keys are arbitrary labels (e.g. the post URLs)
         and whose values are the the corresponding Disqus ID strings.
 
     Returns
     -------
-    Dict[str, int]
+    Dict[str, int | None]
         A dictionary whose keys are the inputted labels and whose values
         are the corresponding comment counts. The comment count is "None"
         if the post is not found.
@@ -112,9 +112,9 @@ def get_comment_counts(disqus_ids_dict):
     """
     # Argument validation
     raise_exception_if_arg_is_not_type(disqus_ids_dict, dict, "disqus_ids_dict")
-    for url, number in disqus_ids_dict.items():
+    for url, disqus_id in disqus_ids_dict.items():
         raise_exception_if_arg_is_not_type(url, str, "disqus_ids_dict label")
-        raise_exception_if_disqus_id_has_incorrect_format(number)
+        raise_exception_if_disqus_id_has_incorrect_format(disqus_id)
 
     # Short-circuit if dict is empty
     if disqus_ids_dict == {}:
@@ -303,10 +303,6 @@ def raise_exception_if_number_has_incorrect_format(number):
 
 def raise_exception_if_disqus_id_has_incorrect_format(disqus_id):
     """Raise an exception if a Diqus ID has the wrong format."""
-    if not isinstance(disqus_id, str):
-        raise TypeError(
-            f"expected Disqus ID to be type str, got type {type(disqus_id)}"
-        )
     if not _extract_post.is_valid_disqus_id(disqus_id):
         raise ValueError(f"Disqus ID {disqus_id} is not valid")
 

@@ -3,8 +3,9 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from utils import (
     assert_is_valid_post,
+    is_valid_comment_count,
     is_valid_edit_or_publish_date,
-    is_valid_vote_or_comment_count,
+    is_valid_vote_count,
 )
 
 from obscraper import _scrape
@@ -26,12 +27,12 @@ def test_core_api_produces_valid_posts_votes_and_comments(edit_dates):
     sample_numbers = {name: post.number for name, post in existing_posts.items()}
     sample_votes = _scrape.get_vote_counts(sample_numbers)
     for v in sample_votes.values():
-        assert is_valid_vote_or_comment_count(v)
+        assert is_valid_vote_count(v)
 
     sample_disqus_ids = {name: post.disqus_id for name, post in existing_posts.items()}
     sample_comments = _scrape.get_comment_counts(sample_disqus_ids)
     for c in sample_comments.values():
-        assert is_valid_vote_or_comment_count(c)
+        assert is_valid_comment_count(c)
 
 
 def test_get_edit_dates_returns_expected_result(edit_dates):

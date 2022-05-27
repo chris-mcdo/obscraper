@@ -100,6 +100,9 @@ async def assemble_vote_count(async_client, number):
 @async_assembly_cache(maxsize=5000, ttl=3600)
 async def assemble_comment_count(async_client, disqus_id):
     """Download and tidy a comment count."""
+    if disqus_id is None:
+        return None
+
     raw_response = await _download.download_comment_count(async_client, disqus_id)
     tidy_item = _tidy.tidy_comment_count(raw_response)
     return tidy_item

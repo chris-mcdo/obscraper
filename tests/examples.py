@@ -2,7 +2,8 @@ from utils import tidy_us_date
 
 from obscraper._extract_post import name_to_url
 
-STANDARD_EXAMPLES = {  # first post
+STANDARD_EXAMPLES = {
+    # first post
     "2006/11/introduction": {
         "title": "How To Join",
         "author": "Robin Hanson",
@@ -53,6 +54,20 @@ STANDARD_EXAMPLES = {  # first post
         ],
         "disqus_id": "18115"
         " http://prod.ob.trike.com.au/2007/04/as-good-as-it-gets.html",
+    },
+    # post without a comment count or section
+    "2007/12/welcome-to-overcoming-bias": {
+        "title": "Welcome to Overcoming Bias!",
+        "author": "Eliezer Yudkowsky",
+        "publish_date": tidy_us_date("December 9, 2007 12:20 am"),
+        "number": 17634,
+        "tags": [],
+        "categories": ["uncategorized"],
+        "endswith": "Semantic Stopsigns",
+        "word_count": 678,
+        "internal_links": None,
+        "external_links": None,
+        "disqus_id": None,
     },
     # just before Disqus API changes
     "2009/05/we-only-need-a-handshake": {
@@ -125,12 +140,12 @@ STANDARD_EXAMPLES = {  # first post
 
 VALID_SPECIAL_CASES = [
     r"2007/01/the-procrastinator%e2%80%99s-clock",  # Unusual name example
+    "2009/02/the-most-important-thing",  # Truncated post, without comments
 ]
 
 INVALID_SPECIAL_CASES = [
     "2007/10/a-rational-argu",  # LessWrong example
     "2012/08/not-a-real-post",  # Fake example
-    "2009/02/the-most-important-thing",  # Broken post (raises AttributeError)
 ]
 
 TEST_DISQUS_IDS = {

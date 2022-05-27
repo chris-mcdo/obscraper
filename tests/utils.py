@@ -19,11 +19,11 @@ def assert_is_valid_post(test_post, votes=True, comments=True, edit_date=True):
     assert_post_standard_attributes_have_correct_types(test_post)
     assert_post_standard_attributes_have_valid_values(test_post)
     if votes:
-        assert is_valid_vote_or_comment_count(test_post.votes)
+        assert is_valid_vote_count(test_post.votes)
     else:
         assert test_post.votes is None
     if comments:
-        assert is_valid_vote_or_comment_count(test_post.comments)
+        assert is_valid_comment_count(test_post.comments)
     else:
         assert test_post.comments is None
     if edit_date:
@@ -66,9 +66,10 @@ def assert_post_standard_attributes_have_correct_types(test_post):
         "page_status",
         "page_format",
         "text_html",
-        "disqus_id",
     ]:
         assert isinstance(getattr(test_post, attr), str)
+    # str | None
+    assert isinstance(test_post.disqus_id, str) or test_post.disqus_id is None
     # datetime.datetime
     assert isinstance(test_post.publish_date, datetime.datetime)
     # int
@@ -119,8 +120,17 @@ def assert_post_standard_attributes_have_valid_values(test_post):
     assert is_valid_disqus_id(test_post.disqus_id)
 
 
-def is_valid_vote_or_comment_count(count):
+def is_valid_vote_count(count):
     if isinstance(count, int) and 0 <= count < 1000:
+        return True
+    else:
+        return False
+
+
+def is_valid_comment_count(count):
+    if count is None:
+        return True
+    elif isinstance(count, int) and 0 <= count < 1000:
         return True
     else:
         return False

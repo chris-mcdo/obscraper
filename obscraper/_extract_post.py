@@ -345,12 +345,17 @@ def extract_disqus_id(post_html):
 
     Returns
     -------
-    disqus_id : str
-        String ID used to identify the post to the Disqus API.
+    disqus_id : str | None
+        String ID used to identify the post to the Disqus API, or None if the string ID
+        is not found.
     """
     match = post_html.find(attrs={"class": "dsq-postid"})
-    raise_attribute_not_found_error_if_none(match, "Disqus ID")
-    return post_html.find(attrs={"class": "dsq-postid"})["data-dsqidentifier"]
+    try:
+        raise_attribute_not_found_error_if_none(match, "Disqus ID")
+    except _exceptions.AttributeNotFoundError:
+        return None
+    else:
+        return match["data-dsqidentifier"]
 
 
 def extract_meta_header(post_html):
@@ -576,17 +581,20 @@ def is_valid_disqus_id(disqus_id):
 
     Parameters
     ----------
-    disqus_id : str
-        A possibly valid Disqus ID string.
+    disqus_id : Any
+        A possibly valid Disqus ID.
 
     Returns
     -------
     is_valid_disqus_id : bool
-        True if the input string is a valid Disqus ID string, and False
+        True if the input string is a valid Disqus ID string (or None), and False
         otherwise.
     """
-    if not isinstance(disqus_id, str):
+    if disqus_id is None:
+        return True
+    elif not isinstance(disqus_id, str):
         return False
+
     return DISQUS_URL_PATTERN.search(disqus_id) is not None
 
 

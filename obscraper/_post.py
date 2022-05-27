@@ -2,7 +2,7 @@
 
 import dataclasses
 import datetime
-from typing import List
+from typing import List, Union
 
 from obscraper import _extract_post
 
@@ -43,7 +43,7 @@ class Post:
         List of hyperlinks to other posts. May contain duplicates.
     external_links : List[str]
         List of hyperlinks to external webpages. May contain duplicates.
-    disqus_id : str
+    disqus_id : str | None
         A string which uniquely identifies the post to the Disqus comment count API.
     votes : int, optional
         The number of votes the post has received.
@@ -68,7 +68,7 @@ class Post:
     word_count: int
     internal_links: List[str]
     external_links: List[str]
-    disqus_id: str
+    disqus_id: Union[str, None]
     votes: int = None
     comments: int = None
     edit_date: datetime.datetime = None

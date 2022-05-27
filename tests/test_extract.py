@@ -23,7 +23,8 @@ def test_extract_functions_raise_exception_for_invalid_html():
     pytest.raises(not_found, _extract_post.extract_internal_links, fake_html)
     pytest.raises(not_found, _extract_post.extract_external_links, fake_html)
     pytest.raises(not_found, _extract_post.extract_vote_auth_code, fake_html)
-    pytest.raises(not_found, _extract_post.extract_disqus_id, fake_html)
+    # no longer raises exception
+    # pytest.raises(not_found, _extract_post.extract_disqus_id, fake_html)
 
 
 class TestIsOBPostName:
@@ -108,6 +109,7 @@ class TestIsValidDisqusID:
         assert valid("18423 http://www.overcomingbias.com/?p=18423")
         assert valid("32811 http://www.overcomingbias.com/?p=32811")
         assert valid("33014 https://www.overcomingbias.com/?p=33014")
+        assert valid(None)
 
     def test_returns_false_for_invalid_ids(self):
         valid = _extract_post.is_valid_disqus_id
