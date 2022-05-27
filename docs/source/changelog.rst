@@ -5,13 +5,34 @@ Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_
 standard.
 
 
+obscraper 0.8.0 (2022-05-27)
+****************************
+
+Improvements
+############
+
+- No longer fail for posts where comments appear to be disabled. (I.e. posts without a
+  ``disqus_id``.) This applies to 4 posts:
+
+    - ``2007/12/welcome-to-overcoming-bias``
+    - ``2008/08/about-the-future-of-humanity-institute``
+    - ``2008/08/yudkowskys-book``
+    - ``2009/02/the-most-important-thing``
+
+
+Trivial/Internal Changes
+########################
+
+- Use absolute rather than relative imports for clarity.
+
+
 obscraper 0.7.0 (2022-03-14)
 ****************************
 
 Breaking changes
 ################
 
-- Post ``name``s are now formatted without the leading slash. E.g.:
+- Post ``name`` is now formatted without the leading slash. E.g.:
 
     - Before: /2009/02/the-most-important-thing
     - After: 2009/02/the-most-important-thing
