@@ -8,7 +8,7 @@ import re
 
 import bs4
 
-from . import _exceptions, _utils
+from obscraper import _exceptions, _utils
 
 OB_SERVER_TZ = "US/Eastern"
 # timezone of server generating post timestamps

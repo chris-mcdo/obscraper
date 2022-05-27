@@ -1,10 +1,10 @@
 """obscraper: scrape posts from the overcomingbias blog."""
 import logging
 
-from ._exceptions import AttributeNotFoundError, InvalidResponseError
-from ._extract_post import POST_LONG_URL_PATTERN, name_to_url, url_to_name
-from ._post import Post
-from ._scrape import (
+from obscraper._exceptions import AttributeNotFoundError, InvalidResponseError
+from obscraper._extract_post import POST_LONG_URL_PATTERN, name_to_url, url_to_name
+from obscraper._post import Post
+from obscraper._scrape import (
     clear_cache,
     get_all_posts,
     get_comment_counts,
@@ -16,7 +16,7 @@ from ._scrape import (
     get_posts_by_urls,
     get_vote_counts,
 )
-from ._serialize import PostDecoder, PostEncoder
+from obscraper._serialize import PostDecoder, PostEncoder
 
 __all__ = [
     "Post",

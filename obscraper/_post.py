@@ -4,7 +4,7 @@ import dataclasses
 import datetime
 from typing import List
 
-from . import _extract_post
+from obscraper import _extract_post
 
 
 @dataclasses.dataclass(order=False)

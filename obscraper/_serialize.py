@@ -6,7 +6,7 @@ import json
 
 import dateutil.parser
 
-from . import _post, _utils
+from obscraper import _post, _utils
 
 
 class PostEncoder(json.JSONEncoder):

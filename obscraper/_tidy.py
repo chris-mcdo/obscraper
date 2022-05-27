@@ -6,7 +6,7 @@ import re
 import bs4
 import dateutil.parser
 
-from . import _exceptions, _extract_post, _post
+from obscraper import _exceptions, _extract_post, _post
 
 
 def tidy_post(response):

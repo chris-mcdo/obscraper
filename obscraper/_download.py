@@ -7,8 +7,8 @@ import functools
 import httpx
 import trio
 
-from . import _exceptions
-from ._extract_post import name_to_url
+from obscraper import _exceptions
+from obscraper._extract_post import name_to_url
 
 INCREASE_FACTOR = 2
 MAX_DELAY = 5

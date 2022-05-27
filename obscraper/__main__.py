@@ -6,7 +6,7 @@ import sys
 
 import dateutil.parser
 
-from . import _scrape, _serialize
+from obscraper import _scrape, _serialize
 
 
 class _CustomHelpFormatter(argparse.HelpFormatter):

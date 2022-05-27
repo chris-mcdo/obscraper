@@ -9,7 +9,7 @@ from functools import partial
 import httpx
 import trio
 
-from . import _assemble, _exceptions
+from obscraper import _assemble, _exceptions
 
 logger = logging.getLogger(__name__)
 

@@ -13,7 +13,7 @@ import cachetools
 import cachetools.func
 import cachetools.keys
 
-from . import _download, _tidy
+from obscraper import _download, _tidy
 
 # Name used to update the vote auth code
 VOTE_AUTH_UPDATE_NAME = "2011/12/life-is-good"

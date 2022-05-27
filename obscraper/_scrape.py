@@ -5,7 +5,7 @@ This interface is internal - implementation details may change.
 
 import trio
 
-from . import _assemble, _exceptions, _extract_post, _fetch, _utils
+from obscraper import _assemble, _exceptions, _extract_post, _fetch, _utils
 
 
 def get_posts_by_names(names):
