@@ -303,6 +303,10 @@ def raise_exception_if_number_has_incorrect_format(number):
 
 def raise_exception_if_disqus_id_has_incorrect_format(disqus_id):
     """Raise an exception if a Diqus ID has the wrong format."""
+    if disqus_id is not None and not isinstance(disqus_id, str):
+        raise TypeError(
+            f"expected disqus_id to be type str (or None), got type {type(disqus_id)}"
+        )
     if not _extract_post.is_valid_disqus_id(disqus_id):
         raise ValueError(f"Disqus ID {disqus_id} is not valid")
 
