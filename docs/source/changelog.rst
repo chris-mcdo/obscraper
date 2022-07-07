@@ -5,6 +5,15 @@ Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_
 standard.
 
 
+obscraper 0.8.1 (2022-07-07)
+****************************
+
+Improvements
+############
+
+- Use HTTP/2 client for improved performance.
+
+
 obscraper 0.8.0 (2022-05-27)
 ****************************
 
