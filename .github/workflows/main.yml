@@ -1,11 +1,13 @@
 name: main
 
-on: [push]
+on: push
 
 jobs:
   run-tests:
     uses: chris-mcdo/obscraper/.github/workflows/run-tests.yml@main
-  
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   release:
     needs: [run-tests]
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
