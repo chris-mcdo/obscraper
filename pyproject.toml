@@ -1,10 +1,59 @@
 [build-system]
-requires = [
-  "setuptools>=45",
-  "setuptools-scm[toml]>=6.2",
-  "wheel",
-]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
-[tool.setuptools_scm]
-write_to = "obscraper/_version.py"
+[project]
+name = "obscraper"
+description = "obscraper: scrape posts from the overcomingbias blog"
+readme = "README.rst"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+keywords = ["overcomingbias", "api", "bs4"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Internet",
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+]
+dependencies = [
+    "beautifulsoup4>=4.8",
+    "httpx[http2]>=0.20.0",
+    "trio>=0.19.0",
+    "cachetools>=4.2",
+    "lxml>=3",
+    "python-dateutil>=2.7",
+    "pytz",
+]
+authors = [{ name = "Christopher McDonald", email = "cmcdonal33@gmail.com" }]
+dynamic = ["version"]
+
+
+[project.urls]
+changelog = "https://obscraper.readthedocs.io/en/stable/changelog.html"
+repository = "https://github.com/chris-mcdo/obscraper"
+issues = "https://github.com/chris-mcdo/obscraper/issues"
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-trio"]
+
+[project.scripts]
+obscraper = "obscraper.__main__:entrypoint"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "obscraper/_version.py"
+
+[tool.isort]
+profile = "black"

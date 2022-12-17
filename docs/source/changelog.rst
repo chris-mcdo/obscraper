@@ -4,6 +4,14 @@ Changelog
 Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_
 standard.
 
+obscraper 0.8.2 (2022-12-17)
+****************************
+
+Improvements
+############
+
+- Build with hatchling.
+
 
 obscraper 0.8.1 (2022-07-07)
 ****************************
