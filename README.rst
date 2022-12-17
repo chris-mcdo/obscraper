@@ -16,10 +16,6 @@ obscraper: scrape posts from the overcomingbias blog
     :target: https://pypi.org/project/obscraper/
     :alt: Supported Python Versions
 
-.. image:: https://github.com/chris-mcdo/obscraper/workflows/tests/badge.svg
-  :target: https://github.com/chris-mcdo/obscraper/actions?query=workflow%3Atests
-  :alt: Unit Tests
-
 .. image:: https://readthedocs.org/projects/obscraper/badge/?version=latest
   :target: https://obscraper.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
