@@ -5,8 +5,8 @@
    :alt: obscraper
 
 
-obscraper: scrape posts from the overcomingbias blog
-====================================================
+(ARCHIVED) obscraper: scrape posts from the overcomingbias blog
+===============================================================
 
 .. image:: https://img.shields.io/pypi/v/obscraper.svg
     :target: https://pypi.org/project/obscraper/
@@ -32,6 +32,11 @@ obscraper: scrape posts from the overcomingbias blog
   :target: https://github.com/chris-mcdo/obscraper/blob/main/LICENSE
   :alt: MIT License
 
+
+Important UPDATE:
+As of February 2023, the overcomingbias blog has moved to substack.
+As a result, this web scraper no longer works.
+Apologies for the inconvenience!
 
 ``obscraper`` lets you scrape blog posts and associated metadata from the
 `overcomingbias <https://www.overcomingbias.com/>`_ blog.

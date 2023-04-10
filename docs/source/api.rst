@@ -1,6 +1,11 @@
 Public API Reference
 ====================
 
+Important UPDATE:
+As of February 2023, the overcomingbias blog has moved to substack.
+As a result, this web scraper no longer works.
+Apologies for the inconvenience!
+
 This page contains a full reference to obscraper's public API.
 
 .. contents::

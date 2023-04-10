@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Important UPDATE:
+As of February 2023, the overcomingbias blog has moved to substack.
+As a result, this web scraper no longer works.
+Apologies for the inconvenience!
+
 Versions follow the `Semantic Versioning 2.0.0 <https://semver.org/>`_
 standard.
 

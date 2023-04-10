@@ -1,5 +1,10 @@
-obscraper: scrape posts from the overcomingbias blog
-====================================================
+(ARCHIVED) obscraper: scrape posts from the overcomingbias blog
+===============================================================
+
+Important UPDATE:
+As of February 2023, the overcomingbias blog has moved to substack.
+As a result, this web scraper no longer works.
+Apologies for the inconvenience!
 
 ``obscraper`` lets you scrape blog posts and associated metadata from the
 `overcomingbias <https://www.overcomingbias.com/>`_ blog.
